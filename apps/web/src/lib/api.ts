@@ -4,6 +4,7 @@ import type {
   EvidenceItem,
   Finding,
   FindingStatus,
+  IdentityExposure,
   RemediationPlan,
   RemediationSimulation,
   RemediationTask,
@@ -359,6 +360,11 @@ export const api = {
   /** The rules × MITRE ATT&CK × control-framework matrix (deterministic, by rule). */
   getThreatModel(): Promise<ThreatModel> {
     return request<ThreatModel>(`/api/workspaces/${ws}/threat-model`);
+  },
+
+  /** Ranked over-privileged identities + recommended access removals. */
+  getIdentities(): Promise<IdentityExposure[]> {
+    return request<IdentityExposure[]>(`/api/workspaces/${ws}/identities`);
   },
 
   /** Simulate what M365 Copilot could surface to an actor (defaults to the normal-employee persona). */

@@ -27,6 +27,7 @@ const NAV: NavGroup[] = [
       { href: "/findings", label: "Findings" },
       { href: "/graph", label: "Exposure graph" },
       { href: "/threat-model", label: "Threat model" },
+      { href: "/identities", label: "Identities" },
     ],
   },
   {

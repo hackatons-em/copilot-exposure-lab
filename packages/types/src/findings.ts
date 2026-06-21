@@ -206,6 +206,30 @@ export interface RemediationPlan {
   capped: boolean;
 }
 
+/** A recommended access removal to cut an identity's over-exposure. */
+export interface AccessRemoval {
+  /** What to remove: a group membership, a sharing link, or a direct grant. */
+  kind: "group" | "link" | "grant";
+  /** The group id / link id / grant id to act on. */
+  targetId: string;
+  label: string;
+  /** How many sensitive resources this removal would cut the identity's access to. */
+  sensitiveCut: number;
+}
+
+/** Identity-centric over-exposure: what one principal can reach, and how to trim it. */
+export interface IdentityExposure {
+  principalId: string;
+  displayName: string;
+  email?: string;
+  /** Count of sensitive resources this identity can reach. */
+  reachableSensitive: number;
+  /** 0..1 worst sensitivity reached. */
+  topSensitivity: number;
+  /** Highest-impact access removals, most-cut first. */
+  recommendations: AccessRemoval[];
+}
+
 /** Projected tenant exposure if a chosen set of findings were fixed (what-if). */
 export interface RemediationSimulation {
   baselineScore: number;

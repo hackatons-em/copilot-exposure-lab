@@ -38,6 +38,8 @@ export { generateFixScript } from "./remediation/script-generator.js";
 export type { FixScript } from "./remediation/script-generator.js";
 export { buildRemediationPlan, simulateRemediation } from "./remediation/prioritizer.js";
 export type { RemediationPlanOptions } from "./remediation/prioritizer.js";
+export { identityAudit } from "./recommendations/least-privilege.js";
+export type { IdentityAuditOptions } from "./recommendations/least-privilege.js";
 export { SCENARIO_LENSES } from "./scenarios/registry.js";
 
 export { scan, runScenario } from "./pipeline.js";

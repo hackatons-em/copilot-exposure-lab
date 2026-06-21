@@ -17,6 +17,7 @@ import {
   buildThreatModel,
   classifySensitivity,
   generateFixScript,
+  identityAudit,
   remediationFor,
   simulateCopilotAnswer,
   simulateRemediation,
@@ -413,6 +414,16 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
       throw Object.assign(new Error("no scan to simulate against"), { statusCode: 409 });
     }
     return simulateRemediation(result, findingIds);
+  });
+
+  // ── Identity least-privilege audit ─────────────────────────
+  // Ranked over-privileged identities + recommended access removals. A read.
+  app.get("/api/workspaces/:id/identities", perm("view"), async (req) => {
+    const { id } = req.params as { id: string };
+    await requireWorkspace(id);
+    const graph = await store.getTenantGraph(id);
+    if (!graph) return [];
+    return identityAudit(graph);
   });
 
   // ── Continuous monitoring: trend + drift ───────────────────
