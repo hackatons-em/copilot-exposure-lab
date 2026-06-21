@@ -13,6 +13,7 @@ import { EvidenceTimeline } from "@/components/EvidenceTimeline";
 import { ExposureGraphView } from "@/components/ExposureGraphView";
 import { ExposurePath } from "@/components/ExposurePath";
 import { FindingStatusPill } from "@/components/StatusPill";
+import { useToast } from "@/components/Toast";
 import { FixScriptPanel } from "@/components/FixScriptPanel";
 import { RemediationCard } from "@/components/RemediationCard";
 import { ScoreBreakdown } from "@/components/ScoreBreakdown";
@@ -36,6 +37,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export default function FindingDetailPage() {
   const params = useParams<{ id: string }>();
   const findingId = params.id;
+  const toast = useToast();
   const [busy, setBusy] = useState<"remediating" | "fix" | undefined>(undefined);
   const [actionError, setActionError] = useState<string | undefined>(undefined);
 
@@ -62,26 +64,32 @@ export default function FindingDetailPage() {
     setActionError(undefined);
     try {
       await api.updateFinding(findingId, { status: "remediating" });
+      toast.success("Marked as remediating.");
       reload();
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : "Update failed.");
+      const message = err instanceof Error ? err.message : "Update failed.";
+      setActionError(message);
+      toast.error(message);
     } finally {
       setBusy(undefined);
     }
-  }, [findingId, reload]);
+  }, [findingId, reload, toast]);
 
   const applyFix = useCallback(async () => {
     setBusy("fix");
     setActionError(undefined);
     try {
       await api.updateFinding(findingId, { applyFix: true });
+      toast.success("Fix applied — re-scan confirms the path is closed.");
       reload();
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : "Apply fix failed.");
+      const message = err instanceof Error ? err.message : "Apply fix failed.";
+      setActionError(message);
+      toast.error(message);
     } finally {
       setBusy(undefined);
     }
-  }, [findingId, reload]);
+  }, [findingId, reload, toast]);
 
   if (loading) {
     return <LoadingState label="Loading finding…" />;

@@ -10,6 +10,7 @@ import {
 import { formatCadence, formatDateTime, titleCase } from "@/lib/format";
 import { useAsync } from "@/lib/useAsync";
 import { useWorkspace } from "@/components/WorkspaceProvider";
+import { useToast } from "@/components/Toast";
 import { Button } from "@/components/Button";
 import { EmptyState } from "@/components/EmptyState";
 import { ErrorState, LoadingState } from "@/components/States";
@@ -33,6 +34,7 @@ const ACTION_OPTIONS: ScheduleAction[] = ["scan", "report"];
 
 export default function SchedulesPage() {
   const { dataVersion } = useWorkspace();
+  const toast = useToast();
   const { data, loading, error, reload } = useAsync<Schedule[]>(() => api.listSchedules(), [dataVersion]);
 
   const [name, setName] = useState("");
@@ -54,14 +56,17 @@ export default function SchedulesPage() {
         const body: CreateScheduleBody = { name: trimmed, action, cadenceMinutes };
         await api.createSchedule(body);
         setName("");
+        toast.success(`Schedule "${trimmed}" created.`);
         reload();
       } catch (err) {
-        setFormError(err instanceof Error ? err.message : "Could not create the schedule.");
+        const message = err instanceof Error ? err.message : "Could not create the schedule.";
+        setFormError(message);
+        toast.error(message);
       } finally {
         setCreating(false);
       }
     },
-    [action, cadenceMinutes, creating, name, reload],
+    [action, cadenceMinutes, creating, name, reload, toast],
   );
 
   const toggleEnabled = useCallback(
@@ -84,14 +89,15 @@ export default function SchedulesPage() {
       setBusyId(schedule.id);
       try {
         await api.deleteSchedule(schedule.id);
+        toast.success(`Schedule "${schedule.name}" deleted.`);
         reload();
-      } catch {
-        // ignore — reload reflects the real state
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Could not delete the schedule.");
       } finally {
         setBusyId(undefined);
       }
     },
-    [reload],
+    [reload, toast],
   );
 
   const fieldClass =

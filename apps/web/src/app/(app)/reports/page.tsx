@@ -5,6 +5,7 @@ import type { Report, ReportFormat } from "@cel/types";
 import { api } from "@/lib/api";
 import { formatDateTime } from "@/lib/format";
 import { useWorkspace } from "@/components/WorkspaceProvider";
+import { useToast } from "@/components/Toast";
 import { Button } from "@/components/Button";
 import { PageHeader } from "@/components/PageHeader";
 import { TrustCopy } from "@/components/TrustCopy";
@@ -20,6 +21,7 @@ const REPORT_SECTIONS = [
 
 export default function ReportsPage() {
   const { dataVersion } = useWorkspace();
+  const toast = useToast();
   const [format, setFormat] = useState<ReportFormat>("markdown");
   const [report, setReport] = useState<Report | undefined>(undefined);
   const [busy, setBusy] = useState(false);
@@ -31,8 +33,11 @@ export default function ReportsPage() {
     try {
       const result = await api.createReport(format);
       setReport(result);
+      toast.success(`${result.format === "html" ? "HTML" : "Markdown"} report generated.`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Report generation failed.");
+      const message = err instanceof Error ? err.message : "Report generation failed.";
+      setError(message);
+      toast.error(message);
     } finally {
       setBusy(false);
     }

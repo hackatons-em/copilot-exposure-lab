@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
 import { api } from "@/lib/api";
+import { useToast } from "./Toast";
 
 interface RunResult {
   ok: boolean;
@@ -28,6 +29,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [scanning, setScanning] = useState(false);
   const [lastRun, setLastRun] = useState<RunResult | undefined>(undefined);
   const inFlight = useRef(false);
+  const { success, error } = useToast();
 
   const ensureSeeded = useCallback(async () => {
     // Seed only when there is no connection yet, so the scan has a graph to read.
@@ -50,18 +52,19 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     try {
       await ensureSeeded();
       const summary = await api.runScan();
-      setLastRun({
-        ok: true,
-        message: `Scan complete — ${summary.findingCount} finding${summary.findingCount === 1 ? "" : "s"}.`,
-      });
+      const message = `Scan complete — ${summary.findingCount} finding${summary.findingCount === 1 ? "" : "s"}.`;
+      setLastRun({ ok: true, message });
+      success(message);
       setDataVersion((v) => v + 1);
     } catch (err) {
-      setLastRun({ ok: false, message: err instanceof Error ? err.message : "Scan failed." });
+      const message = err instanceof Error ? err.message : "Scan failed.";
+      setLastRun({ ok: false, message });
+      error(message);
     } finally {
       setScanning(false);
       inFlight.current = false;
     }
-  }, [ensureSeeded]);
+  }, [ensureSeeded, success, error]);
 
   const reseedAndScan = useCallback(async () => {
     if (inFlight.current) return;
@@ -70,18 +73,19 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     try {
       await api.seedDemo();
       const summary = await api.runScan();
-      setLastRun({
-        ok: true,
-        message: `Demo re-seeded and re-scanned — ${summary.findingCount} findings.`,
-      });
+      const message = `Demo re-seeded and re-scanned — ${summary.findingCount} findings.`;
+      setLastRun({ ok: true, message });
+      success(message);
       setDataVersion((v) => v + 1);
     } catch (err) {
-      setLastRun({ ok: false, message: err instanceof Error ? err.message : "Re-seed failed." });
+      const message = err instanceof Error ? err.message : "Re-seed failed.";
+      setLastRun({ ok: false, message });
+      error(message);
     } finally {
       setScanning(false);
       inFlight.current = false;
     }
-  }, []);
+  }, [success, error]);
 
   const bumpDataVersion = useCallback(() => setDataVersion((v) => v + 1), []);
 
