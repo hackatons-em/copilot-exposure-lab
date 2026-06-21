@@ -1,0 +1,33 @@
+name: Deploy to Azure
+
+# Manual only. Requires repo secrets:
+#   AZURE_CREDENTIALS   — output of `az ad sp create-for-rbac --sdk-auth`
+#   PG_ADMIN_PASSWORD   — PostgreSQL admin password
+on:
+  workflow_dispatch:
+    inputs:
+      resourceGroup:
+        description: Resource group
+        default: rg-cel-dev-euw
+      location:
+        description: Azure region
+        default: westeurope
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Provision + deploy
+        shell: pwsh
+        run: |
+          $sec = ConvertTo-SecureString $env:PG_ADMIN_PASSWORD -AsPlainText -Force
+          ./infra/azure/deploy.ps1 -ResourceGroup "${{ inputs.resourceGroup }}" -Location "${{ inputs.location }}" -PgAdminPassword $sec
+        env:
+          PG_ADMIN_PASSWORD: ${{ secrets.PG_ADMIN_PASSWORD }}

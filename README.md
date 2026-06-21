@@ -1,5 +1,7 @@
 # Copilot Exposure Lab
 
+[![CI](https://github.com/hackatons-em/copilot-exposure-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/hackatons-em/copilot-exposure-lab/actions/workflows/ci.yml)
+
 A Microsoft-native security product that safely tests whether **Microsoft 365 Copilot**, **Copilot Studio agents**, and existing **SharePoint / OneDrive permissions** could expose sensitive company data — then gives security teams exact evidence and remediation steps before rollout.
 
 > Run a Copilot exposure drill **before** rollout. See the evidence, fix what matters first, prove the fix.
