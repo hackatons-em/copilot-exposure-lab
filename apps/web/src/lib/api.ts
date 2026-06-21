@@ -102,6 +102,24 @@ export interface RetrievalResult {
   items: RetrievalItem[];
 }
 
+/** One sensitive document Copilot would ground on for an actor (POST /copilot-sim). */
+export interface CopilotCitation {
+  resourceId: string;
+  name: string;
+  via: string;
+  sensitivity: number;
+}
+
+/** Shape returned by POST /copilot-sim — a simulated, deterministic Copilot answer. */
+export interface CopilotAnswer {
+  actorId: string;
+  actorName: string;
+  prompt: string;
+  answer: string;
+  citations: CopilotCitation[];
+  exposed: boolean;
+}
+
 /** Headline tenant exposure (GET /exposure). */
 export interface TenantExposure {
   score: number;
@@ -289,6 +307,18 @@ export const api = {
   /** Simulate what M365 Copilot could surface to an actor (defaults to the normal-employee persona). */
   getRetrieval(actorId?: string): Promise<RetrievalResult> {
     return request<RetrievalResult>(`/api/workspaces/${ws}/retrieval${qs({ actorId })}`);
+  },
+
+  /**
+   * Simulate a Copilot answer to a prompt as a given actor. Deterministic and
+   * metadata-only: no document content is read and no LLM is called. When
+   * `actorId` is omitted the API defaults to the normal-employee persona.
+   */
+  copilotSim(prompt: string, actorId?: string): Promise<CopilotAnswer> {
+    return request<CopilotAnswer>(`/api/workspaces/${ws}/copilot-sim`, {
+      method: "POST",
+      body: JSON.stringify(actorId ? { actorId, prompt } : { prompt }),
+    });
   },
 
   /** Headline tenant exposure score (deterministic aggregate of the latest scan). */
