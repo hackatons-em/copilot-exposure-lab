@@ -1,21 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import { SITE_URL } from "@/lib/config";
 import "./globals.css";
 
-/** Body / UI typeface. */
+/**
+ * Type is system-native first (SF Pro on Apple, Segoe on Windows). Inter is loaded
+ * as the cross-platform fallback so non-Apple devices still render a clean grotesk.
+ * Display + body share the family — Apple distinguishes by size/weight, not typeface.
+ */
 const sans = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-sans",
-});
-
-/** Display typeface — headings, wordmark, big numbers. */
-const display = Space_Grotesk({
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["500", "600", "700"],
-  variable: "--font-display",
 });
 
 /** Data typeface — evidence ids, scores, paths. */
@@ -64,13 +60,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#fbfbf9",
+  themeColor: "#ffffff",
   colorScheme: "light",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${sans.variable} ${display.variable} ${mono.variable}`}>
+    <html lang="en" className={`${sans.variable} ${mono.variable}`}>
       <body className="min-h-screen bg-canvas font-sans text-ink antialiased">{children}</body>
     </html>
   );

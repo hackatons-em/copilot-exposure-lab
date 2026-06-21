@@ -11,7 +11,7 @@
 import { useInView } from "@/lib/useInView";
 
 const SCORES = [92, 84, 61, 40, 18] as const;
-const BRAND = "#4733b8";
+const BRAND = "#0071e3";
 
 export function TrendSpecimen({ className }: { className?: string }) {
   const { ref, inView } = useInView<HTMLDivElement>();

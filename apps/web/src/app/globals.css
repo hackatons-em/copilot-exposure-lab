@@ -11,6 +11,10 @@ body {
   height: 100%;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: theme("colors.canvas");
   color: theme("colors.ink.DEFAULT");
@@ -33,35 +37,35 @@ body {
     @apply text-brand;
   }
 
-  /* Crafted, brand-tinted text selection. */
+  /* Calm Apple-blue text selection. */
   ::selection {
     background-color: theme("colors.brand.soft");
-    color: theme("colors.brand.strong");
+    color: theme("colors.ink.DEFAULT");
   }
 
-  /* Consistent, visible focus affordance in the brand color. */
+  /* Consistent, visible focus affordance in the accent color. */
   :focus-visible {
     outline: 2px solid theme("colors.brand.ring");
     outline-offset: 2px;
-    border-radius: 4px;
+    border-radius: 6px;
   }
 
-  /* Subtle, instrument-grade scrollbars. */
+  /* Subtle, Apple-grey scrollbars. */
   * {
     scrollbar-width: thin;
-    scrollbar-color: #d6d5cf transparent;
+    scrollbar-color: #c7c7cc transparent;
   }
   ::-webkit-scrollbar {
     width: 11px;
     height: 11px;
   }
   ::-webkit-scrollbar-thumb {
-    background-color: #d6d5cf;
+    background-color: #c7c7cc;
     border-radius: 999px;
     border: 3px solid theme("colors.canvas");
   }
   ::-webkit-scrollbar-thumb:hover {
-    background-color: #c4c3bb;
+    background-color: #aeaeb2;
   }
   ::-webkit-scrollbar-track {
     background: transparent;
@@ -69,17 +73,15 @@ body {
 }
 
 @layer components {
-  /* Faint dot-grid texture behind the app canvas — kills the "flat default" feel
-     without being busy. ~3% contrast dots on the warm paper. */
+  /* Retired: the dot-grid texture read as a generic "startup moodboard". Kept as a
+     no-op so any lingering class usage renders nothing — Apple-clean relies on
+     whitespace + hairlines, not texture. */
   .bg-dotgrid {
-    background-image: radial-gradient(rgba(16, 16, 26, 0.045) 1px, transparent 1px);
-    background-size: 22px 22px;
-    background-position: -1px -1px;
   }
 
   /* Section eyebrow — uppercase, letter-spaced micro-label. */
   .eyebrow {
-    @apply text-xs font-medium uppercase tracking-wider text-ink-faint;
+    @apply text-xs font-medium uppercase tracking-wide text-ink-faint;
   }
 
   /* Marquee track: duplicate the children inside, so a -50% translate loops

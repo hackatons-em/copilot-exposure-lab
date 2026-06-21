@@ -41,7 +41,7 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
             marginTop: 24,
             border: "none",
             borderRadius: 10,
-            backgroundColor: "#4733b8",
+            backgroundColor: "#0071e3",
             color: "#fff",
             fontSize: 14,
             fontWeight: 500,

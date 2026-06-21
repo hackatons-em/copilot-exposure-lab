@@ -35,14 +35,14 @@ export function TrendChart({ snapshots }: { snapshots: ScanSnapshot[] }) {
       <svg viewBox={`0 0 ${w} ${h}`} className="w-full" role="img" aria-label="Exposure score over time">
         <defs>
           <linearGradient id="trend-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#4733b8" stopOpacity={0.16} />
-            <stop offset="100%" stopColor="#4733b8" stopOpacity={0} />
+            <stop offset="0%" stopColor="#0071e3" stopOpacity={0.16} />
+            <stop offset="100%" stopColor="#0071e3" stopOpacity={0} />
           </linearGradient>
         </defs>
         <path d={area} fill="url(#trend-fill)" />
-        <path d={line} fill="none" stroke="#4733b8" strokeWidth={2} strokeLinejoin="round" />
+        <path d={line} fill="none" stroke="#0071e3" strokeWidth={2} strokeLinejoin="round" />
         {coords.map((c, i) => (
-          <circle key={i} cx={c.x} cy={c.y} r={2.5} fill="#4733b8" stroke="#ffffff" strokeWidth={1.5} />
+          <circle key={i} cx={c.x} cy={c.y} r={2.5} fill="#0071e3" stroke="#ffffff" strokeWidth={1.5} />
         ))}
       </svg>
       <div className="mt-1.5 flex justify-between font-mono text-[11px] tabular-nums text-ink-faint">

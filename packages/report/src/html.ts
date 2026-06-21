@@ -83,7 +83,7 @@ function topRisks(model: ReportModel): string {
   const items = model.topRisks
     .map((r) => {
       const mitre = r.techniqueIds.length
-        ? ` <span class="mitre" style="font-size:11px;color:#4733b8">${r.techniqueIds.map(esc).join(", ")}</span>`
+        ? ` <span class="mitre" style="font-size:11px;color:#0071e3">${r.techniqueIds.map(esc).join(", ")}</span>`
         : "";
       return `<li><strong>${esc(r.title)}</strong> ${badge(r.band)} <span class="score">${r.score}/100</span>${mitre}<br><span style="font-size:13px;color:#4a5160">${esc(
         r.businessImpact,

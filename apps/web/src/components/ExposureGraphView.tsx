@@ -40,7 +40,7 @@ const BAND_COLOR: Record<Band, string> = {
   info: "#56565f",
 };
 
-const BRAND = "#4733b8";
+const BRAND = "#0071e3";
 const BORDER = "#e6e5df";
 const INK = "#16161a";
 

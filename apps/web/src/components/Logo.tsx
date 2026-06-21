@@ -40,26 +40,26 @@ function ExposureMark({ size }: { size: number }) {
       className="shrink-0"
     >
       {/* Origin node — the tenant. */}
-      <circle cx="9" cy="23" r="3" fill="#4733b8" />
+      <circle cx="9" cy="23" r="3" fill="#0071e3" />
       {/* Concentric exposure arcs sweeping outward from the origin. */}
       <path
         d="M9 14.5A8.5 8.5 0 0 1 17.5 23"
-        stroke="#4733b8"
+        stroke="#0071e3"
         strokeWidth="2"
         strokeLinecap="round"
         opacity="0.85"
       />
       <path
         d="M9 8.5A14.5 14.5 0 0 1 23.5 23"
-        stroke="#4733b8"
+        stroke="#0071e3"
         strokeWidth="2"
         strokeLinecap="round"
         opacity="0.45"
       />
       {/* Breach line: the path that reaches the exposed node. */}
-      <path d="M11.1 20.9 22 10" stroke="#4733b8" strokeWidth="2" strokeLinecap="round" />
+      <path d="M11.1 20.9 22 10" stroke="#0071e3" strokeWidth="2" strokeLinecap="round" />
       {/* The exposed node — broken containment, hollow + ringed. */}
-      <circle cx="23.5" cy="8.5" r="3.5" fill="#fbfbf9" stroke="#4733b8" strokeWidth="2" />
+      <circle cx="23.5" cy="8.5" r="3.5" fill="#fbfbf9" stroke="#0071e3" strokeWidth="2" />
       <circle cx="23.5" cy="8.5" r="1.25" fill="#c0362c" />
     </svg>
   );
