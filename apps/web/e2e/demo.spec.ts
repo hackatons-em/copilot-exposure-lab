@@ -73,3 +73,45 @@ test("reports page generates a downloadable report", async ({ page }) => {
   // A download link appears once the report is ready (best-effort, tolerant timeout).
   await expect(page.getByRole("link", { name: /download/i }).first()).toBeVisible({ timeout: 20000 });
 });
+
+test("overview gauge shows the peer percentile", async ({ page }) => {
+  await page.goto("/overview");
+  await ensureAssessment(page);
+  await expect(page.getByText(/more exposed than/i).first()).toBeVisible(VISIBLE);
+});
+
+test("threat model page renders the rules × ATT&CK matrix", async ({ page }) => {
+  await page.goto("/threat-model");
+  await expect(page.getByRole("heading", { name: /^Threat model$/ })).toBeVisible(VISIBLE);
+  await expect(page.getByText("Coverage matrix").first()).toBeVisible(VISIBLE);
+  // A known MITRE technique id from the catalog.
+  await expect(page.getByText("T1213.002").first()).toBeVisible(VISIBLE);
+});
+
+test("finding detail generates an advisory fix script + shows threat/confidence", async ({ page }) => {
+  await page.goto("/overview");
+  await ensureAssessment(page);
+  await page
+    .getByRole("link", { name: /shared through an organization-wide link/i })
+    .first()
+    .click();
+  await expect(page).toHaveURL(/\/findings\/.+/, VISIBLE);
+
+  // Threat & controls panel + confidence are folded into the detail.
+  await expect(page.getByRole("heading", { name: /Threat & controls/i })).toBeVisible(VISIBLE);
+  await expect(page.getByText(/Confidence/).first()).toBeVisible(VISIBLE);
+
+  // Lazy "Generate fix script" → a real cmdlet appears.
+  await page.getByRole("button", { name: /generate fix script/i }).click();
+  await expect(page.getByText(/Remove-MgDriveItemPermission/).first()).toBeVisible(VISIBLE);
+});
+
+test("marketing trust + research pages render", async ({ page }) => {
+  await page.goto("/security");
+  await expect(page.getByText("User.Read.All").first()).toBeVisible(VISIBLE);
+
+  await page.goto("/research");
+  await expect(
+    page.getByRole("heading", { name: /The State of Copilot Exposure/i }),
+  ).toBeVisible(VISIBLE);
+});
