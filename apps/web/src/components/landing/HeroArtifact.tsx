@@ -93,10 +93,10 @@ function ScoreArc() {
 export function HeroArtifact() {
   return (
     <div className="relative">
-      {/* Soft iris halo behind the card for depth. */}
+      {/* Soft iris halo behind the card for depth — drifts gently (motion-safe). */}
       <div
         aria-hidden
-        className="absolute -inset-6 -z-10 rounded-[28px] bg-brand-soft/60 blur-2xl"
+        className="absolute -inset-6 -z-10 rounded-[28px] bg-brand-soft/60 blur-2xl animate-float"
       />
 
       <figure className="overflow-hidden rounded-lg border border-hairline bg-surface shadow-elevation-lg">

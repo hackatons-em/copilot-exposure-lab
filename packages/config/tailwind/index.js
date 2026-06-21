@@ -102,6 +102,45 @@ const preset = {
       letterSpacing: {
         tightest: "-0.02em",
       },
+      transitionTimingFunction: {
+        // The expressive ease used by the guided demo — reuse for premium motion.
+        spring: "cubic-bezier(0.16, 1, 0.3, 1)",
+      },
+      keyframes: {
+        // Gentle vertical drift for the hero halo / floating accents.
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
+        // Continuous left scroll for the integration/credibility marquee. The
+        // track duplicates its content, so -50% loops seamlessly.
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+        // Sweeping highlight — used on "live"/processing affordances.
+        shimmer: {
+          "0%": { backgroundPosition: "-150% 0" },
+          "100%": { backgroundPosition: "250% 0" },
+        },
+        // Left-anchored fill for the product-tour auto-advance progress sliver.
+        progress: {
+          from: { transform: "scaleX(0)" },
+          to: { transform: "scaleX(1)" },
+        },
+        // Soft entrance for cross-faded panels.
+        "fade-in": {
+          from: { opacity: "0", transform: "translateY(6px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+      },
+      animation: {
+        float: "float 6s ease-in-out infinite",
+        marquee: "marquee 32s linear infinite",
+        shimmer: "shimmer 2.4s linear infinite",
+        progress: "progress 6000ms linear forwards",
+        "fade-in": "fade-in 420ms cubic-bezier(0.16,1,0.3,1) both",
+      },
     },
   },
   plugins: [],

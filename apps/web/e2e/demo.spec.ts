@@ -115,3 +115,35 @@ test("marketing trust + research pages render", async ({ page }) => {
     page.getByRole("heading", { name: /The State of Copilot Exposure/i }),
   ).toBeVisible(VISIBLE);
 });
+
+test("landing shows the product tour and pricing teaser", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: /The whole drill, on one screen/i })).toBeVisible(VISIBLE);
+  // Tour tab rail + pricing teaser CTA.
+  await expect(page.getByRole("button", { name: /Attack graph/i }).first()).toBeVisible(VISIBLE);
+  await expect(page.getByRole("link", { name: /See full pricing/i })).toBeVisible(VISIBLE);
+});
+
+test("product tour switches panels on tab click", async ({ page }) => {
+  await page.goto("/");
+  const tour = page.locator("#product");
+  await tour.scrollIntoViewIfNeeded();
+  await page.getByRole("button", { name: /Find \+ Fix/i }).first().click();
+  // The fix-script specimen shows a real cmdlet once that tab is active.
+  await expect(page.getByText(/Remove-MgDriveItemPermission/).first()).toBeVisible(VISIBLE);
+});
+
+test("/product page tours every surface", async ({ page }) => {
+  await page.goto("/product");
+  await expect(page.getByRole("heading", { name: /Every surface of the drill/i })).toBeVisible(VISIBLE);
+  await expect(page.getByRole("heading", { name: /The exact path to the data/i })).toBeVisible(VISIBLE);
+});
+
+test("/pricing shows the three tiers and comparison", async ({ page }) => {
+  await page.goto("/pricing");
+  await expect(page.getByRole("heading", { name: /Start free\. Scale to always-on\./i })).toBeVisible(VISIBLE);
+  for (const tier of ["Free", "Team", "Enterprise"]) {
+    await expect(page.getByRole("heading", { name: new RegExp(`^${tier}$`) }).first()).toBeVisible(VISIBLE);
+  }
+  await expect(page.getByRole("heading", { name: /Compare plans/i })).toBeVisible(VISIBLE);
+});
