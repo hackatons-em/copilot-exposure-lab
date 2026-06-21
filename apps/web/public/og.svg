@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none" font-family="Inter, Segoe UI, system-ui, sans-serif">
+  <defs>
+    <pattern id="dots" width="32" height="32" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.5" fill="#10101a" opacity="0.05"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="#fbfbf9"/>
+  <rect width="1200" height="630" fill="url(#dots)"/>
+
+  <!-- mark -->
+  <g transform="translate(72,64) scale(1.4)">
+    <circle cx="9" cy="23" r="3" fill="#4733b8"/>
+    <path d="M9 14.5A8.5 8.5 0 0 1 17.5 23" stroke="#4733b8" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
+    <path d="M9 8.5A14.5 14.5 0 0 1 23.5 23" stroke="#4733b8" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+    <path d="M11.1 20.9 22 10" stroke="#4733b8" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="23.5" cy="8.5" r="3.5" fill="#fbfbf9" stroke="#4733b8" stroke-width="2"/>
+    <circle cx="23.5" cy="8.5" r="1.25" fill="#c0362c"/>
+  </g>
+  <text x="128" y="92" font-size="24" font-weight="600" letter-spacing="4" fill="#56565f">EXPOSURE LAB</text>
+
+  <!-- headline -->
+  <text x="72" y="318" font-size="72" font-weight="700" letter-spacing="-1.4" fill="#16161a">Know what Copilot would expose —</text>
+  <text x="72" y="398" font-size="72" font-weight="700" letter-spacing="-1.4" fill="#4733b8">before you turn it on.</text>
+
+  <!-- subhead -->
+  <text x="72" y="466" font-size="30" fill="#56565f">Evidence-backed findings, a deterministic 0–100 score, and the exact Microsoft fix.</text>
+
+  <!-- footer -->
+  <circle cx="79" cy="556" r="6" fill="#4733b8"/>
+  <text x="96" y="563" font-size="22" fill="#9795a0">Read-only · metadata-only · Microsoft-native</text>
+</svg>
