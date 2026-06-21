@@ -1,4 +1,4 @@
-import { createDb } from "@cel/db";
+import { createDb, runMigrations } from "@cel/db";
 import { buildApp } from "./app.js";
 import { DrizzleStore } from "./store/drizzle.js";
 import { MemoryStore } from "./store/memory.js";
@@ -15,6 +15,9 @@ async function bootstrapDemo(store: Store): Promise<void> {
 
 async function main(): Promise<void> {
   const url = process.env.DATABASE_URL;
+  if (url && process.env.RUN_MIGRATIONS === "true") {
+    await runMigrations(url);
+  }
   const store: Store = url ? new DrizzleStore(createDb(url)) : new MemoryStore();
   await bootstrapDemo(store);
 
