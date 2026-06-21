@@ -75,6 +75,8 @@ export async function dispatch(ctx: JobContext, job: Job): Promise<JobResult> {
         return { ok: false, error: `unknown job type: ${job.type}` };
     }
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : String(err) };
+    // Keep the job runner resilient, but preserve the stack for production debugging.
+    const error = err instanceof Error ? (err.stack ?? err.message) : String(err);
+    return { ok: false, error };
   }
 }

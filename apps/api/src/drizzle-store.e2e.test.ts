@@ -85,3 +85,55 @@ describe("DrizzleStore over a real (pglite) Postgres", () => {
     expect(await store.listFindings("ws-pg")).toHaveLength(0);
   });
 });
+
+describe("DrizzleStore — schedule CRUD (store level)", () => {
+  beforeAll(async () => {
+    await store.createWorkspace({ id: "ws-sched", name: "Schedule Co" });
+  });
+
+  it("creates a schedule with a default next run", async () => {
+    const s = await store.createSchedule("ws-sched", { name: "Nightly scan", cadenceMinutes: 60 });
+    expect(s.id).toMatch(/^sch-/);
+    expect(s.action).toBe("scan");
+    expect(s.enabled).toBe(true);
+    expect(s.nextRunAt).toBeTruthy();
+    expect(await store.listSchedules("ws-sched")).toHaveLength(1);
+  });
+
+  it("updates a schedule (rename + disable)", async () => {
+    const [s] = await store.listSchedules("ws-sched");
+    const updated = await store.updateSchedule("ws-sched", s!.id, { name: "Weekly report", enabled: false });
+    expect(updated!.name).toBe("Weekly report");
+    expect(updated!.enabled).toBe(false);
+  });
+
+  it("excludes disabled schedules from the due set, includes enabled past-due ones", async () => {
+    // The one above is disabled — never due. Add an enabled one already past due.
+    const due = await store.createSchedule("ws-sched", {
+      name: "Past due",
+      cadenceMinutes: 30,
+      nextRunAt: "2000-01-01T00:00:00.000Z",
+    });
+    const dueNow = await store.dueSchedules("2026-06-21T00:00:00.000Z");
+    const ids = dueNow.map((d) => d.id);
+    expect(ids).toContain(due.id);
+    expect(dueNow.every((d) => d.enabled)).toBe(true);
+  });
+
+  it("advances nextRunAt after a run", async () => {
+    const [s] = (await store.listSchedules("ws-sched")).filter((x) => x.enabled);
+    const next = "2026-07-01T00:00:00.000Z";
+    await store.markScheduleRan(s!.id, "2026-06-21T00:00:00.000Z", next);
+    const after = (await store.listSchedules("ws-sched")).find((x) => x.id === s!.id);
+    // Postgres normalizes the timestamp text, so compare by instant, not exact string.
+    expect(new Date(after!.nextRunAt).getTime()).toBe(new Date(next).getTime());
+    expect(new Date(after!.lastRunAt!).getTime()).toBe(new Date("2026-06-21T00:00:00.000Z").getTime());
+  });
+
+  it("deletes a schedule", async () => {
+    const before = await store.listSchedules("ws-sched");
+    const ok = await store.deleteSchedule("ws-sched", before[0]!.id);
+    expect(ok).toBe(true);
+    expect(await store.listSchedules("ws-sched")).toHaveLength(before.length - 1);
+  });
+});

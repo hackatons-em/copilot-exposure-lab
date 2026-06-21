@@ -71,7 +71,8 @@ export class DrizzleStore implements Store {
     const row = { id: input.id ?? `ws-${randomUUID()}`, name: input.name };
     await this.db.insert(workspaces).values(row);
     const ws = await this.getWorkspace(row.id);
-    return ws!;
+    if (!ws) throw new Error(`createWorkspace: workspace ${row.id} not found immediately after insert`);
+    return ws;
   }
 
   async listWorkspaces(): Promise<Workspace[]> {
@@ -577,7 +578,8 @@ export class DrizzleStore implements Store {
     };
     await this.db.insert(schedulesTable).values(row);
     const [created] = await this.db.select().from(schedulesTable).where(eq(schedulesTable.id, row.id));
-    return this.toSchedule(created!);
+    if (!created) throw new Error(`createSchedule: schedule ${row.id} not found immediately after insert`);
+    return this.toSchedule(created);
   }
 
   async listSchedules(workspaceId: string): Promise<Schedule[]> {
