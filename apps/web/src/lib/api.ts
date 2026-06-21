@@ -225,6 +225,14 @@ export interface ThreatModel {
   controls: ControlRef[];
 }
 
+/** The exact advisory remediation script for a finding (GET /findings/:id/fix-script). */
+export interface FixScript {
+  language: "powershell";
+  tooling: string;
+  script: string;
+  caveats: string[];
+}
+
 const ws = WORKSPACE_ID;
 
 /**
@@ -378,6 +386,11 @@ export const api = {
 
   getFinding(findingId: string): Promise<FindingDetail> {
     return request<FindingDetail>(`/api/workspaces/${ws}/findings/${encodeURIComponent(findingId)}`);
+  },
+
+  /** The exact advisory Microsoft fix script for a finding (generated, never executed). */
+  getFixScript(findingId: string): Promise<FixScript> {
+    return request<FixScript>(`/api/workspaces/${ws}/findings/${encodeURIComponent(findingId)}/fix-script`);
   },
 
   updateFinding(findingId: string, patch: { status?: FindingStatus; applyFix?: boolean }): Promise<Finding> {

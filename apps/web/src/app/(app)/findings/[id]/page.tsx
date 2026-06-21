@@ -13,6 +13,7 @@ import { EvidenceTimeline } from "@/components/EvidenceTimeline";
 import { ExposureGraphView } from "@/components/ExposureGraphView";
 import { ExposurePath } from "@/components/ExposurePath";
 import { FindingStatusPill } from "@/components/StatusPill";
+import { FixScriptPanel } from "@/components/FixScriptPanel";
 import { RemediationCard } from "@/components/RemediationCard";
 import { ScoreBreakdown } from "@/components/ScoreBreakdown";
 import { ThreatChips } from "@/components/ThreatChips";
@@ -167,6 +168,8 @@ export default function FindingDetailPage() {
                 {resolved ? "Fix verified" : "Apply fix & re-verify"}
               </Button>
             </div>
+
+            <FixScriptPanel findingId={finding.id} />
           </Section>
         </div>
 

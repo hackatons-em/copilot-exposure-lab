@@ -14,6 +14,8 @@ import {
   allRules,
   buildExposureGraphModel,
   buildThreatModel,
+  generateFixScript,
+  remediationFor,
   simulateCopilotAnswer,
   simulateRetrieval,
   tenantExposureScore,
@@ -410,6 +412,16 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     const detail = await store.getFinding(id, fid);
     if (!detail) throw Object.assign(new Error("finding not found"), { statusCode: 404 });
     return detail;
+  });
+
+  // The exact, copy-pasteable Microsoft fix for a finding, wired to its real source
+  // ids. ADVISORY — generated, never executed by the product. A read (no audit).
+  app.get("/api/workspaces/:id/findings/:fid/fix-script", perm("view"), async (req) => {
+    const { id, fid } = req.params as { id: string; fid: string };
+    await requireWorkspace(id);
+    const detail = await store.getFinding(id, fid);
+    if (!detail) throw Object.assign(new Error("finding not found"), { statusCode: 404 });
+    return generateFixScript(detail.finding, detail.evidence, remediationFor(detail.finding.ruleId));
   });
 
   app.patch("/api/workspaces/:id/findings/:fid", perm("scan"), async (req) => {
