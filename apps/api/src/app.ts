@@ -12,6 +12,7 @@ import {
 import { EXPORT_FORMATS, isExportFormat, runExport } from "@cel/integrations";
 import {
   allRules,
+  buildAgentInventory,
   buildExposureGraphModel,
   buildRemediationPlan,
   buildThreatModel,
@@ -424,6 +425,16 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     const graph = await store.getTenantGraph(id);
     if (!graph) return [];
     return identityAudit(graph);
+  });
+
+  // ── Copilot agent governance inventory ─────────────────────
+  app.get("/api/workspaces/:id/agents", perm("view"), async (req) => {
+    const { id } = req.params as { id: string };
+    await requireWorkspace(id);
+    const graph = await store.getTenantGraph(id);
+    const result = await store.getScanResult(id);
+    if (!graph || !result) return [];
+    return buildAgentInventory(graph, result);
   });
 
   // ── Continuous monitoring: trend + drift ───────────────────

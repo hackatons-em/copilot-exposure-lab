@@ -1,4 +1,5 @@
 import type {
+  AgentSummary,
   AuditEvent,
   ControlRef,
   EvidenceItem,
@@ -365,6 +366,11 @@ export const api = {
   /** Ranked over-privileged identities + recommended access removals. */
   getIdentities(): Promise<IdentityExposure[]> {
     return request<IdentityExposure[]>(`/api/workspaces/${ws}/identities`);
+  },
+
+  /** Copilot Studio agent governance inventory (capabilities, owner, findings). */
+  getAgents(): Promise<AgentSummary[]> {
+    return request<AgentSummary[]>(`/api/workspaces/${ws}/agents`);
   },
 
   /** Simulate what M365 Copilot could surface to an actor (defaults to the normal-employee persona). */

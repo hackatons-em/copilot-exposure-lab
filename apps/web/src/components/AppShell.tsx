@@ -35,6 +35,7 @@ const NAV: NavGroup[] = [
     items: [
       { href: "/scenarios", label: "Scenarios" },
       { href: "/copilot-sim", label: "Copilot sim" },
+      { href: "/agents", label: "Agents" },
       { href: "/resources", label: "Resources" },
     ],
   },

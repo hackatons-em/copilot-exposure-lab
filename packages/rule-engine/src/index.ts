@@ -40,6 +40,7 @@ export { buildRemediationPlan, simulateRemediation } from "./remediation/priorit
 export type { RemediationPlanOptions } from "./remediation/prioritizer.js";
 export { identityAudit } from "./recommendations/least-privilege.js";
 export type { IdentityAuditOptions } from "./recommendations/least-privilege.js";
+export { buildAgentInventory } from "./agents/inventory.js";
 export { SCENARIO_LENSES } from "./scenarios/registry.js";
 
 export { scan, runScenario } from "./pipeline.js";

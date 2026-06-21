@@ -206,6 +206,27 @@ export interface RemediationPlan {
   capped: boolean;
 }
 
+/** One row of the Copilot Studio agent governance inventory. */
+export interface AgentSummary {
+  id: string;
+  name: string;
+  ownerId?: string;
+  ownerName: string;
+  /** False when the owner is missing or a disabled/departed account (orphaned). */
+  ownerActive: boolean;
+  /** Declared agent actions, e.g. "mail.send", "external.connector". */
+  actions: string[];
+  connectors: string[];
+  authMode?: string;
+  publication?: string;
+  /** Worst severity band among this agent's findings ("info" when it has none). */
+  riskBand: Band;
+  findingIds: string[];
+  findingCount: number;
+  /** True when the agent can send mail / call external or webhook/SQL connectors (egress path). */
+  hasEgress: boolean;
+}
+
 /** A recommended access removal to cut an identity's over-exposure. */
 export interface AccessRemoval {
   /** What to remove: a group membership, a sharing link, or a direct grant. */
