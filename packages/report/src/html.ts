@@ -188,7 +188,7 @@ export function renderHtml(model: ReportModel): string {
   const proof =
     model.resolved.length === 0
       ? "<p><em>No findings have been remediated and re-verified yet.</em></p>"
-      : `<ul>${model.resolved.map((rf) => `<li>✅ <strong>${esc(rf.finding.title)}</strong> — re-scan confirms the exposure path is closed.</li>`).join("")}</ul>`;
+      : `<ul>${model.resolved.map((rf) => `<li><span style="color:#2f6f4f;font-weight:600">Resolved</span> &mdash; <strong>${esc(rf.finding.title)}</strong>: re-scan confirms the exposure path is closed.</li>`).join("")}</ul>`;
 
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><title>${esc(model.title)}</title>

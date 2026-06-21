@@ -212,7 +212,7 @@ export function renderMarkdown(model: ReportModel): string {
     out.push("_No findings have been remediated and re-verified yet._");
   } else {
     for (const rf of model.resolved) {
-      out.push(`- ✅ **${rf.finding.title}** — re-scan confirms the exposure path is closed.`);
+      out.push(`- **Resolved** — ${rf.finding.title}: re-scan confirms the exposure path is closed.`);
     }
   }
   out.push("");

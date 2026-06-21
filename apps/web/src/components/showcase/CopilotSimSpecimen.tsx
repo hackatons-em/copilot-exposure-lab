@@ -9,6 +9,7 @@
  * data — the exchange is fixed. Reduced-motion-safe via the shared hook.
  */
 import { useInView } from "@/lib/useInView";
+import { AlertIcon } from "@/components/icons";
 
 const SENSITIVITY = 0.9;
 const CRITICAL = "#c0362c";
@@ -70,7 +71,7 @@ export function CopilotSimSpecimen({ className }: { className?: string }) {
           >
             <div className="flex items-center gap-1.5">
               <span aria-hidden className="text-severity-high">
-                ⚠
+                <AlertIcon size={13} />
               </span>
               <span className="text-[11px] font-semibold uppercase tracking-wide text-severity-high">
                 Exposed source surfaced to the prompt

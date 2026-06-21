@@ -5,6 +5,7 @@ import type { Scenario } from "@cel/types";
 import { api, ApiError, type CopilotAnswer } from "@/lib/api";
 import { useAsync } from "@/lib/useAsync";
 import { useWorkspace } from "@/components/WorkspaceProvider";
+import { AlertIcon } from "@/components/icons";
 import { Button } from "@/components/Button";
 import { EmptyState } from "@/components/EmptyState";
 import { ErrorState } from "@/components/States";
@@ -88,7 +89,9 @@ function CopilotResponse({ answer }: { answer: CopilotAnswer }) {
       {answer.exposed ? (
         <div className="mt-3 rounded-md border border-severity-critical/30 bg-severity-critical/5 p-3">
           <p className="flex items-center gap-1.5 text-xs font-semibold text-severity-critical">
-            <span aria-hidden>⚠</span>
+            <span aria-hidden>
+              <AlertIcon size={13} />
+            </span>
             {answer.citations.length} sensitive document
             {answer.citations.length === 1 ? "" : "s"} this user can reach
           </p>

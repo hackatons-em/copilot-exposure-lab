@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { api, type FixScript } from "@/lib/api";
+import { AlertIcon, CheckIcon } from "./icons";
 import { Button } from "./Button";
 
 /**
@@ -54,7 +55,13 @@ export function FixScriptPanel({ findingId }: { findingId: string }) {
           </Button>
         ) : (
           <Button variant="secondary" onClick={() => void copy()}>
-            {copied ? "Copied ✓" : "Copy"}
+            {copied ? (
+              <span className="inline-flex items-center gap-1.5">
+                <CheckIcon size={14} /> Copied
+              </span>
+            ) : (
+              "Copy"
+            )}
           </Button>
         )}
       </div>
@@ -74,8 +81,8 @@ export function FixScriptPanel({ findingId }: { findingId: string }) {
           <ul className="mt-2 space-y-1">
             {fix.caveats.map((c) => (
               <li key={c} className="flex gap-1.5 text-[11px] leading-relaxed text-ink-faint">
-                <span aria-hidden className="text-severity-medium">
-                  ⚠
+                <span aria-hidden className="mt-px shrink-0 text-severity-medium">
+                  <AlertIcon size={12} />
                 </span>
                 {c}
               </li>

@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ComponentType } from "react";
 import type { Band } from "@cel/types";
 import { api, type ExposureGraphModel } from "@/lib/api";
 import { BAND_ORDER, titleCase } from "@/lib/format";
 import { useAsync } from "@/lib/useAsync";
 import { useWorkspace } from "@/components/WorkspaceProvider";
+import { AgentIcon, FileIcon, GroupIcon, type IconProps, LinkIcon, SiteIcon, UserIcon } from "@/components/icons";
 import { Button } from "@/components/Button";
 import { EmptyState } from "@/components/EmptyState";
 import { ErrorState, LoadingState } from "@/components/States";
@@ -25,13 +26,13 @@ const BAND_COLOR: Record<Band, string> = {
 };
 
 /** Node-type legend (icon + label). */
-const NODE_LEGEND: { icon: string; label: string }[] = [
-  { icon: "👤", label: "User" },
-  { icon: "👥", label: "Group" },
-  { icon: "🔗", label: "Link" },
-  { icon: "📄", label: "File" },
-  { icon: "🗂", label: "Site / drive" },
-  { icon: "🤖", label: "Agent" },
+const NODE_LEGEND: { Icon: ComponentType<IconProps>; label: string }[] = [
+  { Icon: UserIcon, label: "User" },
+  { Icon: GroupIcon, label: "Group" },
+  { Icon: LinkIcon, label: "Link" },
+  { Icon: FileIcon, label: "File" },
+  { Icon: SiteIcon, label: "Site / drive" },
+  { Icon: AgentIcon, label: "Agent" },
 ];
 
 function Legend() {
@@ -39,10 +40,12 @@ function Legend() {
     <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-lg border border-hairline bg-surface px-4 py-3 text-xs shadow-elevation">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span className="eyebrow">Nodes</span>
-        {NODE_LEGEND.map((item) => (
-          <span key={item.label} className="inline-flex items-center gap-1.5 text-ink-soft">
-            <span aria-hidden>{item.icon}</span>
-            {item.label}
+        {NODE_LEGEND.map(({ Icon, label }) => (
+          <span key={label} className="inline-flex items-center gap-1.5 text-ink-soft">
+            <span aria-hidden className="text-ink-faint">
+              <Icon size={14} />
+            </span>
+            {label}
           </span>
         ))}
       </div>

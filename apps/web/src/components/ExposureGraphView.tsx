@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type ComponentType } from "react";
 import Dagre from "@dagrejs/dagre";
 import {
   Background,
@@ -17,6 +17,20 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import type { ExposureGraphEdge, ExposureGraphModel, ExposureGraphNode } from "@/lib/api";
+import {
+  ActionIcon,
+  AgentIcon,
+  ConnectorIcon,
+  DriveIcon,
+  FileIcon,
+  FolderIcon,
+  GroupIcon,
+  type IconProps,
+  LinkIcon,
+  PermissionIcon,
+  SiteIcon,
+  UserIcon,
+} from "@/components/icons";
 
 /**
  * Visual attack/exposure graph. Lays the model out left→right with dagre, then
@@ -44,19 +58,19 @@ const BRAND = "#0071e3";
 const BORDER = "#e6e5df";
 const INK = "#16161a";
 
-/** Small visual prefix per node type. */
-const TYPE_ICON: Record<ExposureGraphNode["type"], string> = {
-  user: "👤",
-  group: "👥",
-  link: "🔗",
-  file: "📄",
-  folder: "🗂",
-  site: "🗂",
-  drive: "🗂",
-  agent: "🤖",
-  connector: "🔌",
-  permission: "🔐",
-  action: "⚡",
+/** Bespoke thin-stroke icon per node type (no emoji). */
+const TYPE_ICON: Record<ExposureGraphNode["type"], ComponentType<IconProps>> = {
+  user: UserIcon,
+  group: GroupIcon,
+  link: LinkIcon,
+  file: FileIcon,
+  folder: FolderIcon,
+  site: SiteIcon,
+  drive: DriveIcon,
+  agent: AgentIcon,
+  connector: ConnectorIcon,
+  permission: PermissionIcon,
+  action: ActionIcon,
 };
 
 /** Resource-ish node types — these are the "things reached", highlighted when critical. */
@@ -104,8 +118,11 @@ function ExposureNode({ data }: NodeProps<ExposureFlowNode>) {
       {/* Handles are present so edges connect, but no interactive connecting is offered. */}
       <Handle type="target" position={Position.Left} isConnectable={false} style={{ opacity: 0, pointerEvents: "none" }} />
       <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-        <span aria-hidden style={{ fontSize: 16, lineHeight: "20px" }}>
-          {TYPE_ICON[data.nodeType]}
+        <span aria-hidden style={{ color: "#6e6e73", lineHeight: 0, marginTop: 1 }}>
+          {(() => {
+            const NodeIcon = TYPE_ICON[data.nodeType];
+            return <NodeIcon size={16} />;
+          })()}
         </span>
         <div style={{ minWidth: 0, flex: 1 }}>
           <div

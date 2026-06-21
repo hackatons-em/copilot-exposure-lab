@@ -9,6 +9,7 @@
  * static depiction matching FixScriptPanel. Reduced-motion-safe via the hook.
  */
 import { useInView } from "@/lib/useInView";
+import { AlertIcon } from "@/components/icons";
 
 const SCRIPT = `Connect-MgGraph -Scopes 'Files.ReadWrite.All','Sites.ReadWrite.All'
 
@@ -64,8 +65,8 @@ export function FixScriptSpecimen({ className }: { className?: string }) {
           </pre>
 
           <p className="mt-2.5 flex items-start gap-1.5 text-[11px] leading-relaxed text-severity-medium">
-            <span aria-hidden className="mt-px">
-              ⚠
+            <span aria-hidden className="mt-px shrink-0">
+              <AlertIcon size={12} />
             </span>
             Advisory — review before running. Never auto-executed.
           </p>

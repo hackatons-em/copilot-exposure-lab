@@ -6,6 +6,7 @@ import { api, type ConnectableSystem } from "@/lib/api";
 import { formatDateTime, titleCase } from "@/lib/format";
 import { useAsync } from "@/lib/useAsync";
 import { useWorkspace } from "@/components/WorkspaceProvider";
+import { CheckIcon } from "@/components/icons";
 import { Button } from "@/components/Button";
 import { ErrorState, LoadingState } from "@/components/States";
 import { PageHeader } from "@/components/PageHeader";
@@ -254,7 +255,11 @@ export default function SettingsPage() {
                       <td className="py-1 pr-2 font-medium capitalize text-ink">{row.role}</td>
                       {RBAC_PERMISSIONS.map((permission) => (
                         <td key={permission} className="px-1 py-1 text-center text-ink-soft">
-                          {row.permissions.includes(permission) ? "✓" : "—"}
+                          {row.permissions.includes(permission) ? (
+                            <CheckIcon size={14} className="mx-auto text-severity-low" />
+                          ) : (
+                            <span className="text-ink-faint">—</span>
+                          )}
                         </td>
                       ))}
                     </tr>
