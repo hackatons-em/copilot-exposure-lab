@@ -13,6 +13,14 @@ import { simulateRetrieval } from "@cel/rule-engine";
 import Fastify, { type FastifyInstance } from "fastify";
 import { z } from "zod";
 import type { FindingStatus } from "@cel/types";
+import {
+  type ApiKeyEntry,
+  type Permission,
+  type Role,
+  assertPermission,
+  buildKeyIndex,
+  resolveRole,
+} from "./auth.js";
 import type { Store } from "./store/types.js";
 
 export interface GraphProviderInput {
@@ -29,6 +37,44 @@ export interface BuildAppOptions {
   logger?: boolean;
   /** Build a live Graph provider from credentials. Injectable for testing. */
   graphProviderFactory?: (input: GraphProviderInput) => GraphProvider;
+  /**
+   * Configured API keys (the on/off switch for auth).
+   *  - undefined OR empty → AUTH DISABLED: every request is role "owner" (full
+   *    access). Preserves all existing behavior / the open demo.
+   *  - non-empty → AUTH ENFORCED: the caller's key (Bearer / x-api-key) is
+   *    resolved to a role and each route's required permission is checked.
+   */
+  apiKeys?: ApiKeyEntry[];
+}
+
+/**
+ * Per-route metadata. Each route declares the permission it requires (or marks
+ * itself public) via Fastify's route `config`, and a single hook enforces it —
+ * no giant switch. `public: true` skips auth entirely (health, the Graph
+ * webhook); a `permission` is required when auth is enforced.
+ */
+interface RouteAuthConfig {
+  permission?: Permission;
+  public?: boolean;
+}
+
+/** Helper: declare a route's auth requirement as a Fastify `config` object. */
+function perm(permission: Permission): { config: RouteAuthConfig } {
+  return { config: { permission } };
+}
+
+/** Helper: declare a route as public (no auth ever). */
+const PUBLIC: { config: RouteAuthConfig } = { config: { public: true } };
+
+declare module "fastify" {
+  interface FastifyRequest {
+    /** The caller's resolved role (always set; "owner" when auth is disabled). */
+    role: Role;
+  }
+  interface FastifyContextConfig {
+    permission?: Permission;
+    public?: boolean;
+  }
 }
 
 /** Default factory: a metadata-only, least-privilege live Microsoft Graph client. */
@@ -104,31 +150,59 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     void reply.status(status).send({ error: message, details: err instanceof z.ZodError ? err.issues : undefined });
   });
 
+  // ── Auth (config-gated) ────────────────────────────────────
+  // Auth is OFF unless API keys are configured. When off, every request is the
+  // "owner" role (full access) — existing tests, the e2e, and the demo are
+  // untouched. When on, resolve the caller's role from the credential header
+  // and enforce the per-route permission declared via the route `config`.
+  const authEnabled = (opts.apiKeys?.length ?? 0) > 0;
+  const keyIndex = authEnabled ? buildKeyIndex(opts.apiKeys ?? []) : undefined;
+
+  app.addHook("onRequest", async (req) => {
+    const routeConfig = req.routeOptions.config as RouteAuthConfig | undefined;
+
+    if (!authEnabled) {
+      // Auth disabled: treat everyone as owner so handlers can read req.role uniformly.
+      req.role = "owner";
+      return;
+    }
+
+    // Public routes (health, the Graph webhook) never require a credential.
+    if (routeConfig?.public) return;
+
+    // Resolve role from the credential (401 on missing/unknown key).
+    const role = resolveRole(req.headers, keyIndex ?? new Map());
+    req.role = role;
+
+    // Enforce the route's required permission (403 if the role lacks it).
+    if (routeConfig?.permission) assertPermission(role, routeConfig.permission);
+  });
+
   // Resolve + assert a workspace exists (workspace isolation gate).
   async function requireWorkspace(id: string): Promise<void> {
     const ws = await store.getWorkspace(id);
     if (!ws) throw Object.assign(new Error("workspace not found"), { statusCode: 404 });
   }
 
-  app.get("/health", async () => ({ ok: true, service: "cel-api" }));
+  app.get("/health", PUBLIC, async () => ({ ok: true, service: "cel-api" }));
 
   // ── Workspaces ─────────────────────────────────────────────
-  app.post("/api/workspaces", async (req, reply) => {
+  app.post("/api/workspaces", perm("manage"), async (req, reply) => {
     const body = createWorkspaceBody.parse(req.body);
     const ws = await store.createWorkspace(body);
     await store.logAudit({ workspaceId: ws.id, actor: "api", action: "workspace.create", targetId: ws.id });
     return reply.status(201).send(ws);
   });
 
-  app.get("/api/workspaces", async () => store.listWorkspaces());
+  app.get("/api/workspaces", perm("view"), async () => store.listWorkspaces());
 
-  app.get("/api/workspaces/:id", async (req) => {
+  app.get("/api/workspaces/:id", perm("view"), async (req) => {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
     return store.getWorkspace(id);
   });
 
-  app.delete("/api/workspaces/:id", async (req, reply) => {
+  app.delete("/api/workspaces/:id", perm("delete"), async (req, reply) => {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
     await store.deleteWorkspace(id);
@@ -137,7 +211,7 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
   });
 
   // ── Connections ────────────────────────────────────────────
-  app.post("/api/workspaces/:id/connections/demo/seed", async (req, reply) => {
+  app.post("/api/workspaces/:id/connections/demo/seed", perm("connect"), async (req, reply) => {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
     const result = await store.seedDemo(id);
@@ -148,7 +222,7 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
   // Connect a live Microsoft 365 tenant (metadata-only ingestion via Graph).
   // The client secret is used transiently to build the provider and is never
   // logged, returned, or persisted (non-negotiable: secrets never leave).
-  app.post("/api/workspaces/:id/connections/microsoft/start", async (req, reply) => {
+  app.post("/api/workspaces/:id/connections/microsoft/start", perm("connect"), async (req, reply) => {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
     const body = z
@@ -182,7 +256,7 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
   // Connect another system (Google Workspace, Slack, Salesforce, or the combined
   // multi-system demo). Each builds a metadata-only provider that normalizes into
   // the same TenantGraph, so the unchanged deterministic engine scans it as-is.
-  app.post("/api/workspaces/:id/connections/:system/seed", async (req, reply) => {
+  app.post("/api/workspaces/:id/connections/:system/seed", perm("connect"), async (req, reply) => {
     const { id, system } = req.params as { id: string; system: string };
     await requireWorkspace(id);
     const factory = SYSTEM_PROVIDERS[system];
@@ -200,19 +274,19 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     return reply.status(201).send(result);
   });
 
-  app.get("/api/workspaces/:id/connections", async (req) => {
+  app.get("/api/workspaces/:id/connections", perm("view"), async (req) => {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
     return store.listConnections(id);
   });
 
-  app.get("/api/workspaces/:id/resources", async (req) => {
+  app.get("/api/workspaces/:id/resources", perm("view"), async (req) => {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
     return store.listResources(id);
   });
 
-  app.get("/api/workspaces/:id/scenarios", async (req) => {
+  app.get("/api/workspaces/:id/scenarios", perm("view"), async (req) => {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
     return store.listScenarios(id);
@@ -221,7 +295,7 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
   // ── Copilot retrieval simulation ───────────────────────────
   // What M365 Copilot, grounded on what an actor can access, could surface to
   // them. Deterministic, metadata-only — a read, so no audit event required.
-  app.get("/api/workspaces/:id/retrieval", async (req) => {
+  app.get("/api/workspaces/:id/retrieval", perm("view"), async (req) => {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
     const graph = await store.getTenantGraph(id);
@@ -236,7 +310,7 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
   });
 
   // ── Scans ──────────────────────────────────────────────────
-  app.post("/api/workspaces/:id/scans", async (req, reply) => {
+  app.post("/api/workspaces/:id/scans", perm("scan"), async (req, reply) => {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
     const body = scanBody.parse(req.body ?? {}) ?? {};
@@ -251,7 +325,7 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     return reply.status(201).send(summary);
   });
 
-  app.get("/api/workspaces/:id/scenarios/:sid/run", async (req) => {
+  app.get("/api/workspaces/:id/scenarios/:sid/run", perm("view"), async (req) => {
     const { id, sid } = req.params as { id: string; sid: string };
     await requireWorkspace(id);
     const run = await store.getScenarioRun(id, sid);
@@ -260,14 +334,14 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
   });
 
   // ── Findings ───────────────────────────────────────────────
-  app.get("/api/workspaces/:id/findings", async (req) => {
+  app.get("/api/workspaces/:id/findings", perm("view"), async (req) => {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
     const q = req.query as { severity?: string; status?: string; scenarioId?: string };
     return store.listFindings(id, q);
   });
 
-  app.get("/api/workspaces/:id/findings/:fid", async (req) => {
+  app.get("/api/workspaces/:id/findings/:fid", perm("view"), async (req) => {
     const { id, fid } = req.params as { id: string; fid: string };
     await requireWorkspace(id);
     const detail = await store.getFinding(id, fid);
@@ -275,7 +349,7 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     return detail;
   });
 
-  app.patch("/api/workspaces/:id/findings/:fid", async (req) => {
+  app.patch("/api/workspaces/:id/findings/:fid", perm("scan"), async (req) => {
     const { id, fid } = req.params as { id: string; fid: string };
     await requireWorkspace(id);
     const patch = findingPatch.parse(req.body ?? {});
@@ -292,7 +366,7 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
   });
 
   // ── Reports ────────────────────────────────────────────────
-  app.post("/api/workspaces/:id/reports", async (req, reply) => {
+  app.post("/api/workspaces/:id/reports", perm("export"), async (req, reply) => {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
     const { format } = z.object({ format: z.enum(["markdown", "html"]).default("markdown") }).parse(req.body ?? {});
@@ -301,7 +375,7 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     return reply.status(201).send(report);
   });
 
-  app.get("/api/workspaces/:id/reports/:rid", async (req) => {
+  app.get("/api/workspaces/:id/reports/:rid", perm("view"), async (req) => {
     const { id, rid } = req.params as { id: string; rid: string };
     await requireWorkspace(id);
     const report = await store.getReport(id, rid);
@@ -309,7 +383,7 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     return report;
   });
 
-  app.get("/api/workspaces/:id/reports/:rid/download", async (req, reply) => {
+  app.get("/api/workspaces/:id/reports/:rid/download", perm("export"), async (req, reply) => {
     const { id, rid } = req.params as { id: string; rid: string };
     await requireWorkspace(id);
     const content = await store.getReportContent(id, rid);
@@ -324,7 +398,7 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
 
   // ── Schedules ──────────────────────────────────────────────
   // A schedule periodically enqueues a scan (or report) job for a workspace.
-  app.post("/api/workspaces/:id/schedules", async (req, reply) => {
+  app.post("/api/workspaces/:id/schedules", perm("manage"), async (req, reply) => {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
     const body = createScheduleBody.parse(req.body ?? {});
@@ -339,13 +413,13 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     return reply.status(201).send(schedule);
   });
 
-  app.get("/api/workspaces/:id/schedules", async (req) => {
+  app.get("/api/workspaces/:id/schedules", perm("view"), async (req) => {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
     return store.listSchedules(id);
   });
 
-  app.patch("/api/workspaces/:id/schedules/:sid", async (req) => {
+  app.patch("/api/workspaces/:id/schedules/:sid", perm("manage"), async (req) => {
     const { id, sid } = req.params as { id: string; sid: string };
     await requireWorkspace(id);
     const patch = schedulePatch.parse(req.body ?? {});
@@ -361,7 +435,7 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     return schedule;
   });
 
-  app.delete("/api/workspaces/:id/schedules/:sid", async (req, reply) => {
+  app.delete("/api/workspaces/:id/schedules/:sid", perm("manage"), async (req, reply) => {
     const { id, sid } = req.params as { id: string; sid: string };
     await requireWorkspace(id);
     const deleted = await store.deleteSchedule(id, sid);
@@ -372,7 +446,7 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
 
   // ── Exports ────────────────────────────────────────────────
   // The available deterministic security-tool export formats (drives the UI).
-  app.get("/api/workspaces/:id/exports", async (req) => {
+  app.get("/api/workspaces/:id/exports", perm("view"), async (req) => {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
     return EXPORT_FORMATS;
@@ -380,7 +454,7 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
 
   // Generate a single export on demand from the latest scan. Pure transform —
   // no document content, no secrets; TimeGenerated uses the scan's generatedAt.
-  app.get("/api/workspaces/:id/exports/:format", async (req, reply) => {
+  app.get("/api/workspaces/:id/exports/:format", perm("export"), async (req, reply) => {
     const { id, format } = req.params as { id: string; format: string };
     await requireWorkspace(id);
     if (!isExportFormat(format)) throw Object.assign(new Error(`unknown export format: ${format}`), { statusCode: 400 });
@@ -396,7 +470,7 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
   });
 
   // ── Audit ──────────────────────────────────────────────────
-  app.get("/api/workspaces/:id/audit-events", async (req) => {
+  app.get("/api/workspaces/:id/audit-events", perm("view"), async (req) => {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
     return store.listAudit(id);
@@ -407,7 +481,7 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
   // point notificationUrl at the single webhook route below and set clientState
   // to the workspace id so notifications route back here. (No live subscription
   // is created from the API in this scaffold — see docs/SETUP-GRAPH.md.)
-  app.get("/api/workspaces/:id/notifications/subscribe-info", async (req) => {
+  app.get("/api/workspaces/:id/notifications/subscribe-info", perm("view"), async (req) => {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
     return {
@@ -420,7 +494,7 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
   // Single Graph notification URL (NOT workspace-scoped — Graph calls one URL and
   // we route by clientState). Graph retries aggressively, so this never 500s a
   // notification: malformed or unknown payloads are accepted (202) and skipped.
-  app.post("/api/webhooks/graph", async (req, reply) => {
+  app.post("/api/webhooks/graph", PUBLIC, async (req, reply) => {
     // Validation handshake: on subscription creation Graph GET/POSTs with a
     // validationToken query param and expects it echoed back as text/plain <10s.
     const { validationToken } = req.query as { validationToken?: string };

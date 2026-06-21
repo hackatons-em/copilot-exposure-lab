@@ -1,5 +1,6 @@
 import { createDb, runMigrations } from "@cel/db";
 import { buildApp } from "./app.js";
+import { parseApiKeys } from "./auth.js";
 import { DrizzleStore } from "./store/drizzle.js";
 import { MemoryStore } from "./store/memory.js";
 import type { Store } from "./store/types.js";
@@ -21,10 +22,18 @@ async function main(): Promise<void> {
   const store: Store = url ? new DrizzleStore(createDb(url)) : new MemoryStore();
   await bootstrapDemo(store);
 
-  const app = buildApp({ store, logger: true });
+  // API-key RBAC is OFF unless CEL_API_KEYS is set (comma-separated key:role
+  // pairs, e.g. `k_admin123:admin,k_view456:viewer`). When unset, the API stays
+  // open — the deployed demo keeps working with no credential.
+  const apiKeys = parseApiKeys(process.env.CEL_API_KEYS);
+
+  const app = buildApp({ store, logger: true, ...(apiKeys ? { apiKeys } : {}) });
   const port = Number(process.env.PORT ?? 4000);
   await app.listen({ port, host: "0.0.0.0" });
-  app.log.info(`cel-api on :${port} — store=${url ? "postgres" : "memory"}, demo workspace ws-demo ready`);
+  const authState = apiKeys ? `enforced (${apiKeys.length} key(s))` : "off (open demo)";
+  app.log.info(
+    `cel-api on :${port} — store=${url ? "postgres" : "memory"}, auth=${authState}, demo workspace ws-demo ready`,
+  );
 }
 
 main().catch((err) => {

@@ -12,7 +12,7 @@ import type {
   TenantConnection,
   Workspace,
 } from "@cel/types";
-import { API_URL, WORKSPACE_ID } from "./config";
+import { API_KEY, API_URL, WORKSPACE_ID } from "./config";
 
 /**
  * Typed client for the Copilot Exposure Lab REST API.
@@ -134,6 +134,12 @@ export interface UpdateScheduleBody {
 
 const ws = WORKSPACE_ID;
 
+/**
+ * Auth header sent on every request when NEXT_PUBLIC_API_KEY is set. Empty when
+ * unset, so against the open demo nothing is sent and behavior is unchanged.
+ */
+const AUTH_HEADER: Record<string, string> = API_KEY ? { authorization: `Bearer ${API_KEY}` } : {};
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let res: Response;
   try {
@@ -141,6 +147,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       ...init,
       headers: {
         "content-type": "application/json",
+        ...AUTH_HEADER,
         ...(init?.headers ?? {}),
       },
       cache: "no-store",

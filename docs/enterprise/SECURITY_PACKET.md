@@ -156,17 +156,20 @@ Supported deletion operations: delete workspace, disconnect tenant, delete a rep
 We state this honestly rather than overclaiming:
 
 - **Workspace isolation is enforced today.** Every API route resolves and asserts the target workspace before acting, and all data (graph, findings, reports, audit) is partitioned by workspace.
-- **Product RBAC and API authentication are on the roadmap.** The intended model is API-key / RBAC with roles **Owner / Admin / Analyst / Viewer**, plus **Microsoft Entra ID SSO** for V1. These are not yet enforced in the current build.
-- **For pilots**, access to the assessment environment is controlled at the deployment boundary (network/identity controls on the hosting environment, or — in customer-cloud — by your own Azure RBAC).
+- **API-key authentication + RBAC now exists, config-gated.** The API supports API-key credentials mapped to roles **Owner / Admin / Analyst / Viewer**, enforced per route against the matrix below. It is **OFF by default**: when no keys are configured the API is open (the public demo runs this way). When the operator sets `CEL_API_KEYS` (comma-separated `key:role` pairs), every non-public route requires a valid key (sent as `Authorization: Bearer <key>` or `x-api-key: <key>`); a missing/unknown key returns **401** and a key whose role lacks the required permission returns **403**. `GET /health` and the Microsoft Graph change-notification webhook remain public. The dashboard authenticates by setting `NEXT_PUBLIC_API_KEY`.
+- **Microsoft Entra ID SSO remains the roadmap item** for V1 (interactive user sign-in / directory-backed roles), layering on top of the RBAC model already implemented.
+- **For pilots**, access to the assessment environment is additionally controlled at the deployment boundary (network/identity controls on the hosting environment, or — in customer-cloud — by your own Azure RBAC).
 
-Intended RBAC matrix (roadmap):
+RBAC matrix (enforced when API keys are configured):
 
-| Role | Connect | Scan | View findings | Export | Manage users | Delete |
+| Role | Connect | Scan | View findings | Export | Manage | Delete |
 |---|:--:|:--:|:--:|:--:|:--:|:--:|
 | Owner | yes | yes | yes | yes | yes | yes |
 | Admin | yes | yes | yes | yes | no | no |
 | Analyst | no | yes | yes | yes | no | no |
 | Viewer | no | no | yes | no | no | no |
+
+Permissions map to routes as: **connect** (seed/connect a system), **scan** (run a scan, update a finding), **view** (read workspaces/findings/resources/reports/audit/exports list), **export** (create/download reports and exports), **manage** (create a workspace, manage schedules), **delete** (delete a workspace).
 
 ---
 

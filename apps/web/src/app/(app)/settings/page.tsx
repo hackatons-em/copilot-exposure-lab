@@ -228,6 +228,42 @@ export default function SettingsPage() {
             ) : null}
           </section>
 
+          <section className="rounded-lg border border-surface-border bg-surface p-5">
+            <h2 className="text-sm font-semibold text-ink">Access control</h2>
+            <p className="mt-2 text-xs text-ink-soft">
+              Role-based access control. API authentication is enabled when the server is configured with API
+              keys (<code className="font-mono text-[11px]">CEL_API_KEYS</code>); the demo runs open. Set{" "}
+              <code className="font-mono text-[11px]">NEXT_PUBLIC_API_KEY</code> to authenticate from this
+              dashboard.
+            </p>
+            <div className="mt-3 overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="text-ink-faint">
+                    <th className="py-1 pr-2 font-medium">Role</th>
+                    {RBAC_PERMISSIONS.map((permission) => (
+                      <th key={permission} className="px-1 py-1 text-center font-medium capitalize">
+                        {permission}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {RBAC_MATRIX.map((row) => (
+                    <tr key={row.role} className="border-t border-surface-border">
+                      <td className="py-1 pr-2 font-medium capitalize text-ink">{row.role}</td>
+                      {RBAC_PERMISSIONS.map((permission) => (
+                        <td key={permission} className="px-1 py-1 text-center text-ink-soft">
+                          {row.permissions.includes(permission) ? "✓" : "—"}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
           <TrustCopy />
         </div>
       </div>
@@ -348,6 +384,16 @@ export default function SettingsPage() {
     </>
   );
 }
+
+/** Static RBAC matrix shown in the Access control card (mirrors the API ROLE_PERMISSIONS). */
+const RBAC_PERMISSIONS = ["connect", "scan", "view", "export", "manage", "delete"] as const;
+
+const RBAC_MATRIX: { role: string; permissions: readonly string[] }[] = [
+  { role: "owner", permissions: ["connect", "scan", "view", "export", "manage", "delete"] },
+  { role: "admin", permissions: ["connect", "scan", "view", "export"] },
+  { role: "analyst", permissions: ["scan", "view", "export"] },
+  { role: "viewer", permissions: ["view"] },
+];
 
 interface SystemOption {
   system: ConnectableSystem;
