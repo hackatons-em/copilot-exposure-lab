@@ -24,8 +24,8 @@ interface DetailBundle {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-lg border border-surface-border bg-surface p-5">
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-faint">{title}</h2>
+    <section className="rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+      <h2 className="eyebrow mb-3.5">{title}</h2>
       {children}
     </section>
   );
@@ -100,14 +100,16 @@ export default function FindingDetailPage() {
         </Link>
       </div>
 
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3 border-b border-hairline pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs text-ink-faint">{finding.ruleId}</span>
+            <span className="font-mono text-xs tracking-wide text-ink-faint">{finding.ruleId}</span>
             <FindingStatusPill status={finding.status} />
           </div>
-          <h1 className="mt-1 text-2xl font-semibold text-ink">{finding.title}</h1>
-          <p className="mt-1 text-sm text-ink-soft">
+          <h1 className="mt-1.5 font-display text-2xl font-semibold tracking-tightest text-ink">
+            {finding.title}
+          </h1>
+          <p className="mt-1.5 text-sm text-ink-soft">
             {resource ? `${resource.name}${resource.path ? ` · ${resource.path}` : ""}` : finding.resourceId}
             {" · "}
             <span className="text-ink-faint">created {formatDateTime(finding.createdAt)}</span>
@@ -116,7 +118,8 @@ export default function FindingDetailPage() {
       </div>
 
       {resolved && remediation?.fixVerified ? (
-        <div className="mb-6 rounded-lg border border-severity-low/30 bg-severity-low/5 px-4 py-3 text-sm text-severity-low">
+        <div className="mb-6 flex items-center gap-2 rounded-lg border border-severity-low/30 bg-severity-low-soft px-4 py-3 text-sm font-medium text-severity-low shadow-elevation">
+          <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-severity-low" />
           Fix applied and re-verified — the exposure path is no longer reachable (proof-of-fix).
         </div>
       ) : null}

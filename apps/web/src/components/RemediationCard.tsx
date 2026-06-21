@@ -5,21 +5,25 @@ import { RemediationStatusPill } from "./StatusPill";
 /** Microsoft-native remediation: control, numbered steps, effort, status. */
 export function RemediationCard({ task }: { task: RemediationTask }) {
   return (
-    <div className="rounded-lg border border-surface-border bg-surface p-4">
+    <div className="rounded-lg border border-hairline bg-surface p-4 shadow-elevation">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <h3 className="text-sm font-semibold text-ink">{task.title}</h3>
         <RemediationStatusPill status={task.status} verified={task.fixVerified} />
       </div>
 
-      <div className="mt-2 flex flex-wrap gap-2 text-xs text-ink-soft">
+      <div className="mt-2.5 flex flex-wrap items-center gap-2 text-xs">
         {task.microsoftControl ? (
-          <span className="rounded bg-brand-soft px-2 py-0.5 font-medium text-brand">{task.microsoftControl}</span>
+          <span className="rounded-full bg-brand-soft px-2.5 py-0.5 font-medium text-brand">
+            {task.microsoftControl}
+          </span>
         ) : null}
-        <span className="rounded bg-surface-muted px-2 py-0.5">{effortLabel(task.estimatedEffort)}</span>
+        <span className="rounded-full border border-hairline bg-surface-subtle px-2.5 py-0.5 text-ink-soft">
+          {effortLabel(task.estimatedEffort)}
+        </span>
       </div>
 
       {task.steps.length > 0 ? (
-        <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm text-ink">
+        <ol className="mt-3.5 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed text-ink marker:font-mono marker:text-ink-faint">
           {task.steps.map((step, index) => (
             <li key={index}>{step}</li>
           ))}
@@ -27,7 +31,9 @@ export function RemediationCard({ task }: { task: RemediationTask }) {
       ) : null}
 
       {task.graphActionHint ? (
-        <p className="mt-3 font-mono text-xs text-ink-faint">{task.graphActionHint}</p>
+        <p className="mt-3.5 rounded-md border border-hairline bg-surface-subtle px-2.5 py-2 font-mono text-xs text-ink-soft">
+          {task.graphActionHint}
+        </p>
       ) : null}
     </div>
   );

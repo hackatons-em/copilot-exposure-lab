@@ -177,10 +177,10 @@ export default function OverviewPage() {
 
       {data?.history.drift && (
         <div
-          className="mt-4 rounded-lg border px-4 py-2.5 text-sm"
+          className="mt-4 rounded-lg border px-4 py-3 text-sm shadow-elevation"
           style={{
-            borderColor: data.history.drift.scoreDelta <= 0 ? "#bfe3cf" : "#f2c7c2",
-            backgroundColor: data.history.drift.scoreDelta <= 0 ? "#f0faf4" : "#fcf2f1",
+            borderColor: data.history.drift.scoreDelta <= 0 ? "#bcdbc8" : "#eecbc6",
+            backgroundColor: data.history.drift.scoreDelta <= 0 ? "#e8f3ec" : "#fbedeb",
           }}
         >
           <span className="font-semibold text-ink">Since last scan:</span>{" "}
@@ -198,21 +198,24 @@ export default function OverviewPage() {
         </div>
       )}
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+      <div className="mt-8 grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <h2 className="mb-2 text-sm font-semibold text-ink">Top exposure paths</h2>
+          <h2 className="eyebrow mb-2.5">Top exposure paths</h2>
           <DataTable columns={columns} rows={topPaths} rowKey={(f) => f.id} empty="No findings." />
         </div>
 
         <div>
-          <h2 className="mb-2 text-sm font-semibold text-ink">Recommended next fixes</h2>
-          <div className="rounded-lg border border-surface-border bg-surface p-3">
+          <h2 className="eyebrow mb-2.5">Recommended next fixes</h2>
+          <div className="rounded-lg border border-hairline bg-surface p-3 shadow-elevation">
             {recommendedFixes.length === 0 ? (
               <p className="px-1 py-2 text-sm text-ink-faint">No open remediations.</p>
             ) : (
               <ul className="space-y-2">
                 {recommendedFixes.map((f) => (
-                  <li key={f.id} className="rounded-md border border-surface-border p-3">
+                  <li
+                    key={f.id}
+                    className="rounded-md border border-hairline p-3 transition-colors duration-150 hover:bg-surface-subtle"
+                  >
                     <div className="flex items-start justify-between gap-2">
                       <Link
                         href={`/findings/${f.id}`}

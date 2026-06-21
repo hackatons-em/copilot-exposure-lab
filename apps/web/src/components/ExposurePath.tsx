@@ -13,21 +13,33 @@ export function ExposurePath({ path }: { path?: ExposurePathType }) {
 
   return (
     <div className="flex flex-wrap items-center gap-y-3">
-      <span className="mr-2 rounded bg-surface-muted px-2 py-0.5 text-xs font-medium text-ink-soft">
+      <span className="mr-2 inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-2.5 py-1 text-[11px] font-medium tracking-wide text-brand">
         via {titleCase(path.via)}
       </span>
       {path.steps.map((step, index) => {
         const isLast = index === path.steps.length - 1;
         return (
           <div key={`${step.objectId}-${index}`} className="flex items-center">
-            <div className="rounded-md border border-surface-border bg-surface px-3 py-1.5">
-              <div className="text-sm font-medium text-ink">{step.label}</div>
-              <div className="font-mono text-[10px] uppercase tracking-wide text-ink-faint">{step.objectType}</div>
+            <div
+              className={`rounded-md border px-3 py-2 ${
+                isLast
+                  ? "border-severity-critical/40 bg-severity-critical-soft"
+                  : "border-hairline bg-surface shadow-sm"
+              }`}
+            >
+              <div className={`text-sm font-medium ${isLast ? "text-severity-critical" : "text-ink"}`}>
+                {step.label}
+              </div>
+              <div className="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-ink-faint">
+                {step.objectType}
+              </div>
             </div>
             {!isLast ? (
-              <div className="mx-1.5 flex items-center gap-1 text-ink-faint">
-                <span className="text-xs italic text-ink-soft">{step.relation.replace(/[-_]/g, " ")}</span>
-                <span aria-hidden className="text-base leading-none">
+              <div className="mx-2 flex items-center gap-1.5 text-ink-faint">
+                <span className="text-[11px] italic text-ink-soft">
+                  {step.relation.replace(/[-_]/g, " ")}
+                </span>
+                <span aria-hidden className="text-base leading-none text-brand">
                   →
                 </span>
               </div>

@@ -33,16 +33,16 @@ type Band = ExposureGraphNode["risk"];
 
 /** Band → hex. Mirrors the severity tokens used across the app (color lives here). */
 const BAND_COLOR: Record<Band, string> = {
-  critical: "#b42318",
+  critical: "#c0362c",
   high: "#c4570a",
-  medium: "#b7791f",
+  medium: "#b07a12",
   low: "#2f6f4f",
-  info: "#4a5160",
+  info: "#56565f",
 };
 
-const BRAND = "#2563eb";
-const BORDER = "#e2e6ec";
-const INK = "#1a1f29";
+const BRAND = "#4733b8";
+const BORDER = "#e6e5df";
+const INK = "#16161a";
 
 /** Small visual prefix per node type. */
 const TYPE_ICON: Record<ExposureGraphNode["type"], string> = {
@@ -83,7 +83,7 @@ function ExposureNode({ data }: NodeProps<ExposureFlowNode>) {
   const isCriticalResource = band === "critical" && RESOURCE_TYPES.has(data.nodeType);
 
   const borderColor = isCriticalResource ? BAND_COLOR.critical : band === "info" ? BORDER : color;
-  const background = isCriticalResource ? "#fdf3f2" : "#ffffff";
+  const background = isCriticalResource ? "#fbedeb" : "#ffffff";
   const borderWidth = data.emphasized || isCriticalResource ? 2 : 1;
 
   return (
@@ -116,6 +116,7 @@ function ExposureNode({ data }: NodeProps<ExposureFlowNode>) {
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
+              fontFamily: "var(--font-sans), ui-sans-serif, system-ui, sans-serif",
             }}
             title={data.label}
           >
@@ -125,10 +126,10 @@ function ExposureNode({ data }: NodeProps<ExposureFlowNode>) {
             <span
               style={{
                 fontSize: 9,
-                letterSpacing: "0.04em",
+                letterSpacing: "0.06em",
                 textTransform: "uppercase",
-                color: "#8a93a3",
-                fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+                color: "#9795a0",
+                fontFamily: "var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
               }}
             >
               {data.nodeType}
@@ -210,7 +211,7 @@ function layout(model: ExposureGraphModel, focusFindingId?: string): { nodes: Ex
       const focused = inFocus(edge.findingIds);
       const dimmed = Boolean(focusFindingId) && !focused;
       const risky = edge.risk === "critical" || edge.risk === "high";
-      const color = risky ? BAND_COLOR[edge.risk] : "#9aa3b2";
+      const color = risky ? BAND_COLOR[edge.risk] : "#b8b6ad";
       return {
         id: edge.id,
         source: edge.source,
@@ -219,7 +220,7 @@ function layout(model: ExposureGraphModel, focusFindingId?: string): { nodes: Ex
         animated: risky && !dimmed,
         markerEnd: ARROW,
         style: { stroke: color, strokeWidth: risky ? 2 : 1.5, opacity: dimmed ? 0.2 : 1 },
-        labelStyle: { fill: "#4a5160", fontSize: 10, fontWeight: 500, fontStyle: "italic" },
+        labelStyle: { fill: "#56565f", fontSize: 10, fontWeight: 500, fontStyle: "italic" },
         labelBgStyle: { fill: "#ffffff", fillOpacity: dimmed ? 0.2 : 0.85 },
         labelBgPadding: [4, 2] as [number, number],
         labelBgBorderRadius: 4,
@@ -243,10 +244,10 @@ export function ExposureGraphView({ model, focusFindingId, height = 560 }: Expos
   if (model.nodes.length === 0) {
     return (
       <div
-        className="flex flex-col items-center justify-center rounded-lg border border-dashed border-surface-border bg-surface px-6 text-center"
+        className="bg-dotgrid flex flex-col items-center justify-center rounded-lg border border-dashed border-hairline bg-surface/60 px-6 text-center"
         style={{ height }}
       >
-        <h3 className="text-base font-semibold text-ink">No exposure paths yet</h3>
+        <h3 className="font-display text-lg font-semibold tracking-tightest text-ink">No exposure paths yet</h3>
         <p className="mt-1 max-w-md text-sm text-ink-soft">
           Run an exposure assessment to compute findings — the graph draws itself from every finding&apos;s path.
         </p>
@@ -256,7 +257,7 @@ export function ExposureGraphView({ model, focusFindingId, height = 560 }: Expos
 
   return (
     <div
-      className="overflow-hidden rounded-lg border border-surface-border bg-surface-subtle"
+      className="overflow-hidden rounded-lg border border-hairline bg-surface-subtle shadow-elevation"
       style={{ height, width: "100%" }}
     >
       <ReactFlow
@@ -282,7 +283,7 @@ export function ExposureGraphView({ model, focusFindingId, height = 560 }: Expos
             return data ? BAND_COLOR[data.risk] : BRAND;
           }}
           nodeStrokeWidth={2}
-          maskColor="rgba(238,241,245,0.6)"
+          maskColor="rgba(236,235,230,0.6)"
         />
       </ReactFlow>
     </div>

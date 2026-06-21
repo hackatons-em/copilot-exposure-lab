@@ -17,11 +17,11 @@ const GRAPH_TRUST = ["Derived from permission metadata — deterministic, no doc
 
 /** Band → hex, kept in sync with the graph view + severity tokens. */
 const BAND_COLOR: Record<Band, string> = {
-  critical: "#b42318",
+  critical: "#c0362c",
   high: "#c4570a",
-  medium: "#b7791f",
+  medium: "#b07a12",
   low: "#2f6f4f",
-  info: "#4a5160",
+  info: "#56565f",
 };
 
 /** Node-type legend (icon + label). */
@@ -36,9 +36,9 @@ const NODE_LEGEND: { icon: string; label: string }[] = [
 
 function Legend() {
   return (
-    <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-lg border border-surface-border bg-surface px-4 py-3 text-xs">
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-lg border border-hairline bg-surface px-4 py-3 text-xs shadow-elevation">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-        <span className="font-medium uppercase tracking-wide text-ink-faint">Nodes</span>
+        <span className="eyebrow">Nodes</span>
         {NODE_LEGEND.map((item) => (
           <span key={item.label} className="inline-flex items-center gap-1.5 text-ink-soft">
             <span aria-hidden>{item.icon}</span>
@@ -47,7 +47,7 @@ function Legend() {
         ))}
       </div>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-        <span className="font-medium uppercase tracking-wide text-ink-faint">Risk</span>
+        <span className="eyebrow">Risk</span>
         {BAND_ORDER.map((band) => (
           <span key={band} className="inline-flex items-center gap-1.5 text-ink-soft">
             <span aria-hidden className="h-2.5 w-2.5 rounded-full" style={{ background: BAND_COLOR[band] }} />
@@ -88,7 +88,7 @@ export default function GraphPage() {
   const hasNodes = (data?.nodes.length ?? 0) > 0;
 
   const selectClass =
-    "rounded-md border border-surface-border bg-surface px-2.5 py-1.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-brand/30";
+    "rounded-md border border-hairline bg-surface px-2.5 py-1.5 text-sm text-ink transition-shadow duration-150 focus:outline-none focus:ring-2 focus:ring-brand-ring focus:ring-offset-1 focus:ring-offset-surface";
 
   return (
     <>

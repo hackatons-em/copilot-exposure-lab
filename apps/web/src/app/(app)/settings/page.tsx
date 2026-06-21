@@ -134,7 +134,7 @@ export default function SettingsPage() {
     fields.clientSecret.length === 0;
 
   const fieldClass =
-    "mt-1 w-full rounded-md border border-surface-border bg-surface px-2.5 py-1.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-brand/30";
+    "mt-1 w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm text-ink transition-shadow duration-150 focus:outline-none focus:ring-2 focus:ring-brand-ring focus:ring-offset-1 focus:ring-offset-surface";
 
   return (
     <>
@@ -145,8 +145,8 @@ export default function SettingsPage() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
-          <section className="rounded-lg border border-surface-border bg-surface p-5">
-            <h2 className="text-sm font-semibold text-ink">Connected tenant</h2>
+          <section className="rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+            <h2 className="font-display text-base font-semibold tracking-tightest text-ink">Connected tenant</h2>
             {loading ? (
               <div className="mt-3">
                 <LoadingState label="Loading connection…" />
@@ -181,14 +181,14 @@ export default function SettingsPage() {
             )}
           </section>
 
-          <section className="rounded-lg border border-surface-border bg-surface p-5">
-            <h2 className="text-sm font-semibold text-ink">Requested Microsoft Graph scopes</h2>
+          <section className="rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+            <h2 className="font-display text-base font-semibold tracking-tightest text-ink">Requested Microsoft Graph scopes</h2>
             <p className="mt-1 text-xs text-ink-soft">
               Least privilege, read-only. No write scopes are requested in this version.
             </p>
             <ul className="mt-3 space-y-2">
               {scopes.map((scope) => (
-                <li key={scope} className="flex flex-col gap-0.5 rounded-md border border-surface-border p-3">
+                <li key={scope} className="flex flex-col gap-0.5 rounded-md border border-hairline bg-surface-subtle/50 p-3">
                   <span className="font-mono text-xs font-medium text-ink">{scope}</span>
                   <span className="text-xs text-ink-soft">
                     {SCOPE_EXPLANATIONS[scope] ?? "Read-only metadata scope."}
@@ -200,8 +200,8 @@ export default function SettingsPage() {
         </div>
 
         <div className="space-y-6">
-          <section className="rounded-lg border border-surface-border bg-surface p-5">
-            <h2 className="text-sm font-semibold text-ink">Data handling</h2>
+          <section className="rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+            <h2 className="font-display text-base font-semibold tracking-tightest text-ink">Data handling</h2>
             <p className="mt-2 text-sm text-ink">
               Metadata-only mode enabled — document contents are not stored.
             </p>
@@ -211,8 +211,8 @@ export default function SettingsPage() {
             </p>
           </section>
 
-          <section className="rounded-lg border border-surface-border bg-surface p-5">
-            <h2 className="text-sm font-semibold text-ink">Demo controls</h2>
+          <section className="rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+            <h2 className="font-display text-base font-semibold tracking-tightest text-ink">Demo controls</h2>
             <p className="mt-2 text-xs text-ink-soft">
               Reset the workspace to the bundled demo company and run a fresh deterministic scan.
             </p>
@@ -228,8 +228,8 @@ export default function SettingsPage() {
             ) : null}
           </section>
 
-          <section className="rounded-lg border border-surface-border bg-surface p-5">
-            <h2 className="text-sm font-semibold text-ink">Access control</h2>
+          <section className="rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+            <h2 className="font-display text-base font-semibold tracking-tightest text-ink">Access control</h2>
             <p className="mt-2 text-xs text-ink-soft">
               Role-based access control. API authentication is enabled when the server is configured with API
               keys (<code className="font-mono text-[11px]">CEL_API_KEYS</code>); the demo runs open. Set{" "}
@@ -250,7 +250,7 @@ export default function SettingsPage() {
                 </thead>
                 <tbody>
                   {RBAC_MATRIX.map((row) => (
-                    <tr key={row.role} className="border-t border-surface-border">
+                    <tr key={row.role} className="border-t border-hairline">
                       <td className="py-1 pr-2 font-medium capitalize text-ink">{row.role}</td>
                       {RBAC_PERMISSIONS.map((permission) => (
                         <td key={permission} className="px-1 py-1 text-center text-ink-soft">
@@ -268,8 +268,8 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <section className="mt-6 rounded-lg border border-surface-border bg-surface p-5">
-        <h2 className="text-sm font-semibold text-ink">Connect a Microsoft 365 tenant</h2>
+      <section className="mt-6 rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+        <h2 className="font-display text-base font-semibold tracking-tightest text-ink">Connect a Microsoft 365 tenant</h2>
         <p className="mt-1 text-sm text-ink-soft">
           Read-only, metadata-only. Requires an Entra app registration — see{" "}
           <a
@@ -350,8 +350,8 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      <section className="mt-6 rounded-lg border border-surface-border bg-surface p-5">
-        <h2 className="text-sm font-semibold text-ink">Connect another system</h2>
+      <section className="mt-6 rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+        <h2 className="font-display text-base font-semibold tracking-tightest text-ink">Connect another system</h2>
         <p className="mt-1 text-sm text-ink-soft">
           The same deterministic exposure engine runs over more than Microsoft 365. Each connector normalizes its
           world (Google Drive sharing, Slack channels and Slack Connect, Salesforce objects/reports and org-wide
@@ -365,7 +365,7 @@ export default function SettingsPage() {
               type="button"
               onClick={() => void handleConnectSystem(opt.system, opt.label)}
               disabled={systemBusy !== undefined}
-              className="flex flex-col items-start gap-1 rounded-md border border-surface-border bg-surface px-4 py-3 text-left transition hover:border-brand/50 hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex flex-col items-start gap-1 rounded-md border border-hairline bg-surface px-4 py-3 text-left shadow-sm transition-all duration-150 hover:border-brand/50 hover:bg-brand-soft/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-60"
             >
               <span className="text-sm font-medium text-ink">
                 {systemBusy === opt.system ? `Connecting ${opt.label}…` : opt.label}

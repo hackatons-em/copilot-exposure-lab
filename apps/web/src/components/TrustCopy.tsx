@@ -13,16 +13,14 @@ const DEFAULT_LINES = [
 export function TrustCopy({ lines = DEFAULT_LINES, className }: TrustCopyProps) {
   return (
     <div
-      className={`rounded-md border border-surface-border bg-surface-subtle px-3 py-2 text-xs text-ink-soft ${
+      className={`space-y-1.5 rounded-md border border-hairline bg-surface-subtle px-3.5 py-3 text-xs text-ink-soft ${
         className ?? ""
       }`}
     >
       {lines.map((line) => (
-        <p key={line} className="flex items-start gap-1.5">
-          <span aria-hidden className="mt-0.5 text-ink-faint">
-            ●
-          </span>
-          <span>{line}</span>
+        <p key={line} className="flex items-start gap-2">
+          <span aria-hidden className="mt-1 h-1 w-1 shrink-0 rounded-full bg-brand" />
+          <span className="leading-relaxed">{line}</span>
         </p>
       ))}
     </div>

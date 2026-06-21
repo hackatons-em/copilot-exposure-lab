@@ -10,9 +10,9 @@ export function TrendChart({ snapshots }: { snapshots: ScanSnapshot[] }) {
 
   if (points.length < 2) {
     return (
-      <div className="rounded-lg border border-surface-border bg-surface p-4">
-        <h2 className="mb-1 text-sm font-semibold text-ink">Exposure trend</h2>
-        <p className="text-xs text-ink-faint">
+      <div className="rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+        <h2 className="eyebrow mb-1.5">Exposure trend</h2>
+        <p className="text-xs leading-relaxed text-ink-faint">
           Re-run the assessment (or let a schedule run) to build the trend — exposure should fall as fixes land.
         </p>
       </div>
@@ -30,16 +30,22 @@ export function TrendChart({ snapshots }: { snapshots: ScanSnapshot[] }) {
   const area = `${line} L${coords[coords.length - 1]!.x.toFixed(1)},${h - pad} L${coords[0]!.x.toFixed(1)},${h - pad} Z`;
 
   return (
-    <div className="rounded-lg border border-surface-border bg-surface p-4">
-      <h2 className="mb-2 text-sm font-semibold text-ink">Exposure trend</h2>
+    <div className="rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+      <h2 className="eyebrow mb-2.5">Exposure trend</h2>
       <svg viewBox={`0 0 ${w} ${h}`} className="w-full" role="img" aria-label="Exposure score over time">
-        <path d={area} fill="#dbe7ff" opacity={0.5} />
-        <path d={line} fill="none" stroke="#2563eb" strokeWidth={2} />
+        <defs>
+          <linearGradient id="trend-fill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#4733b8" stopOpacity={0.16} />
+            <stop offset="100%" stopColor="#4733b8" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <path d={area} fill="url(#trend-fill)" />
+        <path d={line} fill="none" stroke="#4733b8" strokeWidth={2} strokeLinejoin="round" />
         {coords.map((c, i) => (
-          <circle key={i} cx={c.x} cy={c.y} r={2.5} fill="#2563eb" />
+          <circle key={i} cx={c.x} cy={c.y} r={2.5} fill="#4733b8" stroke="#ffffff" strokeWidth={1.5} />
         ))}
       </svg>
-      <div className="mt-1 flex justify-between text-[11px] text-ink-faint">
+      <div className="mt-1.5 flex justify-between font-mono text-[11px] tabular-nums text-ink-faint">
         <span>{points.length} scans</span>
         <span>
           {points[0]!.exposureScore} → {points[points.length - 1]!.exposureScore}
