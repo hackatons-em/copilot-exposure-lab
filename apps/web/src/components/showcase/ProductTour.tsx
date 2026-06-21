@@ -6,6 +6,7 @@ import {
   FixScriptSpecimen,
   GaugeSpecimen,
   GraphSpecimen,
+  PlannerSpecimen,
   ReportSpecimen,
   ThreatMatrixSpecimen,
 } from "./index";
@@ -46,6 +47,13 @@ const TABS: TourTab[] = [
     title: "The exact Microsoft fix, written for you",
     blurb: "Each finding ships a copy-pasteable Graph PowerShell / PnP script wired to its real ids. Advisory — never auto-run.",
     Specimen: FixScriptSpecimen,
+  },
+  {
+    key: "planner",
+    label: "Remediation plan",
+    title: "Fix these 5, drop the score the most",
+    blurb: "A deterministic plan ranked by score-drop per effort — plus a live what-if. Turns a pile of findings into a roadmap.",
+    Specimen: PlannerSpecimen,
   },
   {
     key: "threat",

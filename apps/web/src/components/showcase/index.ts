@@ -10,3 +10,4 @@ export { CopilotSimSpecimen } from "./CopilotSimSpecimen";
 export { ThreatMatrixSpecimen } from "./ThreatMatrixSpecimen";
 export { FixScriptSpecimen } from "./FixScriptSpecimen";
 export { ReportSpecimen } from "./ReportSpecimen";
+export { PlannerSpecimen } from "./PlannerSpecimen";

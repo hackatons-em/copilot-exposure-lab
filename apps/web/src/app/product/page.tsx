@@ -9,6 +9,7 @@ import {
   FixScriptSpecimen,
   GaugeSpecimen,
   GraphSpecimen,
+  PlannerSpecimen,
   ReportSpecimen,
   ThreatMatrixSpecimen,
   TrendSpecimen,
@@ -56,6 +57,13 @@ const SURFACES: Surface[] = [
     body: "Each finding ships a copy-pasteable Microsoft Graph PowerShell / PnP / Power Platform script wired to its real source-object ids. Advisory by design — you review and run it; the product never writes to your tenant.",
     bullets: ["Wired to real ids", "Per-rule, deterministic", "Never auto-executed"],
     Specimen: FixScriptSpecimen,
+  },
+  {
+    eyebrow: "Remediation planner",
+    title: "Turn the pile into a roadmap",
+    body: "A deterministic plan ranks fixes by exposure-score reduction per unit of effort — 'fix these 5 to drop 92 → 52'. An interactive what-if projects the score for any set you choose, before you touch the tenant.",
+    bullets: ["Greedy impact/effort ranking", "Live what-if simulation", "Sequenced, board-ready"],
+    Specimen: PlannerSpecimen,
   },
   {
     eyebrow: "Threat model",
