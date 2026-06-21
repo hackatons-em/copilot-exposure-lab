@@ -1,0 +1,27 @@
+{
+  "name": "@cel/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "dev": "tsx watch src/worker.ts",
+    "start": "tsx src/worker.ts",
+    "seed:demo": "tsx src/cli/seed-demo.ts",
+    "demo:run": "tsx src/cli/demo-run.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "build": "echo \"(worker) run via tsx; no bundle step\""
+  },
+  "dependencies": {
+    "@cel/api": "workspace:*",
+    "@cel/db": "workspace:*",
+    "@cel/types": "workspace:*",
+    "drizzle-orm": "0.38.3"
+  },
+  "devDependencies": {
+    "@cel/config": "workspace:*",
+    "tsx": "4.19.2"
+  }
+}

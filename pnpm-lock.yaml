@@ -76,6 +76,28 @@ importers:
         specifier: 4.19.2
         version: 4.19.2
 
+  apps/worker:
+    dependencies:
+      '@cel/api':
+        specifier: workspace:*
+        version: link:../api
+      '@cel/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@cel/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      drizzle-orm:
+        specifier: 0.38.3
+        version: 0.38.3(postgres@3.4.5)
+    devDependencies:
+      '@cel/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      tsx:
+        specifier: 4.19.2
+        version: 4.19.2
+
   packages/config: {}
 
   packages/db:
