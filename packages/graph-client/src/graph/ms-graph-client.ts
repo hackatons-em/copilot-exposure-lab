@@ -217,6 +217,49 @@ export class MsGraphClient implements GraphProvider {
     return this.opts.scenarios ?? DEFAULT_SCENARIOS;
   }
 
+  /**
+   * Create a Graph change-notification subscription (live, used after consent).
+   * Graph validates the notificationUrl via a handshake on creation, so the URL
+   * must be reachable and echo back the validationToken within 10s. `nowIso`
+   * (defaulting to the current time) keeps the expiration deterministic for tests.
+   */
+  async createSubscription(opts: {
+    resource: string;
+    notificationUrl: string;
+    clientState: string;
+    expirationMinutes?: number;
+    nowIso?: string;
+  }): Promise<{ id: string; expirationDateTime: string }> {
+    const now = opts.nowIso ? new Date(opts.nowIso) : new Date();
+    const expirationDateTime = new Date(now.getTime() + (opts.expirationMinutes ?? 60) * 60_000).toISOString();
+    const res = await this.requester.post<{ id: string; expirationDateTime: string }>("/subscriptions", {
+      changeType: "updated,created,deleted",
+      notificationUrl: opts.notificationUrl,
+      resource: opts.resource,
+      clientState: opts.clientState,
+      expirationDateTime,
+    });
+    return { id: res.id, expirationDateTime: res.expirationDateTime ?? expirationDateTime };
+  }
+
+  /**
+   * Page a delta resource (e.g. "/drives/{id}/root/delta"), following
+   * @odata.nextLink across pages and capturing the final @odata.deltaLink as
+   * `nextDeltaLink` (use it as the starting point for the next incremental sync).
+   */
+  async getChanges(deltaPathOrLink: string): Promise<{ items: unknown[]; nextDeltaLink?: string }> {
+    const items: unknown[] = [];
+    let next: string | undefined = deltaPathOrLink;
+    let nextDeltaLink: string | undefined;
+    while (next) {
+      const resp: GraphPage<unknown> = await this.requester.get<unknown>(next);
+      items.push(...resp.value);
+      if (resp.deltaLink) nextDeltaLink = resp.deltaLink;
+      next = resp.nextLink;
+    }
+    return { items, nextDeltaLink };
+  }
+
   /** Ingest the full tenant graph (metadata only), checkpointing each phase. */
   async loadTenantGraph(): Promise<TenantGraph> {
     const checkpoint = (phase: string, collected: number): void => this.opts.onCheckpoint?.({ phase, collected });

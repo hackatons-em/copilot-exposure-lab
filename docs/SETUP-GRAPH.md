@@ -95,3 +95,39 @@ curl http://localhost:4000/api/workspaces/$WS/findings
 The `clientSecret` is used transiently to acquire a token and is **never logged,
 returned, or persisted** (the audit log records only the tenant name + mode).
 Key Vault-backed secret storage and scheduled re-scans remain V1 work.
+
+## 7. Change notifications (live)
+
+The product can re-scan automatically when a tenant changes, using
+[Microsoft Graph change notifications](https://learn.microsoft.com/en-us/graph/change-notifications-overview).
+
+- The deployed API exposes a **single** notification URL: `POST /api/webhooks/graph`
+  (not workspace-scoped — Graph calls one URL and we route by `clientState`).
+- Ask the API how to subscribe a workspace:
+  `GET /api/workspaces/<workspaceId>/notifications/subscribe-info` returns the
+  `notificationUrl`, the `clientState` to use (= the workspace id), and the
+  recommended `resource` string.
+- Create a Graph subscription pointing `notificationUrl` at that route, with
+  `clientState=<workspaceId>`. Use the `MsGraphClient.createSubscription` helper,
+  or `az`/Graph Explorer:
+
+  ```ts
+  const sub = await client.createSubscription({
+    resource: "/drives/<drive-id>/root",
+    notificationUrl: "https://<your-app>/api/webhooks/graph",
+    clientState: "<workspaceId>",
+    expirationMinutes: 60,
+  });
+  ```
+
+- On creation Graph performs a **validation handshake**: it calls the
+  notificationUrl with a `validationToken` query param, and the route echoes it
+  back as `text/plain` within 10s (already implemented).
+- When tenant data changes, Graph POSTs a notification batch. For each entry whose
+  `clientState` maps to a known workspace, the API triggers a re-scan and records a
+  `notification.received` audit event. Unknown/malformed payloads are accepted
+  (202) and skipped — Graph retries aggressively, so the route never returns 5xx.
+- **Subscriptions expire** (drive resources allow a short max lifetime) and must be
+  **renewed** before `expirationDateTime` by PATCHing the subscription with a new
+  expiration. A production deployment would re-ingest only the changed items via
+  `MsGraphClient.getChanges(deltaLink)` before re-scanning.

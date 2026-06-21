@@ -325,6 +325,54 @@ describe("live Microsoft Graph connection", () => {
   });
 });
 
+describe("graph change notifications (webhook)", () => {
+  it("echoes the validationToken as text/plain on the handshake", async () => {
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/webhooks/graph?validationToken=abc123",
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toBe("abc123");
+    expect(res.headers["content-type"]).toContain("text/plain");
+  });
+
+  it("re-scans + audits when a notification's clientState is a known workspace", async () => {
+    const created = await app.inject({ method: "POST", url: "/api/workspaces", payload: { name: "Notify Co" } });
+    const nid = created.json().id as string;
+    await app.inject({ method: "POST", url: `/api/workspaces/${nid}/connections/demo/seed` });
+    await app.inject({ method: "POST", url: `/api/workspaces/${nid}/scans`, payload: {} });
+
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/webhooks/graph",
+      payload: { value: [{ clientState: nid, changeType: "updated", resource: "/drives/d1/root" }] },
+    });
+    expect(res.statusCode).toBe(202);
+
+    const audit = await app.inject({ method: "GET", url: `/api/workspaces/${nid}/audit-events` });
+    const actions = audit.json().map((e: { action: string }) => e.action);
+    expect(actions).toContain("notification.received");
+  });
+
+  it("still 202s (no throw) for an unknown clientState", async () => {
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/webhooks/graph",
+      payload: { value: [{ clientState: "ws-does-not-exist", changeType: "updated" }] },
+    });
+    expect(res.statusCode).toBe(202);
+  });
+
+  it("exposes subscribe-info for a workspace", async () => {
+    const info = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/notifications/subscribe-info` });
+    expect(info.statusCode).toBe(200);
+    const body = info.json() as { notificationUrl: string; clientState: string; recommendedResource: string };
+    expect(body.notificationUrl).toBe("/api/webhooks/graph");
+    expect(body.clientState).toBe(wsId);
+    expect(body.recommendedResource).toContain("/drives/");
+  });
+});
+
 describe("retrieval without a connection", () => {
   it("404s when no graph has been ingested yet", async () => {
     const created = await app.inject({ method: "POST", url: "/api/workspaces", payload: { name: "Empty Co" } });

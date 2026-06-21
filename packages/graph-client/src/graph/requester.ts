@@ -16,11 +16,15 @@ export interface GraphConfig {
 export interface GraphPage<T = unknown> {
   value: T[];
   nextLink?: string;
+  /** Final @odata.deltaLink, present on the last page of a delta query. */
+  deltaLink?: string;
 }
 
 export interface GraphRequester {
   /** GET an absolute path (e.g. "/users?$select=id") or a full nextLink URL. */
   get<T = unknown>(pathOrUrl: string): Promise<GraphPage<T>>;
+  /** POST a JSON body to an absolute path (e.g. "/subscriptions") and return the parsed response. */
+  post<T = unknown>(path: string, body: unknown): Promise<T>;
 }
 
 export interface RetryOptions {
@@ -105,11 +109,36 @@ export function createGraphRequester(config: GraphConfig, retry?: Partial<RetryO
       const retryAfterMs = retryAfterHeader ? Number(retryAfterHeader) * 1000 : undefined;
       throw new GraphError(`graph GET ${url} failed: ${res.status}`, res.status, retryAfterMs);
     }
-    const json = (await res.json()) as { value?: T[]; "@odata.nextLink"?: string };
-    return { value: json.value ?? [], nextLink: json["@odata.nextLink"] };
+    const json = (await res.json()) as {
+      value?: T[];
+      "@odata.nextLink"?: string;
+      "@odata.deltaLink"?: string;
+    };
+    return { value: json.value ?? [], nextLink: json["@odata.nextLink"], deltaLink: json["@odata.deltaLink"] };
+  }
+
+  async function rawPost<T>(path: string, body: unknown): Promise<T> {
+    token ??= await getAppToken(config);
+    const url = path.startsWith("http") ? path : `${baseUrl}${path}`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (res.status === 401) {
+      token = await getAppToken(config); // refresh once
+      throw new GraphError("unauthorized — token refreshed, retry", 503);
+    }
+    if (!res.ok) {
+      const retryAfterHeader = res.headers.get("retry-after");
+      const retryAfterMs = retryAfterHeader ? Number(retryAfterHeader) * 1000 : undefined;
+      throw new GraphError(`graph POST ${url} failed: ${res.status}`, res.status, retryAfterMs);
+    }
+    return (await res.json()) as T;
   }
 
   return {
     get: <T>(pathOrUrl: string) => withRetry(() => rawGet<T>(pathOrUrl), { maxRetries, sleep }),
+    post: <T>(path: string, body: unknown) => withRetry(() => rawPost<T>(path, body), { maxRetries, sleep }),
   };
 }

@@ -62,6 +62,22 @@ const findingPatch = z.object({
   applyFix: z.boolean().optional(),
 });
 
+// A Graph change-notification batch. Graph posts a `value` array; each entry
+// carries the clientState we registered (= the workspaceId) plus what changed.
+const graphNotificationBody = z.object({
+  value: z.array(
+    z.object({
+      clientState: z.string().optional(),
+      resource: z.string().optional(),
+      changeType: z.string().optional(),
+    }),
+  ),
+});
+
+// The Graph resource we recommend subscribing to (drive root changes drive the
+// re-scan of SharePoint/OneDrive exposure). Documented for the UI/runbook.
+const RECOMMENDED_NOTIFICATION_RESOURCE = "/drives/{drive-id}/root";
+
 const createScheduleBody = z.object({
   name: z.string().min(1),
   action: z.enum(["scan", "report"]).optional(),
@@ -384,6 +400,54 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
     return store.listAudit(id);
+  });
+
+  // ── Change notifications ───────────────────────────────────
+  // Tells the UI/runbook how to register a Graph subscription for this workspace:
+  // point notificationUrl at the single webhook route below and set clientState
+  // to the workspace id so notifications route back here. (No live subscription
+  // is created from the API in this scaffold — see docs/SETUP-GRAPH.md.)
+  app.get("/api/workspaces/:id/notifications/subscribe-info", async (req) => {
+    const { id } = req.params as { id: string };
+    await requireWorkspace(id);
+    return {
+      notificationUrl: "/api/webhooks/graph",
+      clientState: id,
+      recommendedResource: RECOMMENDED_NOTIFICATION_RESOURCE,
+    };
+  });
+
+  // Single Graph notification URL (NOT workspace-scoped — Graph calls one URL and
+  // we route by clientState). Graph retries aggressively, so this never 500s a
+  // notification: malformed or unknown payloads are accepted (202) and skipped.
+  app.post("/api/webhooks/graph", async (req, reply) => {
+    // Validation handshake: on subscription creation Graph GET/POSTs with a
+    // validationToken query param and expects it echoed back as text/plain <10s.
+    const { validationToken } = req.query as { validationToken?: string };
+    if (validationToken !== undefined) {
+      return reply.status(200).header("content-type", "text/plain").send(validationToken);
+    }
+
+    // Parse defensively — never throw on a notification body.
+    const parsed = graphNotificationBody.safeParse(req.body);
+    if (!parsed.success) return reply.status(202).send();
+
+    for (const note of parsed.data.value) {
+      const workspaceId = note.clientState;
+      if (!workspaceId) continue;
+      const ws = await store.getWorkspace(workspaceId);
+      if (!ws) continue; // unknown/invalid clientState → skip, don't fail the batch
+      // Re-scan the stored graph. In production we would first re-ingest the
+      // changed items via MsGraphClient.getChanges(deltaLink) before scanning.
+      await store.runScan(workspaceId);
+      await store.logAudit({
+        workspaceId,
+        actor: "graph-webhook",
+        action: "notification.received",
+        detail: { changeType: note.changeType, resource: note.resource },
+      });
+    }
+    return reply.status(202).send();
   });
 
   return app;
