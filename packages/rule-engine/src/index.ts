@@ -9,6 +9,9 @@ export { SENSITIVITY_KEYWORDS, SENSITIVE_LABELS } from "./sensitivity/signals.js
 export { buildPermissionGraph, PermissionGraph } from "./graph/permission-graph.js";
 export type { EffectiveAccess, Audience } from "./graph/permission-graph.js";
 
+export { buildExposureGraphModel } from "./graph/exposure-graph.js";
+export type { ExposureGraphModel, ExposureGraphNode, ExposureGraphEdge } from "./graph/exposure-graph.js";
+
 export { fingerprint, hash, findingId, evidenceId, remediationId, pathId } from "./fingerprint.js";
 export { clamp01, round, byId, sortBy, sortByDesc, unique } from "./util.js";
 

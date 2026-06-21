@@ -47,6 +47,14 @@ describe("workspace lifecycle + scan", () => {
     expect(res.json().findingCount).toBe(9);
   });
 
+  it("returns the visual exposure graph", async () => {
+    const res = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/graph` });
+    expect(res.statusCode).toBe(200);
+    const ids = res.json().nodes.map((n: { id: string }) => n.id);
+    expect(ids).toContain("f-salary");
+    expect(res.json().edges.some((e: { target: string }) => e.target === "f-salary")).toBe(true);
+  });
+
   it("lists findings and filters by severity", async () => {
     const all = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/findings` });
     expect(all.json()).toHaveLength(9);

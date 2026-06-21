@@ -9,7 +9,7 @@ import {
   createGraphRequester,
 } from "@cel/graph-client";
 import { EXPORT_FORMATS, isExportFormat, runExport } from "@cel/integrations";
-import { simulateRetrieval, tenantExposureScore } from "@cel/rule-engine";
+import { buildExposureGraphModel, simulateRetrieval, tenantExposureScore } from "@cel/rule-engine";
 import Fastify, { type FastifyInstance } from "fastify";
 import { z } from "zod";
 import type { FindingStatus } from "@cel/types";
@@ -318,6 +318,15 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
       return { score: 0, band: "info", findingCount: 0, bands: { critical: 0, high: 0, medium: 0, low: 0, info: 0 }, drivers: [] };
     }
     return tenantExposureScore(result);
+  });
+
+  // ── Visual attack/exposure graph ───────────────────────────
+  app.get("/api/workspaces/:id/graph", perm("view"), async (req) => {
+    const { id } = req.params as { id: string };
+    await requireWorkspace(id);
+    const result = await store.getScanResult(id);
+    if (!result) return { nodes: [], edges: [] };
+    return buildExposureGraphModel(result);
   });
 
   // ── Continuous monitoring: trend + drift ───────────────────
