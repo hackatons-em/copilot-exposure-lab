@@ -13,11 +13,13 @@ import { EXPORT_FORMATS, isExportFormat, runExport } from "@cel/integrations";
 import {
   allRules,
   buildExposureGraphModel,
+  buildRemediationPlan,
   buildThreatModel,
   classifySensitivity,
   generateFixScript,
   remediationFor,
   simulateCopilotAnswer,
+  simulateRemediation,
   simulateRetrieval,
   tenantExposureScore,
 } from "@cel/rule-engine";
@@ -387,6 +389,30 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     const result = await store.getScanResult(id);
     if (!result) return { nodes: [], edges: [] };
     return buildExposureGraphModel(result);
+  });
+
+  // ── Remediation planner ────────────────────────────────────
+  // Deterministic "fix these first" plan — greedy marginal score-drop per effort.
+  app.get("/api/workspaces/:id/remediation-plan", perm("view"), async (req) => {
+    const { id } = req.params as { id: string };
+    await requireWorkspace(id);
+    const result = await store.getScanResult(id);
+    if (!result) {
+      return { baselineScore: 0, projectedScore: 0, totalDelta: 0, steps: [], candidatesConsidered: 0, capped: false };
+    }
+    return buildRemediationPlan(result);
+  });
+
+  // What-if: project the tenant score if a chosen set of findings were fixed.
+  app.post("/api/workspaces/:id/simulate-remediation", perm("view"), async (req) => {
+    const { id } = req.params as { id: string };
+    await requireWorkspace(id);
+    const { findingIds } = z.object({ findingIds: z.array(z.string()) }).parse(req.body ?? {});
+    const result = await store.getScanResult(id);
+    if (!result) {
+      throw Object.assign(new Error("no scan to simulate against"), { statusCode: 409 });
+    }
+    return simulateRemediation(result, findingIds);
   });
 
   // ── Continuous monitoring: trend + drift ───────────────────

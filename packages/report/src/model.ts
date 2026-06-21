@@ -3,6 +3,7 @@ import type {
   ControlRef,
   EvidenceItem,
   Finding,
+  RemediationPlan,
   RemediationTask,
   ScanResult,
   Scenario,
@@ -98,6 +99,8 @@ export interface ReportModel {
   threatCoverage: ThreatCoverage;
   /** Remediation roadmap, sequenced by effort (quick wins first). */
   roadmap: RemediationRoadmap;
+  /** Optional prioritized "fix these first" plan (deterministic, supplied by the caller). */
+  remediationPlan?: RemediationPlan;
   scenarioRuns: { title: string; summary: string }[];
   methodology: string[];
   limitations: string[];
@@ -120,6 +123,8 @@ export interface BuildReportInput {
   scenarios: Scenario[];
   /** Optional tenant exposure score (deterministic; computed by the caller). */
   exposure?: ReportExposure;
+  /** Optional prioritized remediation plan (deterministic; computed by the caller). */
+  remediationPlan?: RemediationPlan;
 }
 
 function buildHeatMap(findings: Finding[]): HeatMapRow[] {
@@ -234,6 +239,7 @@ export function buildReportModel(input: BuildReportInput): ReportModel {
     topRisks,
     threatCoverage,
     roadmap: buildRoadmap(findings),
+    remediationPlan: input.remediationPlan,
     scenarioRuns: scanResult.scenarioRuns.map((r) => ({ title: scenarioTitle(r.scenarioId), summary: r.summary })),
     methodology: [
       "Metadata ingestion of users, groups, sites, drives, files, permissions, sharing links, and agents.",

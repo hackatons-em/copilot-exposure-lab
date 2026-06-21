@@ -36,6 +36,8 @@ export { threatFor, buildThreatModel } from "./threat/catalog.js";
 export type { ThreatModel, ThreatModelRow } from "./threat/catalog.js";
 export { generateFixScript } from "./remediation/script-generator.js";
 export type { FixScript } from "./remediation/script-generator.js";
+export { buildRemediationPlan, simulateRemediation } from "./remediation/prioritizer.js";
+export type { RemediationPlanOptions } from "./remediation/prioritizer.js";
 export { SCENARIO_LENSES } from "./scenarios/registry.js";
 
 export { scan, runScenario } from "./pipeline.js";

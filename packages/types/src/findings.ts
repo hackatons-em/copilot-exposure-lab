@@ -173,3 +173,48 @@ export interface ScanResult {
   scenarioRuns: ScenarioRun[];
   generatedAt: string;
 }
+
+/** One sequenced step in a remediation plan — fixing this finding drops the tenant score. */
+export interface RemediationStep {
+  findingId: string;
+  title: string;
+  ruleId: string;
+  band: Band;
+  estimatedEffort: EstimatedEffort;
+  /** Tenant exposure score before this step. */
+  scoreBefore: number;
+  /** Tenant exposure score after this step. */
+  scoreAfter: number;
+  /** Points this step removes. */
+  scoreDelta: number;
+  /** Cumulative points removed from the baseline through this step. */
+  cumulativeDelta: number;
+}
+
+/**
+ * A deterministic, sequenced "fix these first" plan: greedy marginal-gain ordering
+ * of fixes by exposure-score reduction per unit of effort.
+ */
+export interface RemediationPlan {
+  baselineScore: number;
+  projectedScore: number;
+  totalDelta: number;
+  steps: RemediationStep[];
+  /** How many candidate findings were evaluated (top-by-score cap). */
+  candidatesConsidered: number;
+  /** True if active findings exceeded the candidate cap (some weren't evaluated). */
+  capped: boolean;
+}
+
+/** Projected tenant exposure if a chosen set of findings were fixed (what-if). */
+export interface RemediationSimulation {
+  baselineScore: number;
+  projectedScore: number;
+  baselineBand: Band;
+  projectedBand: Band;
+  scoreDelta: number;
+  /** The findings the simulation treats as fixed (valid, currently-active ids). */
+  resolvedFindingIds: string[];
+  /** Findings that would remain active afterward. */
+  remainingActive: number;
+}

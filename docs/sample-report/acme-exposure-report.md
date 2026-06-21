@@ -208,6 +208,19 @@ Scenarios run:
 
 ## 8. Remediation Roadmap
 
+**Prioritized plan — fix these 8 first to drop the tenant exposure score 98 → 55 (−43).** Ordered by score reduction per unit of effort.
+
+| # | Finding | Severity | Effort | Score −Δ | Cumulative |
+|---:|---|---|---|---:|---:|
+| 1 | Sensitive file shared through an organization-wide link | Critical | low | −18 | −18 |
+| 2 | Sensitive file inherits broad read from its parent site | High | medium | −5 | −23 |
+| 3 | External guest retains access to a confidential resource | High | low | −1 | −24 |
+| 4 | Agent can take a risky external action | High | medium | −2 | −26 |
+| 5 | Sensitive file exposed to a broad department group | High | medium | −5 | −31 |
+| 6 | Sensitive file exposed to a broad department group | Medium | medium | −7 | −38 |
+| 7 | Agent owned by a departed or inactive maker | Medium | low | −4 | −42 |
+| 8 | Sensitive file is missing a sensitivity label | Medium | low | −1 | −43 |
+
 Remediation sequenced by effort — quick wins first, most severe within each lane.
 
 **Quick wins (low effort)**

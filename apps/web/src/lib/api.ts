@@ -4,6 +4,8 @@ import type {
   EvidenceItem,
   Finding,
   FindingStatus,
+  RemediationPlan,
+  RemediationSimulation,
   RemediationTask,
   Report,
   ReportFormat,
@@ -379,6 +381,19 @@ export const api = {
   /** Headline tenant exposure score (deterministic aggregate of the latest scan). */
   getExposure(): Promise<TenantExposure> {
     return request<TenantExposure>(`/api/workspaces/${ws}/exposure`);
+  },
+
+  /** Deterministic "fix these first" plan — ordered by score-drop per unit effort. */
+  getRemediationPlan(): Promise<RemediationPlan> {
+    return request<RemediationPlan>(`/api/workspaces/${ws}/remediation-plan`);
+  },
+
+  /** What-if: project the tenant score if the given findings were fixed. */
+  simulateRemediation(findingIds: string[]): Promise<RemediationSimulation> {
+    return request<RemediationSimulation>(`/api/workspaces/${ws}/simulate-remediation`, {
+      method: "POST",
+      body: JSON.stringify({ findingIds }),
+    });
   },
 
   /**

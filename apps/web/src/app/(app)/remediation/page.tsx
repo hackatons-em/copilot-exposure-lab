@@ -11,6 +11,7 @@ import { Button } from "@/components/Button";
 import { EmptyState } from "@/components/EmptyState";
 import { ErrorState, LoadingState } from "@/components/States";
 import { PageHeader } from "@/components/PageHeader";
+import { RemediationPlanner } from "@/components/RemediationPlanner";
 import { SeverityBadge } from "@/components/SeverityBadge";
 import { RemediationStatusPill } from "@/components/StatusPill";
 
@@ -58,6 +59,12 @@ export default function RemediationPage() {
         title="Remediation"
         description="Microsoft-native remediation tasks across all findings. Apply a fix to re-verify the exposure path is closed."
       />
+
+      {data && data.length > 0 ? (
+        <div className="mb-6">
+          <RemediationPlanner dataVersion={dataVersion} />
+        </div>
+      ) : null}
 
       {loading ? (
         <LoadingState label="Loading remediation tasks…" />

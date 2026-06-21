@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { type GraphProvider, SeedGraphClient } from "@cel/graph-client";
 import { buildReportModel, generateLlmSummary, renderHtml, renderMarkdown } from "@cel/report";
-import { scan, tenantExposureScore } from "@cel/rule-engine";
+import { buildRemediationPlan, scan, tenantExposureScore } from "@cel/rule-engine";
 import type {
   AuditEvent,
   Band,
@@ -235,6 +235,7 @@ export class MemoryStore implements Store {
       scanResult: state.result,
       scenarios: state.graph.scenarios,
       exposure: tenantExposureScore(state.result),
+      remediationPlan: buildRemediationPlan(state.result),
     });
     // Env-gated AI narrative — undefined by default (deterministic), never affects scoring.
     model.llmSummary = await generateLlmSummary(model);

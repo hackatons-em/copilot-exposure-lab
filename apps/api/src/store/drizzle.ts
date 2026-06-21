@@ -19,7 +19,7 @@ import {
 } from "@cel/db";
 import { type GraphProvider, SeedGraphClient } from "@cel/graph-client";
 import { buildReportModel, generateLlmSummary, renderHtml, renderMarkdown } from "@cel/report";
-import { scan, tenantExposureScore, threatFor } from "@cel/rule-engine";
+import { buildRemediationPlan, scan, tenantExposureScore, threatFor } from "@cel/rule-engine";
 import type {
   AuditEvent,
   Finding,
@@ -482,6 +482,7 @@ export class DrizzleStore implements Store {
       scanResult: result,
       scenarios: graph.scenarios,
       exposure: tenantExposureScore(result),
+      remediationPlan: buildRemediationPlan(result),
     });
     model.llmSummary = await generateLlmSummary(model);
     const report: Report = {
@@ -540,6 +541,7 @@ export class DrizzleStore implements Store {
       scanResult: result,
       scenarios: graph.scenarios,
       exposure: tenantExposureScore(result),
+      remediationPlan: buildRemediationPlan(result),
     });
     // Reuse the narrative computed at creation time (env-gated; undefined by default).
     model.llmSummary = report.llmSummary;

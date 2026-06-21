@@ -184,6 +184,22 @@ export function renderMarkdown(model: ReportModel): string {
 
   out.push("## 8. Remediation Roadmap");
   out.push("");
+  if (model.remediationPlan && model.remediationPlan.steps.length > 0) {
+    const p = model.remediationPlan;
+    out.push(
+      `**Prioritized plan — fix these ${p.steps.length} first to drop the tenant exposure score ` +
+        `${p.baselineScore} → ${p.projectedScore} (−${p.totalDelta}).** Ordered by score reduction per unit of effort.`,
+    );
+    out.push("");
+    out.push("| # | Finding | Severity | Effort | Score −Δ | Cumulative |");
+    out.push("|---:|---|---|---|---:|---:|");
+    p.steps.forEach((s, i) => {
+      out.push(
+        `| ${i + 1} | ${s.title} | ${bandLabel(s.band)} | ${s.estimatedEffort} | −${s.scoreDelta} | −${s.cumulativeDelta} |`,
+      );
+    });
+    out.push("");
+  }
   out.push("Remediation sequenced by effort — quick wins first, most severe within each lane.");
   out.push("");
   out.push(...roadmapLane("Quick wins (low effort)", model.roadmap.quickWins));

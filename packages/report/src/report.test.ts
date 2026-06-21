@@ -1,5 +1,5 @@
 import { loadSeedGraph } from "@cel/graph-client";
-import { scan, tenantExposureScore } from "@cel/rule-engine";
+import { buildRemediationPlan, scan, tenantExposureScore } from "@cel/rule-engine";
 import { describe, expect, it } from "vitest";
 import { buildReportModel } from "./model.js";
 import { renderHtml } from "./html.js";
@@ -13,6 +13,7 @@ const model = buildReportModel({
   scanResult,
   scenarios: graph.scenarios,
   exposure,
+  remediationPlan: buildRemediationPlan(scanResult),
 });
 
 describe("buildReportModel", () => {
@@ -87,6 +88,11 @@ describe("renderMarkdown", () => {
     expect(md).toContain("## 3. Threat Framework Coverage");
     expect(md).toContain("MITRE ATT&CK");
     expect(md).toContain("T1213.002");
+  });
+
+  it("renders the prioritized remediation plan", () => {
+    expect(md).toContain("Prioritized plan — fix these");
+    expect(md).toContain("Cumulative");
   });
 
   it("renders the tenant exposure score line with drivers", () => {

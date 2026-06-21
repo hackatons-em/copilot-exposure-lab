@@ -114,6 +114,22 @@ function threatCoverage(model: ReportModel): string {
   return `${intro}${techBlock}${ctrlBlock}`;
 }
 
+/** Prioritized "fix these first" plan — ranked by score reduction per effort. */
+function remediationPlan(model: ReportModel): string {
+  const p = model.remediationPlan;
+  if (!p || p.steps.length === 0) return "";
+  const rows = p.steps
+    .map(
+      (s, i) =>
+        `<tr><td style="text-align:right">${i + 1}</td><td>${esc(s.title)}</td><td>${badge(s.band)}</td><td>${esc(
+          s.estimatedEffort,
+        )}</td><td style="text-align:right;color:#2f6f4f;font-weight:600">&minus;${s.scoreDelta}</td><td style="text-align:right">&minus;${s.cumulativeDelta}</td></tr>`,
+    )
+    .join("");
+  return `<p><strong>Prioritized plan — fix these ${p.steps.length} first to drop the tenant exposure score ${p.baselineScore} &rarr; ${p.projectedScore} (&minus;${p.totalDelta}).</strong> Ordered by score reduction per unit of effort.</p>
+    <table><thead><tr><th>#</th><th>Finding</th><th>Severity</th><th>Effort</th><th>Score &minus;&Delta;</th><th>Cumulative</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
 function roadmapLane(title: string, items: RoadmapItem[]): string {
   if (items.length === 0) return `<h3>${esc(title)}</h3><p><em>None.</em></p>`;
   const rows = items
@@ -219,6 +235,7 @@ export function renderHtml(model: ReportModel): string {
   ${details || "<p><em>No critical or high findings.</em></p>"}
 
   <h2>8. Remediation Roadmap</h2>
+  ${remediationPlan(model)}
   <p>Remediation sequenced by effort — quick wins first, most severe within each lane.</p>
   ${roadmapLane("Quick wins (low effort)", model.roadmap.quickWins)}
   ${roadmapLane("Planned (medium effort)", model.roadmap.planned)}
