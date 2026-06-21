@@ -10,7 +10,8 @@ import { useWorkspace } from "@/components/WorkspaceProvider";
 import { Button } from "@/components/Button";
 import { DataTable, type Column } from "@/components/DataTable";
 import { EmptyState } from "@/components/EmptyState";
-import { ErrorState, LoadingState } from "@/components/States";
+import { ErrorState } from "@/components/States";
+import { SkeletonTable } from "@/components/Skeleton";
 import { PageHeader } from "@/components/PageHeader";
 import { SeverityBadge } from "@/components/SeverityBadge";
 import { FindingStatusPill } from "@/components/StatusPill";
@@ -117,7 +118,7 @@ export default function FindingsPage() {
       </div>
 
       {loading ? (
-        <LoadingState label="Loading findings…" />
+        <SkeletonTable rows={8} />
       ) : error ? (
         <ErrorState message={error} onRetry={reload} />
       ) : rows.length === 0 ? (

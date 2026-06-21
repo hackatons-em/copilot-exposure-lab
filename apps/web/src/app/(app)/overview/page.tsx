@@ -10,7 +10,8 @@ import { useWorkspace } from "@/components/WorkspaceProvider";
 import { Button } from "@/components/Button";
 import { DataTable, type Column } from "@/components/DataTable";
 import { EmptyState } from "@/components/EmptyState";
-import { ErrorState, LoadingState } from "@/components/States";
+import { ErrorState } from "@/components/States";
+import { Skeleton, SkeletonCard, SkeletonTable } from "@/components/Skeleton";
 import { ExposureGauge } from "@/components/ExposureGauge";
 import { MetricCard } from "@/components/MetricCard";
 import { TrendChart } from "@/components/TrendChart";
@@ -77,7 +78,17 @@ export default function OverviewPage() {
     return (
       <>
         <PageHeader title="Overview" />
-        <LoadingState label="Loading exposure overview…" />
+        <div className="grid gap-4 lg:grid-cols-[16rem_1fr]">
+          <Skeleton className="h-56 rounded-lg" />
+          <div className="grid content-start gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+        </div>
+        <div className="mt-8">
+          <SkeletonTable rows={6} />
+        </div>
       </>
     );
   }
