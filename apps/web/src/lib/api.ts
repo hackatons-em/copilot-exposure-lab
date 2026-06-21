@@ -74,6 +74,13 @@ export interface FindingFilter {
   scenarioId?: string;
 }
 
+/** One available export format, as returned by GET /exports. */
+export interface ExportFormatInfo {
+  format: string;
+  label: string;
+  description: string;
+}
+
 const ws = WORKSPACE_ID;
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -190,6 +197,15 @@ export const api = {
 
   reportDownloadUrl(reportId: string): string {
     return `${API_URL}/api/workspaces/${ws}/reports/${encodeURIComponent(reportId)}/download`;
+  },
+
+  listExports(): Promise<ExportFormatInfo[]> {
+    return request<ExportFormatInfo[]>(`/api/workspaces/${ws}/exports`);
+  },
+
+  /** Full download URL for an export format — generated on demand from the latest scan. */
+  exportUrl(format: string): string {
+    return `${API_URL}/api/workspaces/${ws}/exports/${encodeURIComponent(format)}`;
   },
 
   listAudit(): Promise<AuditEvent[]> {

@@ -92,6 +92,19 @@ describe("workspace lifecycle + scan", () => {
     expect(dl.headers["content-disposition"]).toContain("attachment");
     expect(dl.body).toContain("# Copilot Exposure Assessment Report");
   });
+
+  it("downloads a deterministic security-tool export and rejects unknown formats", async () => {
+    const csv = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/exports/csv` });
+    expect(csv.statusCode).toBe(200);
+    expect(csv.headers["content-disposition"]).toContain("attachment");
+    expect(csv.body).toContain("f-salary");
+
+    const list = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/exports` });
+    expect(list.json()).toHaveLength(6);
+
+    const bad = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/exports/pdf` });
+    expect(bad.statusCode).toBe(400);
+  });
 });
 
 // A network-free live-Graph provider returning a tiny org-wide-exposed graph.

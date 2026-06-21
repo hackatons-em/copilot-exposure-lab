@@ -1,5 +1,6 @@
 import cors from "@fastify/cors";
 import { type GraphProvider, MsGraphClient, createGraphRequester } from "@cel/graph-client";
+import { EXPORT_FORMATS, isExportFormat, runExport } from "@cel/integrations";
 import Fastify, { type FastifyInstance } from "fastify";
 import { z } from "zod";
 import type { FindingStatus } from "@cel/types";
@@ -234,6 +235,31 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
       .header("content-type", contentType)
       .header("content-disposition", `attachment; filename="${content.filename}"`)
       .send(content.content);
+  });
+
+  // ── Exports ────────────────────────────────────────────────
+  // The available deterministic security-tool export formats (drives the UI).
+  app.get("/api/workspaces/:id/exports", async (req) => {
+    const { id } = req.params as { id: string };
+    await requireWorkspace(id);
+    return EXPORT_FORMATS;
+  });
+
+  // Generate a single export on demand from the latest scan. Pure transform —
+  // no document content, no secrets; TimeGenerated uses the scan's generatedAt.
+  app.get("/api/workspaces/:id/exports/:format", async (req, reply) => {
+    const { id, format } = req.params as { id: string; format: string };
+    await requireWorkspace(id);
+    if (!isExportFormat(format)) throw Object.assign(new Error(`unknown export format: ${format}`), { statusCode: 400 });
+    const scanResult = await store.getScanResult(id);
+    if (!scanResult) throw Object.assign(new Error("no scan result — run a scan first"), { statusCode: 404 });
+    const ws = await store.getWorkspace(id);
+    const artifact = runExport(format, scanResult, { workspaceName: ws?.name ?? id });
+    await store.logAudit({ workspaceId: id, actor: "api", action: `export.${format}`, targetId: artifact.filename });
+    return reply
+      .header("content-type", artifact.contentType)
+      .header("content-disposition", `attachment; filename="${artifact.filename}"`)
+      .send(artifact.body);
   });
 
   // ── Audit ──────────────────────────────────────────────────
