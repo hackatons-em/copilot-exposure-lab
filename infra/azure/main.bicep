@@ -157,6 +157,7 @@ resource apiApp 'Microsoft.App/containerApps@2024-03-01' = {
       registries: [{ server: acrServer, username: acrCreds.username, passwordSecretRef: 'acr-pwd' }]
       secrets: [
         { name: 'acr-pwd', value: acrCreds.passwords[0].value }
+        #disable-next-line use-secure-value-for-secure-inputs
         { name: 'database-url', value: databaseUrl }
       ]
     }
@@ -189,6 +190,7 @@ resource workerApp 'Microsoft.App/containerApps@2024-03-01' = {
       registries: [{ server: acrServer, username: acrCreds.username, passwordSecretRef: 'acr-pwd' }]
       secrets: [
         { name: 'acr-pwd', value: acrCreds.passwords[0].value }
+        #disable-next-line use-secure-value-for-secure-inputs
         { name: 'database-url', value: databaseUrl }
       ]
     }

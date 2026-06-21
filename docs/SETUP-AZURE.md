@@ -21,12 +21,26 @@ pwsh ./infra/azure/deploy.ps1 -PgAdminPassword (Read-Host -AsSecureString)
 
 The script:
 
-1. Creates resource group `rg-cel-dev-euw` (West Europe by default).
+1. Creates resource group `rg-cel-dev-swc` (Sweden Central by default).
 2. Deploys `infra/azure/main.bicep` (ACR, Postgres Flexible B1ms, Blob, Key
    Vault, free Azure AI Search, App Insights, Container Apps env + api/worker/web).
-3. Cloud-builds the images with `az acr build` (no local Docker), baking the
-   resolved API URL into the web image.
+3. Cloud-builds the images with `az acr build` **directly from the public GitHub
+   repo** (no local Docker, no local context upload — avoids Windows long-path
+   errors), baking the resolved API URL into the web image.
 4. Redeploys the apps with the built images.
+
+### Notes from a real run
+
+- **Region availability:** credit/free subscriptions are often refused in
+  popular regions (`RequestDisallowedByAzure: not accepting new customers`).
+  Sweden Central worked; if it doesn't, pass `-Location eastus2` (etc.).
+- **No-admin az install:** if you can't install the MSI, `python -m pip install
+  --user azure-cli` works (it lands in `%APPDATA%\Python\Python3xx\Scripts`).
+- **Resource providers** (Microsoft.App, OperationalInsights, DBforPostgreSQL,
+  Search, ...) are auto-registered on a fresh subscription; the first deploy may
+  wait a few minutes for that.
+- **Windows console + az logs:** set `$env:PYTHONUTF8=1` before deploying so
+  `az acr build` log streaming doesn't crash on non-cp1252 build output.
 
 The **api self-migrates** the database and seeds the `ws-demo` workspace on boot
 (`RUN_MIGRATIONS=true`), so the dashboard is ready immediately. The script prints
