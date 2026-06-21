@@ -1,0 +1,20 @@
+{
+  "name": "@cel/config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./eslint": "./eslint/index.js",
+    "./prettier": "./prettier/index.json",
+    "./tailwind": "./tailwind/index.js",
+    "./vitest": "./vitest/index.js",
+    "./tsconfig/base.json": "./tsconfig/base.json",
+    "./tsconfig/node.json": "./tsconfig/node.json",
+    "./tsconfig/next.json": "./tsconfig/next.json"
+  },
+  "scripts": {
+    "lint": "echo \"(config) lint skipped — exports shared presets\"",
+    "typecheck": "echo \"(config) no typecheck\"",
+    "test": "echo \"(config) no tests\""
+  }
+}
