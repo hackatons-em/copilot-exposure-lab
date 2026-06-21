@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Logo } from "@/components/Logo";
 import { HeroArtifact } from "@/components/landing/HeroArtifact";
+import { MarketingFooter } from "@/components/landing/MarketingFooter";
 import { Reveal } from "@/components/landing/Reveal";
 
 /**
@@ -326,14 +327,7 @@ export default function LandingPage() {
       </main>
 
       {/* ── Footer ────────────────────────────────────────────── */}
-      <footer className="border-t border-hairline bg-surface-subtle/50">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-10 md:flex-row md:items-center md:justify-between">
-          <Logo />
-          <p className="max-w-xl text-xs leading-relaxed text-ink-faint">
-            Independent product. Does not replace Microsoft Purview, Defender, or SharePoint Advanced Management.
-          </p>
-        </div>
-      </footer>
+      <MarketingFooter />
     </div>
   );
 }
