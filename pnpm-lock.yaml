@@ -41,6 +41,16 @@ importers:
 
   packages/config: {}
 
+  packages/types:
+    dependencies:
+      zod:
+        specifier: 3.24.1
+        version: 3.24.1
+    devDependencies:
+      '@cel/config':
+        specifier: workspace:*
+        version: link:../config
+
 packages:
 
   '@alloc/quick-lru@5.2.0':
@@ -1212,6 +1222,9 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
+  zod@3.24.1:
+    resolution: {integrity: sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A==}
+
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
@@ -2295,3 +2308,5 @@ snapshots:
   yaml@2.9.0: {}
 
   yocto-queue@0.1.0: {}
+
+  zod@3.24.1: {}
