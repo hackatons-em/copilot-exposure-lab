@@ -15,7 +15,7 @@ import {
   tenantConnections,
   workspaces,
 } from "@cel/db";
-import { loadSeedGraph } from "@cel/graph-client";
+import { type GraphProvider, SeedGraphClient } from "@cel/graph-client";
 import { buildReportModel, renderHtml, renderMarkdown } from "@cel/report";
 import { scan } from "@cel/rule-engine";
 import type {
@@ -70,9 +70,14 @@ export class DrizzleStore implements Store {
     return res.length > 0;
   }
 
-  async seedDemo(workspaceId: string): Promise<{ connection: TenantConnection; counts: Record<string, number> }> {
+  async ingestGraph(
+    workspaceId: string,
+    provider: GraphProvider,
+  ): Promise<{ connection: TenantConnection; counts: Record<string, number> }> {
     await this.assertWorkspace(workspaceId);
-    const demo = loadSeedGraph();
+    const loaded = await provider.loadTenantGraph();
+    const connection: TenantConnection = { ...loaded.connection, id: `conn-${workspaceId}`, workspaceId };
+
     // Clear any existing graph + derived data for this workspace.
     for (const t of [
       evidenceItems,
@@ -87,7 +92,6 @@ export class DrizzleStore implements Store {
     ]) {
       await this.db.delete(t).where(eq(t.workspaceId, workspaceId));
     }
-    const connection: TenantConnection = { ...demo.connection, id: `conn-${workspaceId}`, workspaceId };
     await this.db.insert(tenantConnections).values({
       id: connection.id,
       workspaceId,
@@ -96,22 +100,30 @@ export class DrizzleStore implements Store {
       scopes: connection.scopes ?? [],
     });
     await this.db.insert(principalsTable).values(
-      demo.principals.map((p) => ({ ...p, workspaceId, isExternal: p.isExternal ?? false })),
+      loaded.principals.map((p) => ({ ...p, workspaceId, isExternal: p.isExternal ?? false })),
     );
-    await this.db.insert(resourcesTable).values(demo.resources.map((r) => ({ ...r, workspaceId })));
-    if (demo.grants.length) {
-      await this.db.insert(permissionGrants).values(demo.grants.map((g) => ({ ...g, workspaceId })));
+    if (loaded.resources.length) {
+      await this.db.insert(resourcesTable).values(loaded.resources.map((r) => ({ ...r, workspaceId })));
     }
-    await this.db.insert(scenariosTable).values(demo.scenarios.map((s) => ({ ...s, workspaceId })));
+    if (loaded.grants.length) {
+      await this.db.insert(permissionGrants).values(loaded.grants.map((g) => ({ ...g, workspaceId })));
+    }
+    if (loaded.scenarios.length) {
+      await this.db.insert(scenariosTable).values(loaded.scenarios.map((s) => ({ ...s, workspaceId })));
+    }
     return {
       connection,
       counts: {
-        principals: demo.principals.length,
-        resources: demo.resources.length,
-        grants: demo.grants.length,
-        scenarios: demo.scenarios.length,
+        principals: loaded.principals.length,
+        resources: loaded.resources.length,
+        grants: loaded.grants.length,
+        scenarios: loaded.scenarios.length,
       },
     };
+  }
+
+  async seedDemo(workspaceId: string): Promise<{ connection: TenantConnection; counts: Record<string, number> }> {
+    return this.ingestGraph(workspaceId, new SeedGraphClient());
   }
 
   async listConnections(workspaceId: string): Promise<TenantConnection[]> {

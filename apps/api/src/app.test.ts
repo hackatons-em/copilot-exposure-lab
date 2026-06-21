@@ -1,3 +1,5 @@
+import { DEFAULT_SCENARIOS, type GraphProvider } from "@cel/graph-client";
+import type { PermissionGrant, Principal, Resource, TenantGraph } from "@cel/types";
 import type { FastifyInstance } from "fastify";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "./app.js";
@@ -89,6 +91,116 @@ describe("workspace lifecycle + scan", () => {
     expect(dl.statusCode).toBe(200);
     expect(dl.headers["content-disposition"]).toContain("attachment");
     expect(dl.body).toContain("# Copilot Exposure Assessment Report");
+  });
+});
+
+// A network-free live-Graph provider returning a tiny org-wide-exposed graph.
+const liveGraph: TenantGraph = {
+  workspace: { id: "x", name: "x" },
+  connection: { id: "c", workspaceId: "x", mode: "live-graph", tenantName: "contoso.onmicrosoft.com", scopes: ["User.Read.All"] },
+  principals: [
+    { id: "u-b", sourceId: "u-b", kind: "user", displayName: "Bob", memberOf: ["g-all"], active: true } as Principal,
+    {
+      id: "g-all",
+      sourceId: "g-all",
+      kind: "group",
+      displayName: "Everyone Except External Users",
+      membershipKind: "everyone-except-external",
+      memberCount: 1,
+      memberOf: [],
+      active: true,
+    } as Principal,
+  ],
+  resources: [
+    {
+      id: "f-pay",
+      sourceId: "f-pay",
+      kind: "file",
+      name: "salary_plan.xlsx",
+      sensitivityLabel: "Confidential",
+      sensitivityTags: ["salary"],
+      businessCriticality: "critical",
+      agentActions: [],
+      connectors: [],
+    } as Resource,
+  ],
+  grants: [{ id: "p1", resourceId: "f-pay", principalId: "g-all", right: "read", via: "orgwide", linkScope: "org-wide" } as PermissionGrant],
+  scenarios: DEFAULT_SCENARIOS,
+};
+
+class FakeGraphProvider implements GraphProvider {
+  readonly mode = "live-graph" as const;
+  async loadTenantGraph() {
+    return liveGraph;
+  }
+  async listUsers() {
+    return liveGraph.principals.filter((p) => p.kind === "user");
+  }
+  async listGroups() {
+    return liveGraph.principals.filter((p) => p.kind === "group");
+  }
+  async listGroupMembers() {
+    return [];
+  }
+  async listSites() {
+    return [];
+  }
+  async listResources() {
+    return liveGraph.resources;
+  }
+  async listPermissions() {
+    return liveGraph.grants;
+  }
+  async listScenarios() {
+    return liveGraph.scenarios;
+  }
+}
+
+describe("live Microsoft Graph connection", () => {
+  let liveApp: FastifyInstance;
+  const wsLive = "ws-live";
+
+  beforeAll(async () => {
+    const store = new MemoryStore();
+    await store.createWorkspace({ id: wsLive, name: "Contoso" });
+    liveApp = buildApp({ store, graphProviderFactory: () => new FakeGraphProvider() });
+    await liveApp.ready();
+  });
+  afterAll(async () => {
+    await liveApp.close();
+  });
+
+  it("ingests a live tenant (metadata-only) and records a live-graph connection", async () => {
+    const res = await liveApp.inject({
+      method: "POST",
+      url: `/api/workspaces/${wsLive}/connections/microsoft/start`,
+      payload: { tenantId: "t", clientId: "c", clientSecret: "s", tenantName: "contoso.onmicrosoft.com" },
+    });
+    expect(res.statusCode).toBe(201);
+    expect(res.json().connection.mode).toBe("live-graph");
+    expect(res.json().counts.resources).toBe(1);
+  });
+
+  it("scans the live graph through the same pipeline", async () => {
+    const res = await liveApp.inject({ method: "POST", url: `/api/workspaces/${wsLive}/scans`, payload: {} });
+    expect(res.statusCode).toBe(201);
+    expect(res.json().findingCount).toBeGreaterThanOrEqual(1);
+    expect(res.json().bands.critical).toBeGreaterThanOrEqual(1);
+  });
+
+  it("never returns the client secret in the audit log", async () => {
+    const res = await liveApp.inject({ method: "GET", url: `/api/workspaces/${wsLive}/audit-events` });
+    expect(JSON.stringify(res.json())).not.toContain("\"s\"");
+    expect(JSON.stringify(res.json())).not.toContain("clientSecret");
+  });
+
+  it("rejects a connect request missing credentials (400)", async () => {
+    const res = await liveApp.inject({
+      method: "POST",
+      url: `/api/workspaces/${wsLive}/connections/microsoft/start`,
+      payload: { tenantId: "t" },
+    });
+    expect(res.statusCode).toBe(400);
   });
 });
 

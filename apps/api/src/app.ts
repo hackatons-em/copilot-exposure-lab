@@ -1,12 +1,37 @@
 import cors from "@fastify/cors";
+import { type GraphProvider, MsGraphClient, createGraphRequester } from "@cel/graph-client";
 import Fastify, { type FastifyInstance } from "fastify";
 import { z } from "zod";
 import type { FindingStatus } from "@cel/types";
 import type { Store } from "./store/types.js";
 
+export interface GraphProviderInput {
+  workspaceId: string;
+  workspaceName: string;
+  tenantId: string;
+  clientId: string;
+  clientSecret: string;
+  tenantName: string;
+}
+
 export interface BuildAppOptions {
   store: Store;
   logger?: boolean;
+  /** Build a live Graph provider from credentials. Injectable for testing. */
+  graphProviderFactory?: (input: GraphProviderInput) => GraphProvider;
+}
+
+/** Default factory: a metadata-only, least-privilege live Microsoft Graph client. */
+function defaultGraphProviderFactory(input: GraphProviderInput): GraphProvider {
+  const requester = createGraphRequester({
+    tenantId: input.tenantId,
+    clientId: input.clientId,
+    clientSecret: input.clientSecret,
+  });
+  return new MsGraphClient(requester, {
+    workspace: { id: input.workspaceId, name: input.workspaceName },
+    tenantName: input.tenantName,
+  });
 }
 
 const createWorkspaceBody = z.object({ id: z.string().optional(), name: z.string().min(1) });
@@ -20,6 +45,7 @@ const findingPatch = z.object({
 export function buildApp(opts: BuildAppOptions): FastifyInstance {
   const app = Fastify({ logger: opts.logger ?? false });
   const { store } = opts;
+  const graphProviderFactory = opts.graphProviderFactory ?? defaultGraphProviderFactory;
 
   void app.register(cors, { origin: true });
 
@@ -68,6 +94,40 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     await requireWorkspace(id);
     const result = await store.seedDemo(id);
     await store.logAudit({ workspaceId: id, actor: "api", action: "connection.demo.seed", targetId: result.connection.id });
+    return reply.status(201).send(result);
+  });
+
+  // Connect a live Microsoft 365 tenant (metadata-only ingestion via Graph).
+  // The client secret is used transiently to build the provider and is never
+  // logged, returned, or persisted (non-negotiable: secrets never leave).
+  app.post("/api/workspaces/:id/connections/microsoft/start", async (req, reply) => {
+    const { id } = req.params as { id: string };
+    await requireWorkspace(id);
+    const body = z
+      .object({
+        tenantId: z.string().min(1),
+        clientId: z.string().min(1),
+        clientSecret: z.string().min(1),
+        tenantName: z.string().optional(),
+      })
+      .parse(req.body);
+    const ws = await store.getWorkspace(id);
+    const provider = graphProviderFactory({
+      workspaceId: id,
+      workspaceName: ws?.name ?? id,
+      tenantId: body.tenantId,
+      clientId: body.clientId,
+      clientSecret: body.clientSecret,
+      tenantName: body.tenantName ?? body.tenantId,
+    });
+    const result = await store.ingestGraph(id, provider);
+    await store.logAudit({
+      workspaceId: id,
+      actor: "api",
+      action: "connection.microsoft.start",
+      targetId: result.connection.id,
+      detail: { tenantName: result.connection.tenantName, mode: result.connection.mode },
+    });
     return reply.status(201).send(result);
   });
 

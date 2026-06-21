@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { loadSeedGraph } from "@cel/graph-client";
+import { type GraphProvider, SeedGraphClient } from "@cel/graph-client";
 import { buildReportModel, renderHtml, renderMarkdown } from "@cel/report";
 import { scan } from "@cel/rule-engine";
 import type {
@@ -63,13 +63,16 @@ export class MemoryStore implements Store {
     return this.ws.delete(id);
   }
 
-  async seedDemo(workspaceId: string): Promise<{ connection: TenantConnection; counts: Record<string, number> }> {
+  async ingestGraph(
+    workspaceId: string,
+    provider: GraphProvider,
+  ): Promise<{ connection: TenantConnection; counts: Record<string, number> }> {
     const state = this.require(workspaceId);
-    const demo = loadSeedGraph();
+    const loaded = await provider.loadTenantGraph();
     const graph: TenantGraph = {
-      ...demo,
-      workspace: { ...demo.workspace, id: workspaceId, name: state.workspace.name },
-      connection: { ...demo.connection, id: `conn-${workspaceId}`, workspaceId },
+      ...loaded,
+      workspace: { id: workspaceId, name: state.workspace.name, createdAt: state.workspace.createdAt },
+      connection: { ...loaded.connection, id: `conn-${workspaceId}`, workspaceId },
     };
     state.graph = graph;
     state.connections = [graph.connection];
@@ -84,6 +87,10 @@ export class MemoryStore implements Store {
         scenarios: graph.scenarios.length,
       },
     };
+  }
+
+  async seedDemo(workspaceId: string): Promise<{ connection: TenantConnection; counts: Record<string, number> }> {
+    return this.ingestGraph(workspaceId, new SeedGraphClient());
   }
 
   async listConnections(workspaceId: string): Promise<TenantConnection[]> {

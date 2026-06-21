@@ -74,5 +74,24 @@ console.log(result.findings.map((f) => `${f.risk.total} ${f.risk.band} ${f.ruleI
 The same `scan()` pipeline that powers the demo runs over the live graph — the
 findings, evidence chains, scoring, and report are identical in shape.
 
-> The API's `connections/microsoft/start` wiring and Key Vault-backed secret
-> storage are V1 work; for the sandbox spike the script above is enough.
+## 6. Or connect through the API
+
+The API exposes the connector directly. Create a workspace, then start a
+Microsoft connection — the metadata is ingested immediately and a scan can run:
+
+```bash
+WS=ws-acme-pilot
+curl -X POST http://localhost:4000/api/workspaces \
+  -H 'content-type: application/json' -d "{\"id\":\"$WS\",\"name\":\"Acme pilot\"}"
+
+curl -X POST http://localhost:4000/api/workspaces/$WS/connections/microsoft/start \
+  -H 'content-type: application/json' \
+  -d "{\"tenantId\":\"$CEL_GRAPH_TENANT_ID\",\"clientId\":\"$CEL_GRAPH_CLIENT_ID\",\"clientSecret\":\"$CEL_GRAPH_CLIENT_SECRET\",\"tenantName\":\"contoso.onmicrosoft.com\"}"
+
+curl -X POST http://localhost:4000/api/workspaces/$WS/scans -d '{}' -H 'content-type: application/json'
+curl http://localhost:4000/api/workspaces/$WS/findings
+```
+
+The `clientSecret` is used transiently to acquire a token and is **never logged,
+returned, or persisted** (the audit log records only the tenant name + mode).
+Key Vault-backed secret storage and scheduled re-scans remain V1 work.

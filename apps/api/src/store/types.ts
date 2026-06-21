@@ -1,3 +1,4 @@
+import type { GraphProvider } from "@cel/graph-client";
 import type {
   AuditEvent,
   EvidenceItem,
@@ -49,7 +50,13 @@ export interface Store {
   getWorkspace(id: string): Promise<Workspace | undefined>;
   deleteWorkspace(id: string): Promise<boolean>;
 
-  /** Load the bundled Acme demo company into a workspace. */
+  /** Ingest any metadata source (demo seed or live Graph) into a workspace. */
+  ingestGraph(
+    workspaceId: string,
+    provider: GraphProvider,
+  ): Promise<{ connection: TenantConnection; counts: Record<string, number> }>;
+
+  /** Load the bundled Acme demo company into a workspace (delegates to ingestGraph). */
   seedDemo(workspaceId: string): Promise<{ connection: TenantConnection; counts: Record<string, number> }>;
   listConnections(workspaceId: string): Promise<TenantConnection[]>;
   listResources(workspaceId: string): Promise<Resource[]>;
