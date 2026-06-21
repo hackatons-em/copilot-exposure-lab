@@ -117,6 +117,8 @@ export interface Report {
   findingIds: string[];
   /** Optional, env-gated, clearly flagged. Never affects scoring. */
   llmSummary?: string;
+  /** Where the rendered artifact was stored (e.g. a Blob URL), once generated. */
+  artifactUrl?: string;
 }
 
 export interface AuditEvent {

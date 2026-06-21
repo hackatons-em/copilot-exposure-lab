@@ -79,6 +79,8 @@ export interface Store {
   createReport(workspaceId: string, format: ReportFormat): Promise<Report>;
   getReport(workspaceId: string, reportId: string): Promise<Report | undefined>;
   getReportContent(workspaceId: string, reportId: string): Promise<ReportContent | undefined>;
+  /** Record where a report artifact was stored (e.g. a Blob URL). */
+  setReportArtifactUrl(workspaceId: string, reportId: string, url: string): Promise<void>;
 
   listAudit(workspaceId: string): Promise<AuditEvent[]>;
   logAudit(event: Omit<AuditEvent, "id" | "at"> & { at?: string }): Promise<AuditEvent>;

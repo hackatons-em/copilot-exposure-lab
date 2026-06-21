@@ -2,11 +2,12 @@ import { readFileSync, readdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { DrizzleStore, enqueueJob } from "@cel/api";
-import { type Database, jobs, schema } from "@cel/db";
+import { type Database, jobs, reports, schema } from "@cel/db";
 import { PGlite } from "@electric-sql/pglite";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/pglite";
 import { beforeAll, describe, expect, it } from "vitest";
+import { cleanup } from "./cleanup.js";
 import { drain, pollOnce } from "./poller.js";
 
 /** Verifies the queue SQL (enqueue -> claim -> complete) over real Postgres (pglite). */
@@ -47,5 +48,29 @@ describe("worker queue (pglite)", () => {
     const [job] = await db.select().from(jobs).where(eq(jobs.id, id));
     expect(job!.status).toBe("failed");
     expect(job!.error).toContain("unknown job type");
+  });
+});
+
+describe("cleanup retention (pglite)", () => {
+  it("deletes finished jobs and reports older than the cutoffs", async () => {
+    await db.insert(jobs).values({
+      id: "job-old",
+      workspaceId: "ws-job",
+      type: "scan",
+      status: "completed",
+      createdAt: "2020-01-01T00:00:00.000Z",
+    });
+    await db.insert(reports).values({
+      id: "rep-old",
+      workspaceId: "ws-job",
+      format: "markdown",
+      generatedAt: "2020-01-01T00:00:00.000Z",
+      scenarioRunIds: [],
+      findingIds: [],
+    });
+    const result = await cleanup(db, { now: "2026-06-21T00:00:00.000Z" });
+    expect(result.jobsDeleted).toBeGreaterThanOrEqual(1);
+    expect(result.reportsDeleted).toBeGreaterThanOrEqual(1);
+    expect((await db.select().from(reports).where(eq(reports.id, "rep-old"))).length).toBe(0);
   });
 });

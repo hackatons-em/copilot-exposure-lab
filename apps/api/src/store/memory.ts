@@ -207,6 +207,11 @@ export class MemoryStore implements Store {
     return this.require(workspaceId).reports.get(reportId)?.report;
   }
 
+  async setReportArtifactUrl(workspaceId: string, reportId: string, url: string): Promise<void> {
+    const entry = this.require(workspaceId).reports.get(reportId);
+    if (entry) entry.report.artifactUrl = url;
+  }
+
   async getReportContent(workspaceId: string, reportId: string): Promise<ReportContent | undefined> {
     const entry = this.require(workspaceId).reports.get(reportId);
     if (!entry) return undefined;

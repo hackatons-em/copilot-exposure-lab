@@ -1,12 +1,13 @@
 import type { Store } from "@cel/api";
 import { type Database, jobs } from "@cel/db";
 import { asc, eq } from "drizzle-orm";
+import type { BlobUploader } from "./blob.js";
 import { type Job, dispatch } from "./handlers.js";
 
 const nowIso = (): string => new Date().toISOString();
 
 /** Claim and process one queued job. Returns false when the queue is empty. */
-export async function pollOnce(db: Database, store: Store): Promise<boolean> {
+export async function pollOnce(db: Database, store: Store, blob?: BlobUploader): Promise<boolean> {
   const [queued] = await db
     .select()
     .from(jobs)
@@ -21,7 +22,7 @@ export async function pollOnce(db: Database, store: Store): Promise<boolean> {
     .where(eq(jobs.id, queued.id));
 
   const job: Job = { id: queued.id, workspaceId: queued.workspaceId, type: queued.type, payload: queued.payload };
-  const res = await dispatch(store, job);
+  const res = await dispatch({ store, db, blob }, job);
 
   await db
     .update(jobs)
@@ -36,8 +37,8 @@ export async function pollOnce(db: Database, store: Store): Promise<boolean> {
 }
 
 /** Drain all currently-queued jobs. Returns how many were processed. */
-export async function drain(db: Database, store: Store): Promise<number> {
+export async function drain(db: Database, store: Store, blob?: BlobUploader): Promise<number> {
   let processed = 0;
-  while (await pollOnce(db, store)) processed += 1;
+  while (await pollOnce(db, store, blob)) processed += 1;
   return processed;
 }

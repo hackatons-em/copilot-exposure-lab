@@ -435,8 +435,24 @@ export class DrizzleStore implements Store {
       .from(reportsTable)
       .where(and(eq(reportsTable.workspaceId, workspaceId), eq(reportsTable.id, reportId)));
     return r
-      ? { id: r.id, workspaceId: r.workspaceId, generatedAt: r.generatedAt, format: r.format as ReportFormat, scenarioRunIds: r.scenarioRunIds, findingIds: r.findingIds, llmSummary: r.llmSummary ?? undefined }
+      ? {
+          id: r.id,
+          workspaceId: r.workspaceId,
+          generatedAt: r.generatedAt,
+          format: r.format as ReportFormat,
+          scenarioRunIds: r.scenarioRunIds,
+          findingIds: r.findingIds,
+          llmSummary: r.llmSummary ?? undefined,
+          artifactUrl: r.artifactUrl ?? undefined,
+        }
       : undefined;
+  }
+
+  async setReportArtifactUrl(workspaceId: string, reportId: string, url: string): Promise<void> {
+    await this.db
+      .update(reportsTable)
+      .set({ artifactUrl: url })
+      .where(and(eq(reportsTable.workspaceId, workspaceId), eq(reportsTable.id, reportId)));
   }
 
   async getReportContent(workspaceId: string, reportId: string): Promise<ReportContent | undefined> {

@@ -15,6 +15,7 @@
     "build": "echo \"(worker) run via tsx; no bundle step\""
   },
   "dependencies": {
+    "@azure/storage-blob": "12.26.0",
     "@cel/api": "workspace:*",
     "@cel/db": "workspace:*",
     "@cel/types": "workspace:*",

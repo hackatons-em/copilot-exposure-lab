@@ -192,6 +192,8 @@ resource workerApp 'Microsoft.App/containerApps@2024-03-01' = {
         { name: 'acr-pwd', value: acrCreds.passwords[0].value }
         #disable-next-line use-secure-value-for-secure-inputs
         { name: 'database-url', value: databaseUrl }
+        #disable-next-line use-secure-value-for-secure-inputs
+        { name: 'storage-conn', value: 'DefaultEndpointsProtocol=https;AccountName=${storage.name};AccountKey=${storage.listKeys().keys[0].value};EndpointSuffix=${environment().suffixes.storage}' }
       ]
     }
     template: {
@@ -204,6 +206,8 @@ resource workerApp 'Microsoft.App/containerApps@2024-03-01' = {
           env: [
             { name: 'DATABASE_URL', secretRef: 'database-url' }
             { name: 'WORKER_POLL_MS', value: '5000' }
+            { name: 'AZURE_STORAGE_CONNECTION_STRING', secretRef: 'storage-conn' }
+            { name: 'AZURE_STORAGE_CONTAINER', value: 'reports' }
           ]
         }
       ]
