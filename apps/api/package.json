@@ -15,6 +15,7 @@
   "dependencies": {
     "@cel/db": "workspace:*",
     "@cel/graph-client": "workspace:*",
+    "@cel/report": "workspace:*",
     "@cel/rule-engine": "workspace:*",
     "@cel/types": "workspace:*",
     "@fastify/cors": "10.0.2",

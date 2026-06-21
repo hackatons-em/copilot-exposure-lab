@@ -47,6 +47,9 @@ importers:
       '@cel/graph-client':
         specifier: workspace:*
         version: link:../../packages/graph-client
+      '@cel/report':
+        specifier: workspace:*
+        version: link:../../packages/report
       '@cel/rule-engine':
         specifier: workspace:*
         version: link:../../packages/rule-engine

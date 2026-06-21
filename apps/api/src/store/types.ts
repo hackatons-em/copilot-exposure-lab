@@ -4,6 +4,8 @@ import type {
   Finding,
   FindingStatus,
   RemediationTask,
+  Report,
+  ReportFormat,
   Resource,
   ScanResult,
   Scenario,
@@ -11,6 +13,12 @@ import type {
   TenantConnection,
   Workspace,
 } from "@cel/types";
+
+export interface ReportContent {
+  format: ReportFormat;
+  content: string;
+  filename: string;
+}
 
 export interface FindingDetail {
   finding: Finding;
@@ -60,6 +68,10 @@ export interface Store {
   ): Promise<Finding | undefined>;
 
   getScanResult(workspaceId: string): Promise<ScanResult | undefined>;
+
+  createReport(workspaceId: string, format: ReportFormat): Promise<Report>;
+  getReport(workspaceId: string, reportId: string): Promise<Report | undefined>;
+  getReportContent(workspaceId: string, reportId: string): Promise<ReportContent | undefined>;
 
   listAudit(workspaceId: string): Promise<AuditEvent[]>;
   logAudit(event: Omit<AuditEvent, "id" | "at"> & { at?: string }): Promise<AuditEvent>;

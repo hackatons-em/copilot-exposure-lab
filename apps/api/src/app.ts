@@ -145,6 +145,37 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     return finding;
   });
 
+  // ── Reports ────────────────────────────────────────────────
+  app.post("/api/workspaces/:id/reports", async (req, reply) => {
+    const { id } = req.params as { id: string };
+    await requireWorkspace(id);
+    const { format } = z.object({ format: z.enum(["markdown", "html"]).default("markdown") }).parse(req.body ?? {});
+    const report = await store.createReport(id, format);
+    await store.logAudit({ workspaceId: id, actor: "api", action: "report.create", targetId: report.id, detail: { format } });
+    return reply.status(201).send(report);
+  });
+
+  app.get("/api/workspaces/:id/reports/:rid", async (req) => {
+    const { id, rid } = req.params as { id: string; rid: string };
+    await requireWorkspace(id);
+    const report = await store.getReport(id, rid);
+    if (!report) throw Object.assign(new Error("report not found"), { statusCode: 404 });
+    return report;
+  });
+
+  app.get("/api/workspaces/:id/reports/:rid/download", async (req, reply) => {
+    const { id, rid } = req.params as { id: string; rid: string };
+    await requireWorkspace(id);
+    const content = await store.getReportContent(id, rid);
+    if (!content) throw Object.assign(new Error("report not found"), { statusCode: 404 });
+    await store.logAudit({ workspaceId: id, actor: "api", action: "report.export", targetId: rid });
+    const contentType = content.format === "html" ? "text/html; charset=utf-8" : "text/markdown; charset=utf-8";
+    return reply
+      .header("content-type", contentType)
+      .header("content-disposition", `attachment; filename="${content.filename}"`)
+      .send(content.content);
+  });
+
   // ── Audit ──────────────────────────────────────────────────
   app.get("/api/workspaces/:id/audit-events", async (req) => {
     const { id } = req.params as { id: string };

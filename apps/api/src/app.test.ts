@@ -76,6 +76,20 @@ describe("workspace lifecycle + scan", () => {
     expect(res.statusCode).toBe(200);
     expect(res.json().findingIds.length).toBeGreaterThan(0);
   });
+
+  it("generates and downloads a markdown report", async () => {
+    const created = await app.inject({
+      method: "POST",
+      url: `/api/workspaces/${wsId}/reports`,
+      payload: { format: "markdown" },
+    });
+    expect(created.statusCode).toBe(201);
+    const rid = created.json().id as string;
+    const dl = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/reports/${rid}/download` });
+    expect(dl.statusCode).toBe(200);
+    expect(dl.headers["content-disposition"]).toContain("attachment");
+    expect(dl.body).toContain("# Copilot Exposure Assessment Report");
+  });
 });
 
 describe("workspace isolation", () => {

@@ -1,18 +1,21 @@
 import { randomUUID } from "node:crypto";
 import { loadSeedGraph } from "@cel/graph-client";
+import { buildReportModel, renderHtml, renderMarkdown } from "@cel/report";
 import { scan } from "@cel/rule-engine";
 import type {
   AuditEvent,
   Band,
   Finding,
   FindingStatus,
+  Report,
+  ReportFormat,
   ScanResult,
   ScenarioRun,
   TenantConnection,
   TenantGraph,
   Workspace,
 } from "@cel/types";
-import type { FindingDetail, FindingFilter, ScanRunSummary, Store } from "./types.js";
+import type { FindingDetail, FindingFilter, ReportContent, ScanRunSummary, Store } from "./types.js";
 
 interface WorkspaceState {
   workspace: Workspace;
@@ -21,6 +24,7 @@ interface WorkspaceState {
   result?: ScanResult;
   appliedFixes: Set<string>;
   audit: AuditEvent[];
+  reports: Map<string, { report: Report; content: string }>;
 }
 
 const nowIso = (): string => new Date().toISOString();
@@ -37,7 +41,13 @@ export class MemoryStore implements Store {
 
   async createWorkspace(input: { id?: string; name: string }): Promise<Workspace> {
     const workspace: Workspace = { id: input.id ?? `ws-${randomUUID()}`, name: input.name, createdAt: nowIso() };
-    this.ws.set(workspace.id, { workspace, connections: [], appliedFixes: new Set(), audit: [] });
+    this.ws.set(workspace.id, {
+      workspace,
+      connections: [],
+      appliedFixes: new Set(),
+      audit: [],
+      reports: new Map(),
+    });
     return workspace;
   }
 
@@ -161,6 +171,44 @@ export class MemoryStore implements Store {
     }
     if (patch.status) finding.status = patch.status;
     return finding;
+  }
+
+  async createReport(workspaceId: string, format: ReportFormat): Promise<Report> {
+    const state = this.require(workspaceId);
+    if (!state.graph || !state.result) {
+      throw Object.assign(new Error("run a scan before generating a report"), { statusCode: 409 });
+    }
+    const model = buildReportModel({
+      workspace: state.workspace,
+      scanResult: state.result,
+      scenarios: state.graph.scenarios,
+    });
+    const content = format === "html" ? renderHtml(model) : renderMarkdown(model);
+    const report: Report = {
+      id: `rep-${randomUUID()}`,
+      workspaceId,
+      generatedAt: state.result.generatedAt,
+      format,
+      scenarioRunIds: state.result.scenarioRuns.map((r) => r.id),
+      findingIds: state.result.findings.map((f) => f.id),
+    };
+    state.reports.set(report.id, { report, content });
+    return report;
+  }
+
+  async getReport(workspaceId: string, reportId: string): Promise<Report | undefined> {
+    return this.require(workspaceId).reports.get(reportId)?.report;
+  }
+
+  async getReportContent(workspaceId: string, reportId: string): Promise<ReportContent | undefined> {
+    const entry = this.require(workspaceId).reports.get(reportId);
+    if (!entry) return undefined;
+    const ext = entry.report.format === "html" ? "html" : "md";
+    return {
+      format: entry.report.format,
+      content: entry.content,
+      filename: `copilot-exposure-report-${reportId}.${ext}`,
+    };
   }
 
   async listAudit(workspaceId: string): Promise<AuditEvent[]> {
