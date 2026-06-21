@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@cel/config": "workspace:*",
+    "@electric-sql/pglite": "0.2.17",
     "tsx": "4.19.2"
   }
 }

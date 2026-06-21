@@ -1,0 +1,9 @@
+# Shared image for the Node services (api, worker, migrate).
+# Apps run from TypeScript source via tsx; compose sets working_dir + command.
+FROM node:22-alpine
+RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
+WORKDIR /app
+COPY . .
+RUN pnpm install --frozen-lockfile
+# Default; overridden per service in docker-compose.yml.
+CMD ["node", "--version"]

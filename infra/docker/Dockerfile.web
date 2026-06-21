@@ -1,0 +1,14 @@
+# Next.js web dashboard. NEXT_PUBLIC_API_URL is baked at build time (client fetch).
+FROM node:22-alpine
+RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
+WORKDIR /app
+COPY . .
+RUN pnpm install --frozen-lockfile
+ARG NEXT_PUBLIC_API_URL=http://localhost:4000
+ARG NEXT_PUBLIC_WORKSPACE_ID=ws-demo
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_WORKSPACE_ID=$NEXT_PUBLIC_WORKSPACE_ID
+RUN pnpm --filter @cel/web build
+WORKDIR /app/apps/web
+EXPOSE 3000
+CMD ["pnpm", "start"]
