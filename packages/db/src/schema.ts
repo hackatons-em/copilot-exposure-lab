@@ -1,3 +1,4 @@
+import type { ExposurePath, RiskScore } from "@cel/types";
 import { boolean, integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 /**
@@ -11,7 +12,7 @@ import { boolean, integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/p
 export const workspaces = pgTable("workspaces", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
 });
 
 export const tenantConnections = pgTable("tenant_connections", {
@@ -22,7 +23,7 @@ export const tenantConnections = pgTable("tenant_connections", {
   mode: text("mode").notNull(), // demo-seed | live-graph
   tenantName: text("tenant_name").notNull(),
   scopes: jsonb("scopes").$type<string[]>().default([]).notNull(),
-  connectedAt: timestamp("connected_at", { withTimezone: true }).defaultNow().notNull(),
+  connectedAt: timestamp("connected_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
 });
 
 export const principals = pgTable("principals", {
@@ -41,7 +42,7 @@ export const principals = pgTable("principals", {
   membershipKind: text("membership_kind"),
   memberCount: integer("member_count"),
   active: boolean("active").default(true).notNull(),
-  syncedAt: timestamp("synced_at", { withTimezone: true }).defaultNow().notNull(),
+  syncedAt: timestamp("synced_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
 });
 
 export const resources = pgTable("resources", {
@@ -63,7 +64,7 @@ export const resources = pgTable("resources", {
   connectors: jsonb("connectors").$type<string[]>().default([]).notNull(),
   authMode: text("auth_mode"),
   publication: text("publication"),
-  syncedAt: timestamp("synced_at", { withTimezone: true }).defaultNow().notNull(),
+  syncedAt: timestamp("synced_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
 });
 
 export const permissionGrants = pgTable("permission_grants", {
@@ -78,7 +79,7 @@ export const permissionGrants = pgTable("permission_grants", {
   inheritedFromResourceId: text("inherited_from_resource_id"),
   sourcePermissionId: text("source_permission_id"),
   linkScope: text("link_scope"),
-  expirationAt: timestamp("expiration_at", { withTimezone: true }),
+  expirationAt: timestamp("expiration_at", { withTimezone: true, mode: "string" }),
 });
 
 export const scenarios = pgTable("scenarios", {
@@ -100,7 +101,7 @@ export const scenarioRuns = pgTable("scenario_runs", {
     .notNull()
     .references(() => workspaces.id, { onDelete: "cascade" }),
   scenarioId: text("scenario_id").notNull(),
-  runAt: timestamp("run_at", { withTimezone: true }).defaultNow().notNull(),
+  runAt: timestamp("run_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
   paths: jsonb("paths").$type<unknown[]>().default([]).notNull(),
   findingIds: jsonb("finding_ids").$type<string[]>().default([]).notNull(),
   summary: text("summary").notNull(),
@@ -116,17 +117,18 @@ export const findings = pgTable("findings", {
   title: text("title").notNull(),
   severity: text("severity").notNull(), // band
   score: integer("score").notNull(),
+  risk: jsonb("risk").$type<RiskScore>(),
   status: text("status").notNull().default("open"),
   resourceId: text("resource_id").notNull(),
   actorPrincipalId: text("actor_principal_id"),
   summary: text("summary").notNull(),
   businessImpact: text("business_impact").notNull(),
   remediationTaskId: text("remediation_task_id"),
-  exposurePath: jsonb("exposure_path").$type<unknown>(),
+  exposurePath: jsonb("exposure_path").$type<ExposurePath>(),
   evidenceIds: jsonb("evidence_ids").$type<string[]>().default([]).notNull(),
   scenarioIds: jsonb("scenario_ids").$type<string[]>().default([]).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
 });
 
 export const evidenceItems = pgTable("evidence_items", {
@@ -140,7 +142,7 @@ export const evidenceItems = pgTable("evidence_items", {
   sourceObjectType: text("source_object_type").notNull(),
   statement: text("statement").notNull(),
   data: jsonb("data").$type<Record<string, unknown>>(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
 });
 
 export const remediationTasks = pgTable("remediation_tasks", {
@@ -157,7 +159,7 @@ export const remediationTasks = pgTable("remediation_tasks", {
   owner: text("owner"),
   status: text("status").notNull().default("todo"),
   fixVerified: boolean("fix_verified"),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
 });
 
 export const reports = pgTable("reports", {
@@ -165,7 +167,7 @@ export const reports = pgTable("reports", {
   workspaceId: text("workspace_id")
     .notNull()
     .references(() => workspaces.id, { onDelete: "cascade" }),
-  generatedAt: timestamp("generated_at", { withTimezone: true }).defaultNow().notNull(),
+  generatedAt: timestamp("generated_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
   format: text("format").notNull(),
   scenarioRunIds: jsonb("scenario_run_ids").$type<string[]>().default([]).notNull(),
   findingIds: jsonb("finding_ids").$type<string[]>().default([]).notNull(),
@@ -176,7 +178,7 @@ export const reports = pgTable("reports", {
 export const auditEvents = pgTable("audit_events", {
   id: text("id").primaryKey(),
   workspaceId: text("workspace_id").references(() => workspaces.id, { onDelete: "cascade" }),
-  at: timestamp("at", { withTimezone: true }).defaultNow().notNull(),
+  at: timestamp("at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
   actor: text("actor").notNull(),
   action: text("action").notNull(),
   targetType: text("target_type"),
@@ -195,9 +197,9 @@ export const jobs = pgTable("jobs", {
   checkpoint: jsonb("checkpoint").$type<Record<string, unknown>>(),
   error: text("error"),
   attempts: integer("attempts").default(0).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  startedAt: timestamp("started_at", { withTimezone: true }),
-  finishedAt: timestamp("finished_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
+  startedAt: timestamp("started_at", { withTimezone: true, mode: "string" }),
+  finishedAt: timestamp("finished_at", { withTimezone: true, mode: "string" }),
 });
 
 export const schema = {

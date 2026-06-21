@@ -59,6 +59,9 @@ importers:
       '@fastify/cors':
         specifier: 10.0.2
         version: 10.0.2
+      drizzle-orm:
+        specifier: 0.38.3
+        version: 0.38.3(postgres@3.4.5)
       fastify:
         specifier: 5.2.1
         version: 5.2.1

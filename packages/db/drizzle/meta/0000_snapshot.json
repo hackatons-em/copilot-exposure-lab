@@ -1,5 +1,5 @@
 {
-  "id": "06398cf7-2ef4-488e-a1bc-97928979ca4c",
+  "id": "6354bfba-6831-4bf4-8e98-542d4ca67e44",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -207,6 +207,12 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true
+        },
+        "risk": {
+          "name": "risk",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
         },
         "status": {
           "name": "status",

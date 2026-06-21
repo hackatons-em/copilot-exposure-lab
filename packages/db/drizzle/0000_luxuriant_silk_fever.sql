@@ -29,6 +29,7 @@ CREATE TABLE "findings" (
 	"title" text NOT NULL,
 	"severity" text NOT NULL,
 	"score" integer NOT NULL,
+	"risk" jsonb,
 	"status" text DEFAULT 'open' NOT NULL,
 	"resource_id" text NOT NULL,
 	"actor_principal_id" text,
