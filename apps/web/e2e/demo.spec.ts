@@ -147,3 +147,34 @@ test("/pricing shows the three tiers and comparison", async ({ page }) => {
   }
   await expect(page.getByRole("heading", { name: /Compare plans/i })).toBeVisible(VISIBLE);
 });
+
+/** Ensure the workspace has scan data, running an assessment if the empty state shows. */
+async function ensureData(page: Page): Promise<void> {
+  const runButton = page.getByRole("button", { name: /run exposure assessment/i });
+  if (await runButton.first().isVisible().catch(() => false)) {
+    await runButton.first().click();
+    await page.waitForTimeout(2000);
+  }
+}
+
+test("remediation page shows the planner with a projected score", async ({ page }) => {
+  await page.goto("/remediation");
+  await ensureData(page);
+  await expect(page.getByRole("heading", { name: /^Remediation planner$/i }).first()).toBeVisible(VISIBLE);
+  await expect(page.getByText(/Fix these \d+ to drop your exposure/i).first()).toBeVisible(VISIBLE);
+});
+
+test("identities page ranks over-privileged users", async ({ page }) => {
+  await page.goto("/identities");
+  await ensureData(page);
+  await expect(page.getByRole("heading", { name: /^Identities$/ })).toBeVisible(VISIBLE);
+  await expect(page.getByText(/sensitive reached/i).first()).toBeVisible(VISIBLE);
+});
+
+test("agents page lists Copilot agents with risk posture", async ({ page }) => {
+  await page.goto("/agents");
+  await ensureData(page);
+  await expect(page.getByRole("heading", { name: /^Agents$/ })).toBeVisible(VISIBLE);
+  // The demo's helpdesk agent has a departed owner.
+  await expect(page.getByText(/orphaned owner|egress path/i).first()).toBeVisible(VISIBLE);
+});
