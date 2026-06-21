@@ -184,6 +184,9 @@ importers:
       '@cel/rule-engine':
         specifier: workspace:*
         version: link:../rule-engine
+      tsx:
+        specifier: 4.19.2
+        version: 4.19.2
 
   packages/rule-engine:
     dependencies:

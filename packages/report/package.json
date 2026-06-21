@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
-    "build": "echo \"(report) source-only package — consumed as TS, no build\""
+    "build": "echo \"(report) source-only package — consumed as TS, no build\"",
+    "sample": "tsx scripts/gen-sample.ts"
   },
   "dependencies": {
     "@cel/types": "workspace:*"
@@ -20,6 +21,7 @@
   "devDependencies": {
     "@cel/config": "workspace:*",
     "@cel/graph-client": "workspace:*",
-    "@cel/rule-engine": "workspace:*"
+    "@cel/rule-engine": "workspace:*",
+    "tsx": "4.19.2"
   }
 }
