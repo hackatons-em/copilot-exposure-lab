@@ -47,6 +47,17 @@ describe("workspace lifecycle + scan", () => {
     expect(res.json().findingCount).toBe(9);
   });
 
+  it("simulates what Copilot would surface for a prompt", async () => {
+    const res = await app.inject({
+      method: "POST",
+      url: `/api/workspaces/${wsId}/copilot-sim`,
+      payload: { prompt: "summarize our compensation plan" },
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().exposed).toBe(true);
+    expect(res.json().citations.some((c: { resourceId: string }) => c.resourceId === "f-salary")).toBe(true);
+  });
+
   it("returns the visual exposure graph", async () => {
     const res = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/graph` });
     expect(res.statusCode).toBe(200);

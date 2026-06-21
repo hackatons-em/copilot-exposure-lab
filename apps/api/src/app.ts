@@ -9,7 +9,7 @@ import {
   createGraphRequester,
 } from "@cel/graph-client";
 import { EXPORT_FORMATS, isExportFormat, runExport } from "@cel/integrations";
-import { buildExposureGraphModel, simulateRetrieval, tenantExposureScore } from "@cel/rule-engine";
+import { buildExposureGraphModel, simulateCopilotAnswer, simulateRetrieval, tenantExposureScore } from "@cel/rule-engine";
 import Fastify, { type FastifyInstance } from "fastify";
 import { z } from "zod";
 import type { FindingStatus } from "@cel/types";
@@ -307,6 +307,21 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     const resolvedActor = actorId ?? fallbackActor;
     if (!resolvedActor) throw Object.assign(new Error("no actor available to simulate"), { statusCode: 404 });
     return simulateRetrieval(graph, { actorId: resolvedActor });
+  });
+
+  // ── Copilot answer simulation ("would surface" proof) ──────
+  app.post("/api/workspaces/:id/copilot-sim", perm("view"), async (req) => {
+    const { id } = req.params as { id: string };
+    await requireWorkspace(id);
+    const graph = await store.getTenantGraph(id);
+    if (!graph) throw Object.assign(new Error("no connection — seed or connect first"), { statusCode: 404 });
+    const body = z.object({ actorId: z.string().optional(), prompt: z.string().min(1) }).parse(req.body ?? {});
+    const fallbackActor =
+      graph.scenarios.find((s) => s.key === "normal-employee")?.actorPrincipalId ??
+      graph.principals.find((p) => p.kind === "user")?.id;
+    const actorId = body.actorId ?? fallbackActor;
+    if (!actorId) throw Object.assign(new Error("no actor available to simulate"), { statusCode: 404 });
+    return simulateCopilotAnswer(graph, { actorId, prompt: body.prompt });
   });
 
   // ── Tenant exposure score (headline metric) ────────────────

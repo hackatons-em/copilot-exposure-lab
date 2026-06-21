@@ -35,3 +35,5 @@ export type { ScanOptions } from "./pipeline.js";
 
 export { simulateRetrieval } from "./retrieval/simulate.js";
 export type { RetrievalItem, RetrievalResult, SimulateRetrievalOptions } from "./retrieval/simulate.js";
+export { simulateCopilotAnswer } from "./retrieval/copilot-answer.js";
+export type { CopilotAnswer, CopilotCitation } from "./retrieval/copilot-answer.js";

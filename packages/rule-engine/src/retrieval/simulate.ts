@@ -33,9 +33,15 @@ export interface SimulateRetrievalOptions {
   limit?: number;
 }
 
-/** Org-wide and anyone audiences reach every internal user, including the actor. */
-function reachesEveryone(access: EffectiveAccess): boolean {
-  return access.audience === "org-wide" || access.audience === "anyone";
+/**
+ * Whether a broad-audience grant reaches this actor without an explicit member
+ * grant. "anyone" (anonymous link) reaches everyone, including external users;
+ * "org-wide" is *Everyone Except External Users*, so it excludes external actors.
+ */
+function reachesActor(access: EffectiveAccess, actorIsExternal: boolean): boolean {
+  if (access.audience === "anyone") return true;
+  if (access.audience === "org-wide") return !actorIsExternal;
+  return false;
 }
 
 /** A short, human-readable label for one access path. */
@@ -60,12 +66,13 @@ function strongestAccessFor(
   pg: PermissionGraph,
   resourceId: string,
   actorId: string,
+  actorIsExternal: boolean,
 ): EffectiveAccess | undefined {
   const reachable = pg
     .effectiveAccess(resourceId)
-    .filter((a) => reachesEveryone(a) || a.reachableUserIds.includes(actorId));
+    .filter((a) => reachesActor(a, actorIsExternal) || a.reachableUserIds.includes(actorId));
   if (reachable.length === 0) return undefined;
-  const rank = (a: EffectiveAccess): number => (reachesEveryone(a) ? 1 : 0);
+  const rank = (a: EffectiveAccess): number => (reachesActor(a, actorIsExternal) ? 1 : 0);
   return [...reachable].sort(
     (a, b) => rank(b) - rank(a) || b.breadth - a.breadth || (a.grant.id < b.grant.id ? -1 : 1),
   )[0];
@@ -79,6 +86,7 @@ function strongestAccessFor(
 export function simulateRetrieval(graph: TenantGraph, opts: SimulateRetrievalOptions): RetrievalResult {
   const pg = buildPermissionGraph(graph);
   const actor = pg.principal(opts.actorId);
+  const actorIsExternal = actor?.isExternal === true || actor?.kind === "external";
   const limit = opts.limit ?? 10;
 
   const items: RetrievalItem[] = [];
@@ -86,7 +94,7 @@ export function simulateRetrieval(graph: TenantGraph, opts: SimulateRetrievalOpt
     if (resource.kind !== "file") continue;
     const sensitivity = classifySensitivity(resource).rawScore;
     if (sensitivity <= 0) continue;
-    const access = strongestAccessFor(pg, resource.id, opts.actorId);
+    const access = strongestAccessFor(pg, resource.id, opts.actorId, actorIsExternal);
     if (!access) continue;
     const topSignals = classifySensitivity(resource)
       .signals.slice()
