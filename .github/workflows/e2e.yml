@@ -1,11 +1,11 @@
 name: E2E
 
-# Separate from the fast CI gate (ci.yml) so the browserless gate stays quick.
-# This job boots its own api + web (Playwright `webServer`) and walks the demo flow.
+# MANUAL ONLY. The Playwright run (browser download + boot api+web) is slow, so
+# it's off the push/PR path to keep CI fast. Run it on demand from the Actions
+# tab ("Run workflow") — do this before shipping / once the build is complete.
+# Locally: pnpm --filter @cel/web test:e2e:install && pnpm --filter @cel/web test:e2e
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_dispatch:
 
 jobs:
   e2e:
