@@ -194,7 +194,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </header>
 
-        <main className="bg-dotgrid flex-1">
+        <main className="flex-1">
           <div className="mx-auto w-full max-w-[1200px] px-4 py-8 md:px-6 lg:px-8">{children}</div>
         </main>
       </div>

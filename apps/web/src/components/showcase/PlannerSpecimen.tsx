@@ -28,8 +28,7 @@ export function PlannerSpecimen({ className }: { className?: string }) {
 
   return (
     <div ref={ref} className={`relative ${className ?? ""}`}>
-      <div aria-hidden className="absolute -inset-6 -z-10 rounded-[28px] bg-brand-soft/50 blur-2xl" />
-      <figure className="overflow-hidden rounded-lg border border-hairline bg-surface shadow-elevation-lg">
+      <figure className="overflow-hidden rounded-2xl border border-hairline bg-surface shadow-elevation-lg">
         <div className="flex items-center justify-between border-b border-hairline bg-surface-subtle px-4 py-2.5">
           <div className="flex items-center gap-2">
             <span aria-hidden className="h-2 w-2 rounded-full bg-brand/70" />

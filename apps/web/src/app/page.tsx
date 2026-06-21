@@ -105,13 +105,8 @@ export default function LandingPage() {
       <main>
         {/* ── Hero ──────────────────────────────────────────────── */}
         <section className="relative overflow-hidden border-b border-hairline">
-          <div aria-hidden className="bg-dotgrid absolute inset-0 -z-10" />
-          <div
-            aria-hidden
-            className="absolute inset-x-0 top-0 -z-10 h-24 bg-gradient-to-b from-canvas to-transparent"
-          />
-          <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-20 md:py-28 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
-            <Reveal className="max-w-xl">
+          <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-24 md:py-32 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
+            <div className="max-w-xl animate-rise">
               <span className="eyebrow inline-flex items-center gap-2">
                 <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-brand" />
                 Microsoft 365 Copilot readiness
@@ -123,24 +118,24 @@ export default function LandingPage() {
                 Copilot is only as safe as the permissions beneath it. Simulate the exposure paths, see the
                 evidence, and fix what matters — before you flip the switch.
               </p>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
+              <div className="mt-9 flex flex-wrap items-center gap-3">
                 <Link
                   href="/overview"
-                  className="inline-flex items-center rounded-md bg-brand px-6 py-3 text-sm font-medium text-white no-underline shadow-elevation transition-all hover:bg-brand-strong active:translate-y-px"
+                  className="inline-flex items-center rounded-full bg-brand px-7 py-3 text-sm font-medium text-white no-underline shadow-elevation transition-all hover:bg-brand-strong active:translate-y-px"
                 >
                   Run an exposure assessment
                 </Link>
                 <Link
                   href="/product"
-                  className="inline-flex items-center rounded-md border border-hairline bg-surface px-6 py-3 text-sm font-medium text-ink no-underline shadow-sm transition-colors hover:border-ink-faint/40 hover:bg-surface-subtle"
+                  className="inline-flex items-center rounded-full border border-hairline bg-surface px-7 py-3 text-sm font-medium text-ink no-underline transition-colors hover:border-ink-faint/40 hover:bg-surface-subtle"
                 >
                   See the product
                 </Link>
               </div>
-              <p className="mt-5 font-mono text-[11px] uppercase tracking-wider text-ink-faint">
+              <p className="mt-6 font-mono text-[11px] uppercase tracking-wider text-ink-faint">
                 Read-only · metadata-only · Microsoft-native
               </p>
-            </Reveal>
+            </div>
 
             <Reveal delay={120} className="lg:pl-4">
               <HeroArtifact />
@@ -153,7 +148,7 @@ export default function LandingPage() {
 
         {/* ── Problem / why now ─────────────────────────────────── */}
         <section className="border-b border-hairline">
-          <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
+          <div className="mx-auto max-w-6xl px-6 py-24 md:py-28">
             <Reveal className="max-w-3xl">
               <span className="eyebrow">Why now</span>
               <p className="mt-5 font-display text-2xl font-medium leading-snug tracking-tightest text-ink md:text-[1.75rem]">
@@ -169,7 +164,7 @@ export default function LandingPage() {
 
         {/* ── Product tour (the showcase) ───────────────────────── */}
         <section id="product" className="scroll-mt-20 border-b border-hairline bg-surface-subtle/40">
-          <div className="mx-auto max-w-6xl px-6 py-16 md:py-24">
+          <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
             <Reveal className="max-w-2xl">
               <span className="eyebrow text-brand">See it work</span>
               <h2 className="mt-4 font-display text-3xl font-semibold tracking-tightest text-ink md:text-4xl">
@@ -193,7 +188,7 @@ export default function LandingPage() {
 
         {/* ── How it works ──────────────────────────────────────── */}
         <section id="how-it-works" className="scroll-mt-20 border-b border-hairline">
-          <div className="mx-auto max-w-6xl px-6 py-16 md:py-24">
+          <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
             <Reveal className="max-w-2xl">
               <span className="eyebrow">How it works</span>
               <h2 className="mt-4 font-display text-3xl font-semibold tracking-tightest text-ink md:text-4xl">
@@ -213,7 +208,7 @@ export default function LandingPage() {
                     </div>
                     <div className="grid gap-2 md:grid-cols-[18rem_1fr] md:gap-8">
                       <h3 className="font-display text-lg font-semibold tracking-tightest text-ink">{step.title}</h3>
-                      <p className="max-w-xl text-[15px] leading-relaxed text-ink-soft">{step.body}</p>
+                      <p className="max-w-xl text-base leading-relaxed text-ink-soft">{step.body}</p>
                     </div>
                   </div>
                 </Reveal>
@@ -224,7 +219,7 @@ export default function LandingPage() {
 
         {/* ── Feature grid ──────────────────────────────────────── */}
         <section className="border-b border-hairline bg-surface-subtle/60">
-          <div className="mx-auto max-w-6xl px-6 py-16 md:py-24">
+          <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
             <Reveal className="max-w-2xl">
               <span className="eyebrow">Why it&rsquo;s credible</span>
               <h2 className="mt-4 font-display text-3xl font-semibold tracking-tightest text-ink md:text-4xl">
@@ -235,13 +230,13 @@ export default function LandingPage() {
               </p>
             </Reveal>
 
-            <div className="mt-12 grid gap-px overflow-hidden rounded-lg border border-hairline bg-hairline sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {FEATURES.map((item, index) => (
-                <Reveal key={item.title} delay={index * 50}>
-                  <div className="h-full bg-surface p-6 md:p-7">
+                <Reveal key={item.title} delay={index * 60} className={index === 0 ? "sm:col-span-2 lg:col-span-1" : ""}>
+                  <div className="flex h-full flex-col rounded-2xl border border-hairline bg-surface p-7 shadow-elevation transition-shadow duration-200 hover:shadow-elevation-lg">
                     <span className="eyebrow text-brand">{item.eyebrow}</span>
                     <h3 className="mt-3 font-display text-xl font-semibold tracking-tightest text-ink">{item.title}</h3>
-                    <p className="mt-2.5 text-[15px] leading-relaxed text-ink-soft">{item.body}</p>
+                    <p className="mt-2.5 text-base leading-relaxed text-ink-soft">{item.body}</p>
                   </div>
                 </Reveal>
               ))}
@@ -251,7 +246,7 @@ export default function LandingPage() {
 
         {/* ── Outcome strip (animated) ──────────────────────────── */}
         <section className="border-b border-hairline">
-          <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
+          <div className="mx-auto max-w-6xl px-6 py-24 md:py-28">
             <Reveal className="flex flex-col items-start gap-8 md:flex-row md:items-center md:justify-between">
               <p className="max-w-xl font-display text-2xl font-medium leading-snug tracking-tightest text-ink md:text-[1.75rem]">
                 One number your board can track:{" "}
@@ -282,7 +277,7 @@ export default function LandingPage() {
 
         {/* ── Pricing teaser ────────────────────────────────────── */}
         <section id="pricing" className="scroll-mt-20 border-b border-hairline bg-surface-subtle/60">
-          <div className="mx-auto max-w-6xl px-6 py-16 md:py-24">
+          <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
             <Reveal className="max-w-2xl">
               <span className="eyebrow">Pricing</span>
               <h2 className="mt-4 font-display text-3xl font-semibold tracking-tightest text-ink md:text-4xl">
@@ -293,11 +288,11 @@ export default function LandingPage() {
               </p>
             </Reveal>
 
-            <div className="mt-10 grid gap-4 md:grid-cols-3">
+            <div className="mt-12 grid gap-4 md:grid-cols-3">
               {TIERS.map((tier, i) => (
                 <Reveal key={tier.id} delay={i * 70}>
                   <div
-                    className={`flex h-full flex-col rounded-lg border bg-surface p-6 shadow-elevation ${
+                    className={`flex h-full flex-col rounded-2xl border bg-surface p-7 shadow-elevation ${
                       tier.highlight ? "border-brand/40 ring-1 ring-brand/20" : "border-hairline"
                     }`}
                   >
@@ -306,15 +301,15 @@ export default function LandingPage() {
                       <span className="font-display text-3xl font-semibold tracking-tightest text-ink">{tier.price}</span>
                       {tier.unit && <span className="text-[11px] leading-tight text-ink-faint">{tier.unit}</span>}
                     </div>
-                    <p className="mt-2 text-[13px] text-ink-soft">{tier.tagline}</p>
+                    <p className="mt-2 text-sm text-ink-soft">{tier.tagline}</p>
                   </div>
                 </Reveal>
               ))}
             </div>
-            <Reveal className="mt-8">
+            <Reveal className="mt-10">
               <Link
                 href="/pricing"
-                className="inline-flex items-center rounded-md bg-brand px-6 py-3 text-sm font-medium text-white no-underline shadow-elevation transition-all hover:bg-brand-strong active:translate-y-px"
+                className="inline-flex items-center rounded-full bg-brand px-7 py-3 text-sm font-medium text-white no-underline shadow-elevation transition-all hover:bg-brand-strong active:translate-y-px"
               >
                 See full pricing
               </Link>
@@ -324,7 +319,7 @@ export default function LandingPage() {
 
         {/* ── FAQ ───────────────────────────────────────────────── */}
         <section className="border-b border-hairline">
-          <div className="mx-auto max-w-3xl px-6 py-16 md:py-24">
+          <div className="mx-auto max-w-3xl px-6 py-24 md:py-32">
             <Reveal>
               <span className="eyebrow">FAQ</span>
               <h2 className="mt-4 font-display text-3xl font-semibold tracking-tightest text-ink md:text-4xl">
@@ -339,8 +334,15 @@ export default function LandingPage() {
 
         {/* ── Final CTA ─────────────────────────────────────────── */}
         <section className="relative overflow-hidden">
-          <div aria-hidden className="bg-dotgrid absolute inset-0 -z-10 opacity-70" />
-          <div className="mx-auto max-w-6xl px-6 py-24 text-center md:py-28">
+          <div
+            aria-hidden
+            className="absolute inset-0 -z-10"
+            style={{
+              background:
+                "radial-gradient(60% 80% at 50% 0%, rgba(0,113,227,0.05), transparent 70%)",
+            }}
+          />
+          <div className="mx-auto max-w-6xl px-6 py-28 text-center md:py-36">
             <Reveal className="mx-auto max-w-2xl">
               <h2 className="font-display text-3xl font-semibold leading-tight tracking-tightest text-ink md:text-[2.6rem]">
                 Know what Copilot would expose — <span className="text-brand">before you turn it on.</span>
@@ -348,10 +350,10 @@ export default function LandingPage() {
               <p className="mx-auto mt-5 max-w-lg text-lg text-ink-soft">
                 Run the drill against the live demo tenant and walk the evidence chain yourself.
               </p>
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
                 <Link
                   href="/overview"
-                  className="inline-flex items-center rounded-md bg-brand px-6 py-3 text-sm font-medium text-white no-underline shadow-elevation transition-all hover:bg-brand-strong active:translate-y-px"
+                  className="inline-flex items-center rounded-full bg-brand px-7 py-3 text-sm font-medium text-white no-underline shadow-elevation transition-all hover:bg-brand-strong active:translate-y-px"
                 >
                   Open the dashboard
                 </Link>
@@ -359,7 +361,7 @@ export default function LandingPage() {
                   href={SAMPLE_REPORT_URL}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center rounded-md border border-hairline bg-surface px-6 py-3 text-sm font-medium text-ink no-underline shadow-sm transition-colors hover:border-ink-faint/40 hover:bg-surface-subtle"
+                  className="inline-flex items-center rounded-full border border-hairline bg-surface px-7 py-3 text-sm font-medium text-ink no-underline transition-colors hover:border-ink-faint/40 hover:bg-surface-subtle"
                 >
                   Read the sample report
                 </a>

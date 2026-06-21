@@ -71,7 +71,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <div
             key={t.id}
             role="status"
-            className="animate-fade-in pointer-events-auto flex items-start gap-3 rounded-lg border border-hairline bg-surface px-4 py-3 shadow-elevation-lg"
+            className="animate-fade-in pointer-events-auto flex items-start gap-3 rounded-2xl border border-hairline bg-surface px-4 py-3 shadow-elevation-lg"
           >
             <span aria-hidden className={`mt-1 h-2 w-2 shrink-0 rounded-full ${ACCENT[t.variant]}`} />
             <p className="flex-1 text-sm leading-snug text-ink">{t.message}</p>

@@ -16,7 +16,7 @@ export function FaqAccordion({ items }: { items: FaqItem[] }) {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <div className="divide-y divide-hairline overflow-hidden rounded-lg border border-hairline bg-surface shadow-elevation">
+    <div className="divide-y divide-hairline overflow-hidden rounded-2xl border border-hairline bg-surface shadow-elevation">
       {items.map((item, i) => {
         const isOpen = open === i;
         return (
@@ -27,7 +27,7 @@ export function FaqAccordion({ items }: { items: FaqItem[] }) {
               onClick={() => setOpen(isOpen ? null : i)}
               className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors duration-150 hover:bg-surface-subtle"
             >
-              <span className="text-[15px] font-medium text-ink">{item.q}</span>
+              <span className="text-base font-medium text-ink">{item.q}</span>
               <span
                 aria-hidden
                 className={`shrink-0 text-ink-faint transition-transform duration-300 ease-spring ${isOpen ? "rotate-45" : ""}`}

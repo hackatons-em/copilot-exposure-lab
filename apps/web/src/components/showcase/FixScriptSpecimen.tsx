@@ -28,10 +28,8 @@ export function FixScriptSpecimen({ className }: { className?: string }) {
 
   return (
     <div ref={ref} className={`relative ${className ?? ""}`}>
-      <div aria-hidden className="absolute -inset-6 -z-10 rounded-[28px] bg-brand-soft/30 blur-2xl" />
-
       <figure
-        className="overflow-hidden rounded-lg border border-hairline bg-surface shadow-elevation-lg"
+        className="overflow-hidden rounded-2xl border border-hairline bg-surface shadow-elevation-lg"
         style={{
           opacity: inView ? 1 : 0,
           transform: inView ? "translateY(0)" : "translateY(10px)",

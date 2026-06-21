@@ -105,7 +105,7 @@ export default function ScenariosPage() {
         {scenarios.map((scenario) => {
           const state = runs[scenario.id];
           return (
-            <div key={scenario.id} className="flex flex-col rounded-lg border border-surface-border bg-surface p-5">
+            <div key={scenario.id} className="flex flex-col rounded-2xl border border-hairline bg-surface p-6 shadow-elevation">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className="text-base font-semibold text-ink">{scenario.title}</h2>

@@ -79,7 +79,7 @@ export default function OverviewPage() {
       <>
         <PageHeader title="Overview" />
         <div className="grid gap-4 lg:grid-cols-[16rem_1fr]">
-          <Skeleton className="h-56 rounded-lg" />
+          <Skeleton className="h-56 rounded-2xl" />
           <div className="grid content-start gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {Array.from({ length: 5 }).map((_, i) => (
               <SkeletonCard key={i} />
@@ -188,7 +188,7 @@ export default function OverviewPage() {
 
       {data?.history.drift && (
         <div
-          className="mt-4 rounded-lg border px-4 py-3 text-sm shadow-elevation"
+          className="mt-4 rounded-2xl border px-4 py-3 text-sm shadow-elevation"
           style={{
             borderColor: data.history.drift.scoreDelta <= 0 ? "#bcdbc8" : "#eecbc6",
             backgroundColor: data.history.drift.scoreDelta <= 0 ? "#e8f3ec" : "#fbedeb",
@@ -217,7 +217,7 @@ export default function OverviewPage() {
 
         <div>
           <h2 className="eyebrow mb-2.5">Recommended next fixes</h2>
-          <div className="rounded-lg border border-hairline bg-surface p-3 shadow-elevation">
+          <div className="rounded-2xl border border-hairline bg-surface p-3 shadow-elevation">
             {recommendedFixes.length === 0 ? (
               <p className="px-1 py-2 text-sm text-ink-faint">No open remediations.</p>
             ) : (

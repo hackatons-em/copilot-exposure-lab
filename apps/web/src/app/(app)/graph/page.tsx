@@ -37,7 +37,7 @@ const NODE_LEGEND: { Icon: ComponentType<IconProps>; label: string }[] = [
 
 function Legend() {
   return (
-    <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-lg border border-hairline bg-surface px-4 py-3 text-xs shadow-elevation">
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-2xl border border-hairline bg-surface px-4 py-3 text-xs shadow-elevation">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span className="eyebrow">Nodes</span>
         {NODE_LEGEND.map(({ Icon, label }) => (

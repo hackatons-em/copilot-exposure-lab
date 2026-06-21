@@ -126,7 +126,7 @@ export default function SchedulesPage() {
               {data.map((schedule) => (
                 <div
                   key={schedule.id}
-                  className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-surface-border bg-surface p-5"
+                  className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-hairline bg-surface p-5 shadow-elevation"
                 >
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
@@ -186,7 +186,7 @@ export default function SchedulesPage() {
             </div>
           )}
 
-          <section className="rounded-lg border border-surface-border bg-surface p-5">
+          <section className="rounded-2xl border border-hairline bg-surface p-6 shadow-elevation">
             <h2 className="text-sm font-semibold text-ink">New schedule</h2>
             <form onSubmit={create} className="mt-3 grid gap-4 sm:grid-cols-3">
               <label className="block text-xs font-medium text-ink-soft sm:col-span-3">
@@ -241,7 +241,7 @@ export default function SchedulesPage() {
 
         <div>
           <h2 className="mb-2 text-sm font-semibold text-ink">How schedules work</h2>
-          <div className="rounded-lg border border-surface-border bg-surface p-4">
+          <div className="rounded-2xl border border-hairline bg-surface p-5 shadow-elevation">
             <p className="text-sm text-ink-soft">
               The worker checks for due schedules on every poll. When a schedule&apos;s next run time has passed, it
               enqueues a job — a scan, or a report generated from the latest scan — and advances the next run time by

@@ -93,13 +93,7 @@ function ScoreArc() {
 export function HeroArtifact() {
   return (
     <div className="relative">
-      {/* Soft iris halo behind the card for depth — drifts gently (motion-safe). */}
-      <div
-        aria-hidden
-        className="absolute -inset-6 -z-10 rounded-[28px] bg-brand-soft/60 blur-2xl animate-float"
-      />
-
-      <figure className="overflow-hidden rounded-lg border border-hairline bg-surface shadow-elevation-lg">
+      <figure className="overflow-hidden rounded-2xl border border-hairline bg-surface shadow-elevation-lg">
         {/* Window chrome — reads as a real app surface. */}
         <div className="flex items-center justify-between border-b border-hairline bg-surface-subtle px-4 py-2.5">
           <div className="flex items-center gap-2">
@@ -129,7 +123,7 @@ export function HeroArtifact() {
           {/* The exposure path chain — the heart of the artifact. */}
           <div className="rounded-md border border-hairline bg-canvas/70 p-3.5">
             <div className="mb-3 flex items-center gap-2">
-              <span className="inline-flex items-center rounded-full bg-brand-soft px-2 py-0.5 font-mono text-[10px] font-medium tracking-wide text-brand">
+              <span className="inline-flex items-center rounded-md bg-brand-soft px-2 py-0.5 font-mono text-[10px] font-medium tracking-wide text-brand">
                 via group membership
               </span>
             </div>

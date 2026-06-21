@@ -57,10 +57,10 @@ export default function SecurityPage() {
         marketing claims.
       </p>
 
-      <section className="mt-12">
+      <section className="mt-16">
         <h2 className="font-display text-2xl font-semibold tracking-tightest text-ink">Microsoft Graph scopes</h2>
-        <p className="mt-2 text-[15px] text-ink-soft">Read-only and scope-limited. Each one is explained, not just requested.</p>
-        <div className="mt-5 overflow-hidden rounded-lg border border-hairline bg-surface shadow-elevation">
+        <p className="mt-2 text-base text-ink-soft">Read-only and scope-limited. Each one is explained, not just requested.</p>
+        <div className="mt-6 overflow-hidden rounded-2xl border border-hairline bg-surface shadow-elevation">
           <table className="w-full border-collapse text-sm">
             <tbody>
               {SCOPES.map((s) => (
@@ -74,21 +74,21 @@ export default function SecurityPage() {
         </div>
       </section>
 
-      <section className="mt-12">
+      <section className="mt-16">
         <h2 className="font-display text-2xl font-semibold tracking-tightest text-ink">Data-handling invariants</h2>
-        <div className="mt-5 grid gap-px overflow-hidden rounded-lg border border-hairline bg-hairline sm:grid-cols-2">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
           {INVARIANTS.map((item) => (
-            <div key={item.title} className="h-full bg-surface p-5">
+            <div key={item.title} className="h-full rounded-2xl border border-hairline bg-surface p-6 shadow-elevation">
               <h3 className="font-display text-base font-semibold tracking-tightest text-ink">{item.title}</h3>
-              <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">{item.body}</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">{item.body}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="mt-12 rounded-lg border border-hairline bg-surface-subtle/60 p-6">
+      <section className="mt-16 rounded-2xl border border-hairline bg-surface-subtle/60 p-7">
         <h2 className="font-display text-xl font-semibold tracking-tightest text-ink">Compliance roadmap — honest status</h2>
-        <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">
+        <p className="mt-2 text-base leading-relaxed text-ink-soft">
           We are early-stage and <strong className="text-ink">not SOC 2 certified yet</strong>. We designed the data
           handling — metadata-only, least privilege, audit, deletion — to make that path straightforward, and will
           pursue SOC 2 Type II as we take on production customers. We&rsquo;d rather say this plainly than imply a
@@ -96,9 +96,9 @@ export default function SecurityPage() {
         </p>
       </section>
 
-      <section className="mt-12">
+      <section className="mt-16">
         <h2 className="font-display text-2xl font-semibold tracking-tightest text-ink">Reporting a vulnerability</h2>
-        <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">
+        <p className="mt-2 text-base leading-relaxed text-ink-soft">
           Email{" "}
           <a href="mailto:security@loveiq.org" className="font-medium text-brand no-underline hover:underline">
             security@loveiq.org

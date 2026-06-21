@@ -86,7 +86,7 @@ export default function RemediationPage() {
           {data.map(({ finding, task }) => {
             const done = task.status === "done" || finding.status === "resolved";
             return (
-              <div key={task.id} className="rounded-lg border border-surface-border bg-surface p-4">
+              <div key={task.id} className="rounded-2xl border border-hairline bg-surface p-5 shadow-elevation">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">

@@ -58,7 +58,7 @@ export default function ReportsPage() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-4">
-          <div className="rounded-lg border border-surface-border bg-surface p-5">
+          <div className="rounded-2xl border border-hairline bg-surface p-6 shadow-elevation">
             <h2 className="text-sm font-semibold text-ink">Generate report</h2>
             <div className="mt-3 flex flex-wrap items-end gap-3">
               <label className="flex items-center gap-2 text-xs font-medium text-ink-soft">
@@ -90,7 +90,7 @@ export default function ReportsPage() {
                 </p>
                 <a
                   href={api.reportDownloadUrl(report.id)}
-                  className="mt-3 inline-flex items-center rounded-md bg-brand px-3.5 py-2 text-sm font-medium text-white no-underline hover:bg-brand/90"
+                  className="mt-3 inline-flex items-center rounded-full bg-brand px-5 py-2 text-sm font-medium text-white no-underline shadow-elevation transition-all hover:bg-brand-strong active:translate-y-px"
                   download
                 >
                   Download {report.format === "html" ? "HTML" : "Markdown"}
@@ -104,7 +104,7 @@ export default function ReportsPage() {
 
         <div>
           <h2 className="mb-2 text-sm font-semibold text-ink">Report sections</h2>
-          <div className="rounded-lg border border-surface-border bg-surface p-4">
+          <div className="rounded-2xl border border-hairline bg-surface p-5 shadow-elevation">
             <ol className="list-decimal space-y-1.5 pl-5 text-sm text-ink-soft">
               {REPORT_SECTIONS.map((section) => (
                 <li key={section}>{section}</li>

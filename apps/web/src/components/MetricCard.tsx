@@ -10,7 +10,7 @@ interface MetricCardProps {
 
 export function MetricCard({ label, value, hint, accentClassName }: MetricCardProps) {
   return (
-    <div className="group relative overflow-hidden rounded-lg border border-hairline bg-surface p-4 shadow-elevation transition-shadow duration-150 hover:shadow-elevation-lg">
+    <div className="group relative overflow-hidden rounded-2xl border border-hairline bg-surface p-5 shadow-elevation transition-shadow duration-150 hover:shadow-elevation-lg">
       <div className="eyebrow">{label}</div>
       <div
         className={`mt-2 font-display text-3xl font-semibold tabular-nums tracking-tightest ${

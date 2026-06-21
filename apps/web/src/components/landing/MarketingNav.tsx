@@ -69,7 +69,7 @@ export function MarketingNav() {
           ))}
           <Link
             href="/overview"
-            className="ml-1 inline-flex items-center rounded-md bg-brand px-4 py-2 text-sm font-medium text-white no-underline shadow-elevation transition-all hover:bg-brand-strong active:translate-y-px"
+            className="ml-1 inline-flex items-center rounded-full bg-brand px-5 py-2 text-sm font-medium text-white no-underline shadow-elevation transition-all hover:bg-brand-strong active:translate-y-px"
           >
             Open the dashboard
           </Link>
@@ -108,7 +108,7 @@ export function MarketingNav() {
             <Link
               href="/overview"
               onClick={() => setOpen(false)}
-              className="mt-2 inline-flex items-center justify-center rounded-md bg-brand px-4 py-2.5 text-sm font-medium text-white no-underline shadow-elevation transition-colors hover:bg-brand-strong"
+              className="mt-2 inline-flex items-center justify-center rounded-full bg-brand px-5 py-2.5 text-sm font-medium text-white no-underline shadow-elevation transition-colors hover:bg-brand-strong"
             >
               Open the dashboard
             </Link>

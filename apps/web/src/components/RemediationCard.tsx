@@ -5,7 +5,7 @@ import { RemediationStatusPill } from "./StatusPill";
 /** Microsoft-native remediation: control, numbered steps, effort, status. */
 export function RemediationCard({ task }: { task: RemediationTask }) {
   return (
-    <div className="rounded-lg border border-hairline bg-surface p-4 shadow-elevation">
+    <div className="rounded-xl border border-hairline bg-surface p-5 shadow-elevation">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <h3 className="text-sm font-semibold text-ink">{task.title}</h3>
         <RemediationStatusPill status={task.status} verified={task.fixVerified} />
@@ -13,11 +13,11 @@ export function RemediationCard({ task }: { task: RemediationTask }) {
 
       <div className="mt-2.5 flex flex-wrap items-center gap-2 text-xs">
         {task.microsoftControl ? (
-          <span className="rounded-full bg-brand-soft px-2.5 py-0.5 font-medium text-brand">
+          <span className="rounded-md bg-brand-soft px-2.5 py-0.5 font-medium text-brand">
             {task.microsoftControl}
           </span>
         ) : null}
-        <span className="rounded-full border border-hairline bg-surface-subtle px-2.5 py-0.5 text-ink-soft">
+        <span className="rounded-md border border-hairline bg-surface-subtle px-2.5 py-0.5 text-ink-soft">
           {effortLabel(task.estimatedEffort)}
         </span>
       </div>

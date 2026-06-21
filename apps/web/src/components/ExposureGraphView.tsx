@@ -342,7 +342,7 @@ export function ExposureGraphView({ model, focusFindingId, height = 560, maxNode
   if (model.nodes.length === 0) {
     return (
       <div
-        className="bg-dotgrid flex flex-col items-center justify-center rounded-lg border border-dashed border-hairline bg-surface/60 px-6 text-center"
+        className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-hairline bg-surface/60 px-6 text-center"
         style={{ height }}
       >
         <h3 className="font-display text-lg font-semibold tracking-tightest text-ink">No exposure paths yet</h3>
@@ -355,7 +355,7 @@ export function ExposureGraphView({ model, focusFindingId, height = 560, maxNode
 
   return (
     <div
-      className="overflow-hidden rounded-lg border border-hairline bg-surface-subtle shadow-elevation"
+      className="overflow-hidden rounded-2xl border border-hairline bg-surface-subtle shadow-elevation"
       style={{ height, width: "100%", position: "relative" }}
     >
       {capped?.truncated && (

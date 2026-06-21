@@ -5,7 +5,7 @@ interface ErrorStateProps {
 
 export function LoadingState({ label = "Loading…" }: { label?: string }) {
   return (
-    <div className="flex items-center gap-2.5 rounded-lg border border-hairline bg-surface px-4 py-6 text-sm text-ink-soft shadow-elevation">
+    <div className="flex items-center gap-2.5 rounded-2xl border border-hairline bg-surface px-4 py-6 text-sm text-ink-soft shadow-elevation">
       <span
         aria-hidden
         className="h-4 w-4 animate-spin rounded-full border-2 border-surface-muted border-t-brand"
@@ -17,7 +17,7 @@ export function LoadingState({ label = "Loading…" }: { label?: string }) {
 
 export function ErrorState({ message, onRetry }: ErrorStateProps) {
   return (
-    <div className="rounded-lg border border-severity-critical/30 bg-severity-critical-soft px-4 py-4 text-sm shadow-elevation">
+    <div className="rounded-2xl border border-severity-critical/30 bg-severity-critical-soft px-4 py-4 text-sm shadow-elevation">
       <p className="font-medium text-severity-critical">Something went wrong</p>
       <p className="mt-1 text-ink-soft">{message}</p>
       {onRetry ? (

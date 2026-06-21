@@ -68,14 +68,12 @@ export function ReportSpecimen({ className }: { className?: string }) {
 
   return (
     <div ref={ref} className={`relative ${className ?? ""}`}>
-      <div aria-hidden className="absolute -inset-6 -z-10 rounded-[28px] bg-brand-soft/40 blur-2xl" />
-
       {/* Stacked-paper edges behind the document for a printable feel. */}
-      <div aria-hidden className="absolute -bottom-1.5 -right-1.5 h-full w-full rounded-lg border border-hairline bg-surface/70" />
-      <div aria-hidden className="absolute -bottom-0.5 -right-0.5 h-full w-full rounded-lg border border-hairline bg-surface" />
+      <div aria-hidden className="absolute -bottom-1.5 -right-1.5 h-full w-full rounded-2xl border border-hairline bg-surface/70" />
+      <div aria-hidden className="absolute -bottom-0.5 -right-0.5 h-full w-full rounded-2xl border border-hairline bg-surface" />
 
       <figure
-        className="relative overflow-hidden rounded-lg border border-hairline bg-surface shadow-elevation-lg"
+        className="relative overflow-hidden rounded-2xl border border-hairline bg-surface shadow-elevation-lg"
         style={{
           opacity: inView ? 1 : 0,
           transform: inView ? "translateY(0)" : "translateY(10px)",

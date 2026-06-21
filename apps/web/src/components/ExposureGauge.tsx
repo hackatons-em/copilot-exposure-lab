@@ -23,7 +23,7 @@ export function ExposureGauge({ exposure }: { exposure: TenantExposure }) {
   const color = BAND_COLOR[exposure.band] ?? BAND_COLOR.info!;
 
   return (
-    <div className="flex flex-col items-center rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+    <div className="flex flex-col items-center rounded-2xl border border-hairline bg-surface p-6 shadow-elevation">
       <div className="eyebrow self-start">Tenant exposure</div>
       <svg
         viewBox="0 0 140 140"

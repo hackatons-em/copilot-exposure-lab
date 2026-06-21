@@ -54,7 +54,7 @@ export default function AgentsPage() {
       ) : (
         <div className="space-y-3">
           {data.map((agent) => (
-            <div key={agent.id} className="rounded-lg border border-hairline bg-surface p-4 shadow-elevation">
+            <div key={agent.id} className="rounded-2xl border border-hairline bg-surface p-5 shadow-elevation">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">

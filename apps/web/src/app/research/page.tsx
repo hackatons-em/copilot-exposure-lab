@@ -42,7 +42,7 @@ export default function ResearchPage() {
         permitted to see. The latent permission surface becomes an active retrieval surface overnight.
       </p>
 
-      <div className="mt-6 rounded-lg border border-severity-medium/30 bg-severity-medium-soft/40 px-4 py-3">
+      <div className="mt-6 rounded-2xl border border-severity-medium/30 bg-severity-medium-soft/40 px-5 py-4">
         <p className="text-[13px] leading-relaxed text-ink-soft">
           <strong className="text-ink">Honesty note.</strong> The figures below come from our deterministic engine run
           over a <strong className="text-ink">synthetic reference enterprise</strong>, not customer tenants. They are
@@ -51,12 +51,12 @@ export default function ResearchPage() {
         </p>
       </div>
 
-      <section className="mt-12">
+      <section className="mt-16">
         <h2 className="font-display text-2xl font-semibold tracking-tightest text-ink">The eight exposure archetypes</h2>
-        <p className="mt-2 text-[15px] text-ink-soft">
+        <p className="mt-2 text-base text-ink-soft">
           Each is evidence-backed, scored 0–100, and mapped to MITRE ATT&amp;CK + control frameworks.
         </p>
-        <div className="mt-5 overflow-hidden rounded-lg border border-hairline bg-surface shadow-elevation">
+        <div className="mt-6 overflow-hidden rounded-2xl border border-hairline bg-surface shadow-elevation">
           <table className="w-full border-collapse text-sm">
             <tbody>
               {ARCHETYPES.map((a) => (
@@ -70,32 +70,32 @@ export default function ResearchPage() {
         </div>
       </section>
 
-      <section className="mt-12">
+      <section className="mt-16">
         <h2 className="font-display text-2xl font-semibold tracking-tightest text-ink">Illustrative figures</h2>
-        <p className="mt-2 text-[15px] text-ink-soft">
+        <p className="mt-2 text-base text-ink-soft">
           Synthetic reference tenant (~1,100 principals), scanned in well under a second.
         </p>
-        <div className="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-hairline bg-hairline sm:grid-cols-4">
+        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
           {FIGURES.map((f) => (
-            <div key={f.label} className="bg-surface p-5">
+            <div key={f.label} className="rounded-2xl border border-hairline bg-surface p-5 shadow-elevation">
               <div className="font-display text-2xl font-semibold tracking-tightest text-ink">{f.value}</div>
               <div className="mt-1 text-[12px] leading-snug text-ink-faint">{f.label}</div>
             </div>
           ))}
         </div>
-        <p className="mt-4 text-[15px] leading-relaxed text-ink-soft">
+        <p className="mt-5 text-base leading-relaxed text-ink-soft">
           The headline isn&rsquo;t any single percentage — it&rsquo;s <strong className="text-ink">volume × reachability</strong>.
           At this scale manual review is hopeless; deterministic scoring and ranked, evidence-backed findings are what
           make the surface governable.
         </p>
       </section>
 
-      <div className="mt-12">
+      <div className="mt-16">
         <a
           href={DOC_URL}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center rounded-md border border-hairline bg-surface px-5 py-2.5 text-sm font-medium text-ink no-underline shadow-sm transition-colors hover:border-ink-faint/40 hover:bg-surface-subtle"
+          className="inline-flex items-center rounded-full border border-hairline bg-surface px-6 py-2.5 text-sm font-medium text-ink no-underline transition-colors hover:border-ink-faint/40 hover:bg-surface-subtle"
         >
           Read the full write-up →
         </a>

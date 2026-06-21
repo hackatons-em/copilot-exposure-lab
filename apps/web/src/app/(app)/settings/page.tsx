@@ -146,7 +146,7 @@ export default function SettingsPage() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
-          <section className="rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+          <section className="rounded-2xl border border-hairline bg-surface p-6 shadow-elevation">
             <h2 className="font-display text-base font-semibold tracking-tightest text-ink">Connected tenant</h2>
             {loading ? (
               <div className="mt-3">
@@ -182,7 +182,7 @@ export default function SettingsPage() {
             )}
           </section>
 
-          <section className="rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+          <section className="rounded-2xl border border-hairline bg-surface p-6 shadow-elevation">
             <h2 className="font-display text-base font-semibold tracking-tightest text-ink">Requested Microsoft Graph scopes</h2>
             <p className="mt-1 text-xs text-ink-soft">
               Least privilege, read-only. No write scopes are requested in this version.
@@ -201,7 +201,7 @@ export default function SettingsPage() {
         </div>
 
         <div className="space-y-6">
-          <section className="rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+          <section className="rounded-2xl border border-hairline bg-surface p-6 shadow-elevation">
             <h2 className="font-display text-base font-semibold tracking-tightest text-ink">Data handling</h2>
             <p className="mt-2 text-sm text-ink">
               Metadata-only mode enabled — document contents are not stored.
@@ -212,7 +212,7 @@ export default function SettingsPage() {
             </p>
           </section>
 
-          <section className="rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+          <section className="rounded-2xl border border-hairline bg-surface p-6 shadow-elevation">
             <h2 className="font-display text-base font-semibold tracking-tightest text-ink">Demo controls</h2>
             <p className="mt-2 text-xs text-ink-soft">
               Reset the workspace to the bundled demo company and run a fresh deterministic scan.
@@ -229,7 +229,7 @@ export default function SettingsPage() {
             ) : null}
           </section>
 
-          <section className="rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+          <section className="rounded-2xl border border-hairline bg-surface p-6 shadow-elevation">
             <h2 className="font-display text-base font-semibold tracking-tightest text-ink">Access control</h2>
             <p className="mt-2 text-xs text-ink-soft">
               Role-based access control. API authentication is enabled when the server is configured with API

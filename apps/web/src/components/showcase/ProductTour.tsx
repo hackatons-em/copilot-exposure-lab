@@ -132,7 +132,7 @@ export function ProductTour() {
       <div className="min-w-0">
         <div key={active} className="animate-fade-in">
           <h3 className="font-display text-xl font-semibold tracking-tightest text-ink md:text-2xl">{tab.title}</h3>
-          <p className="mt-1.5 max-w-xl text-[15px] leading-relaxed text-ink-soft lg:hidden">{tab.blurb}</p>
+          <p className="mt-1.5 max-w-xl text-base leading-relaxed text-ink-soft lg:hidden">{tab.blurb}</p>
           <div className="mt-5">
             <Specimen />
           </div>

@@ -96,32 +96,31 @@ export default function ProductPage() {
       <main>
         {/* Hero */}
         <section className="relative overflow-hidden border-b border-hairline">
-          <div aria-hidden className="bg-dotgrid absolute inset-0 -z-10 opacity-70" />
-          <div className="mx-auto max-w-6xl px-6 py-16 text-center md:py-24">
-            <Reveal className="mx-auto max-w-2xl">
+          <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
+            <div className="max-w-2xl animate-rise">
               <span className="eyebrow text-brand">Product</span>
               <h1 className="mt-4 font-display text-4xl font-semibold leading-[1.05] tracking-tightest text-ink md:text-5xl">
                 Every surface of the drill
               </h1>
-              <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-ink-soft">
+              <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-soft">
                 From a single deterministic score down to the exact PowerShell that closes the path — here&rsquo;s the
                 whole product, surface by surface.
               </p>
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <div className="mt-9 flex flex-wrap items-center gap-3">
                 <Link
                   href="/overview"
-                  className="inline-flex items-center rounded-md bg-brand px-6 py-3 text-sm font-medium text-white no-underline shadow-elevation transition-all hover:bg-brand-strong active:translate-y-px"
+                  className="inline-flex items-center rounded-full bg-brand px-7 py-3 text-sm font-medium text-white no-underline shadow-elevation transition-all hover:bg-brand-strong active:translate-y-px"
                 >
                   Open the dashboard
                 </Link>
                 <Link
                   href="/pricing"
-                  className="inline-flex items-center rounded-md border border-hairline bg-surface px-6 py-3 text-sm font-medium text-ink no-underline shadow-sm transition-colors hover:border-ink-faint/40 hover:bg-surface-subtle"
+                  className="inline-flex items-center rounded-full border border-hairline bg-surface px-7 py-3 text-sm font-medium text-ink no-underline transition-colors hover:border-ink-faint/40 hover:bg-surface-subtle"
                 >
                   See pricing
                 </Link>
               </div>
-            </Reveal>
+            </div>
           </div>
         </section>
 
@@ -131,13 +130,13 @@ export default function ProductPage() {
           const flip = i % 2 === 1;
           return (
             <section key={s.eyebrow} className="border-b border-hairline">
-              <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-16 md:py-20 lg:grid-cols-2 lg:gap-16">
+              <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-24 md:py-28 lg:grid-cols-2 lg:gap-16">
                 <Reveal className={flip ? "lg:order-2" : ""}>
                   <span className="eyebrow text-brand">{s.eyebrow}</span>
                   <h2 className="mt-3 font-display text-3xl font-semibold tracking-tightest text-ink md:text-[2.1rem]">
                     {s.title}
                   </h2>
-                  <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-ink-soft">{s.body}</p>
+                  <p className="mt-4 max-w-lg text-base leading-relaxed text-ink-soft">{s.body}</p>
                   <ul className="mt-5 space-y-2">
                     {s.bullets.map((b) => (
                       <li key={b} className="flex items-center gap-2 text-sm text-ink">
@@ -157,8 +156,15 @@ export default function ProductPage() {
 
         {/* CTA */}
         <section className="relative overflow-hidden">
-          <div aria-hidden className="bg-dotgrid absolute inset-0 -z-10 opacity-70" />
-          <div className="mx-auto max-w-6xl px-6 py-20 text-center md:py-24">
+          <div
+            aria-hidden
+            className="absolute inset-0 -z-10"
+            style={{
+              background:
+                "radial-gradient(60% 80% at 50% 0%, rgba(0,113,227,0.05), transparent 70%)",
+            }}
+          />
+          <div className="mx-auto max-w-6xl px-6 py-28 text-center md:py-36">
             <Reveal className="mx-auto max-w-2xl">
               <h2 className="font-display text-3xl font-semibold leading-tight tracking-tightest text-ink md:text-[2.4rem]">
                 Walk the evidence chain yourself.
@@ -166,16 +172,16 @@ export default function ProductPage() {
               <p className="mx-auto mt-5 max-w-lg text-lg text-ink-soft">
                 Run the drill against the live demo tenant — no setup, no write access.
               </p>
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
                 <Link
                   href="/overview"
-                  className="inline-flex items-center rounded-md bg-brand px-6 py-3 text-sm font-medium text-white no-underline shadow-elevation transition-all hover:bg-brand-strong active:translate-y-px"
+                  className="inline-flex items-center rounded-full bg-brand px-7 py-3 text-sm font-medium text-white no-underline shadow-elevation transition-all hover:bg-brand-strong active:translate-y-px"
                 >
                   Open the dashboard
                 </Link>
                 <Link
                   href="/pricing"
-                  className="inline-flex items-center rounded-md border border-hairline bg-surface px-6 py-3 text-sm font-medium text-ink no-underline shadow-sm transition-colors hover:border-ink-faint/40 hover:bg-surface-subtle"
+                  className="inline-flex items-center rounded-full border border-hairline bg-surface px-7 py-3 text-sm font-medium text-ink no-underline transition-colors hover:border-ink-faint/40 hover:bg-surface-subtle"
                 >
                   See pricing
                 </Link>

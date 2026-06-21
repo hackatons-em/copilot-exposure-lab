@@ -25,9 +25,7 @@ export function CopilotSimSpecimen({ className }: { className?: string }) {
 
   return (
     <div ref={ref} className={`relative ${className ?? ""}`}>
-      <div aria-hidden className="absolute -inset-6 -z-10 rounded-[28px] bg-brand-soft/40 blur-2xl" />
-
-      <figure className="overflow-hidden rounded-lg border border-hairline bg-surface shadow-elevation-lg">
+      <figure className="overflow-hidden rounded-2xl border border-hairline bg-surface shadow-elevation-lg">
         <div className="flex items-center justify-between border-b border-hairline bg-surface-subtle px-4 py-2.5">
           <div className="flex items-center gap-2">
             <span aria-hidden className="h-2 w-2 rounded-full bg-brand/70" />
@@ -80,7 +78,7 @@ export function CopilotSimSpecimen({ className }: { className?: string }) {
 
             <div className="mt-2.5 flex flex-wrap items-center gap-2">
               <span className="font-mono text-[12px] font-medium text-ink">2026_salary_plan.xlsx</span>
-              <span className="inline-flex items-center rounded-full border border-hairline bg-surface px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-ink-soft">
+              <span className="inline-flex items-center rounded-md border border-hairline bg-surface px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-ink-soft">
                 reachable via org-wide link
               </span>
             </div>

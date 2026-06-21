@@ -50,7 +50,7 @@ export default function IdentitiesPage() {
       ) : (
         <div className="space-y-3">
           {data.map((id, i) => (
-            <div key={id.principalId} className="rounded-lg border border-hairline bg-surface p-4 shadow-elevation">
+            <div key={id.principalId} className="rounded-2xl border border-hairline bg-surface p-5 shadow-elevation">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="flex min-w-0 items-start gap-3">
                   <span className="mt-0.5 w-5 shrink-0 text-center font-mono text-sm text-ink-faint">{i + 1}</span>

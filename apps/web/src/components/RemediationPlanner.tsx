@@ -60,11 +60,11 @@ export function RemediationPlanner({ dataVersion }: { dataVersion: number }) {
   }, [plan]);
 
   if (loading) {
-    return <div className="shimmer-fill animate-shimmer h-44 rounded-lg border border-hairline bg-surface-subtle" />;
+    return <div className="shimmer-fill animate-shimmer h-44 rounded-2xl border border-hairline bg-surface-subtle" />;
   }
   if (!plan || plan.steps.length === 0) {
     return (
-      <div className="rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+      <div className="rounded-2xl border border-hairline bg-surface p-6 shadow-elevation">
         <h2 className="eyebrow mb-1.5">Remediation planner</h2>
         <p className="text-sm text-ink-faint">
           No score-reducing fixes available — run an assessment, or the tenant is already clean.
@@ -74,7 +74,7 @@ export function RemediationPlanner({ dataVersion }: { dataVersion: number }) {
   }
 
   return (
-    <div className="rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+    <div className="rounded-2xl border border-hairline bg-surface p-6 shadow-elevation">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h2 className="eyebrow mb-1.5">Remediation planner</h2>

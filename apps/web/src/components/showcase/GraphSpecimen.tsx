@@ -66,9 +66,7 @@ export function GraphSpecimen({ className }: { className?: string }) {
 
   return (
     <div ref={ref} className={`relative ${className ?? ""}`}>
-      <div aria-hidden className="absolute -inset-6 -z-10 rounded-[28px] bg-brand-soft/40 blur-2xl" />
-
-      <figure className="overflow-hidden rounded-lg border border-hairline bg-surface shadow-elevation-lg">
+      <figure className="overflow-hidden rounded-2xl border border-hairline bg-surface shadow-elevation-lg">
         <div className="flex items-center justify-between border-b border-hairline bg-surface-subtle px-4 py-2.5">
           <div className="flex items-center gap-2">
             <span aria-hidden className="h-2 w-2 rounded-full bg-severity-critical/70" />
@@ -79,12 +77,12 @@ export function GraphSpecimen({ className }: { className?: string }) {
 
         <div className="p-5">
           <div className="mb-3 flex items-center gap-2">
-            <span className="inline-flex items-center rounded-full bg-brand-soft px-2 py-0.5 font-mono text-[10px] font-medium tracking-wide text-brand">
+            <span className="inline-flex items-center rounded-md bg-brand-soft px-2 py-0.5 font-mono text-[10px] font-medium tracking-wide text-brand">
               via group membership
             </span>
           </div>
 
-          <div className="relative aspect-[16/9] w-full rounded-md border border-hairline bg-canvas/70 bg-dotgrid">
+          <div className="relative aspect-[16/9] w-full rounded-md border border-hairline bg-canvas/70">
             {/* Arrow layer — drawn under the nodes. */}
             <svg
               viewBox="0 0 100 100"

@@ -9,7 +9,7 @@ export function Skeleton({ className }: { className?: string }) {
 /** A card-shaped skeleton (matches MetricCard / panel chrome). */
 export function SkeletonCard({ className }: { className?: string }) {
   return (
-    <div className={`rounded-lg border border-hairline bg-surface p-4 shadow-elevation ${className ?? ""}`}>
+    <div className={`rounded-2xl border border-hairline bg-surface p-5 shadow-elevation ${className ?? ""}`}>
       <Skeleton className="h-3 w-20" />
       <Skeleton className="mt-3 h-7 w-12" />
     </div>
@@ -19,7 +19,7 @@ export function SkeletonCard({ className }: { className?: string }) {
 /** A table skeleton — header row + N body rows. */
 export function SkeletonTable({ rows = 6 }: { rows?: number }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-hairline bg-surface shadow-elevation">
+    <div className="overflow-hidden rounded-2xl border border-hairline bg-surface shadow-elevation">
       <div className="border-b border-hairline bg-surface-subtle px-4 py-2.5">
         <Skeleton className="h-3 w-24" />
       </div>

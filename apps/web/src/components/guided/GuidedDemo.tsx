@@ -358,7 +358,7 @@ function DemoOverlay({
           onMouseLeave={() => onHoverChange(false)}
           role="dialog"
           aria-label="Guided demo narration"
-          className="pointer-events-auto relative w-full max-w-xl overflow-hidden rounded-lg border border-hairline bg-surface shadow-elevation-lg"
+          className="pointer-events-auto relative w-full max-w-xl overflow-hidden rounded-2xl border border-hairline bg-surface shadow-elevation-lg"
           style={{
             animation: reducedMotion ? undefined : "cel-demo-card-in 460ms cubic-bezier(0.16,1,0.3,1) both",
           }}

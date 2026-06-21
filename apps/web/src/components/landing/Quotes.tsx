@@ -23,7 +23,7 @@ const QUOTES: { quote: string; role: string }[] = [
 export function Quotes() {
   return (
     <section className="border-b border-hairline">
-      <div className="mx-auto max-w-6xl px-6 py-16 md:py-24">
+      <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
         <Reveal className="max-w-2xl">
           <span className="eyebrow">What we hear</span>
           <h2 className="mt-4 font-display text-3xl font-semibold tracking-tightest text-ink md:text-4xl">
@@ -35,12 +35,12 @@ export function Quotes() {
           </p>
         </Reveal>
 
-        <div className="mt-12 grid gap-px overflow-hidden rounded-lg border border-hairline bg-hairline md:grid-cols-3">
+        <div className="mt-14 grid gap-4 md:grid-cols-3">
           {QUOTES.map((q, i) => (
             <Reveal key={q.role} delay={i * 70}>
-              <figure className="flex h-full flex-col justify-between bg-surface p-6 md:p-7">
-                <blockquote className="text-[15px] leading-relaxed text-ink">&ldquo;{q.quote}&rdquo;</blockquote>
-                <figcaption className="mt-5 text-sm text-ink-faint">
+              <figure className="flex h-full flex-col justify-between rounded-2xl border border-hairline bg-surface p-7 shadow-elevation">
+                <blockquote className="text-base leading-relaxed text-ink">&ldquo;{q.quote}&rdquo;</blockquote>
+                <figcaption className="mt-6 text-sm text-ink-faint">
                   — {q.role}{" "}
                   <span className="font-mono text-[10px] uppercase tracking-wide">(illustrative)</span>
                 </figcaption>

@@ -10,7 +10,7 @@ export function TrendChart({ snapshots }: { snapshots: ScanSnapshot[] }) {
 
   if (points.length < 2) {
     return (
-      <div className="rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+      <div className="rounded-2xl border border-hairline bg-surface p-6 shadow-elevation">
         <h2 className="eyebrow mb-1.5">Exposure trend</h2>
         <p className="text-xs leading-relaxed text-ink-faint">
           Re-run the assessment (or let a schedule run) to build the trend — exposure should fall as fixes land.
@@ -30,7 +30,7 @@ export function TrendChart({ snapshots }: { snapshots: ScanSnapshot[] }) {
   const area = `${line} L${coords[coords.length - 1]!.x.toFixed(1)},${h - pad} L${coords[0]!.x.toFixed(1)},${h - pad} Z`;
 
   return (
-    <div className="rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+    <div className="rounded-2xl border border-hairline bg-surface p-6 shadow-elevation">
       <h2 className="eyebrow mb-2.5">Exposure trend</h2>
       <svg viewBox={`0 0 ${w} ${h}`} className="w-full" role="img" aria-label="Exposure score over time">
         <defs>

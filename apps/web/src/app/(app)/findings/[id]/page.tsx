@@ -27,7 +27,7 @@ interface DetailBundle {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-lg border border-hairline bg-surface p-5 shadow-elevation">
+    <section className="rounded-2xl border border-hairline bg-surface p-6 shadow-elevation">
       <h2 className="eyebrow mb-3.5">{title}</h2>
       {children}
     </section>
@@ -137,7 +137,7 @@ export default function FindingDetailPage() {
       </div>
 
       {resolved && remediation?.fixVerified ? (
-        <div className="mb-6 flex items-center gap-2 rounded-lg border border-severity-low/30 bg-severity-low-soft px-4 py-3 text-sm font-medium text-severity-low shadow-elevation">
+        <div className="mb-6 flex items-center gap-2 rounded-2xl border border-severity-low/30 bg-severity-low-soft px-4 py-3 text-sm font-medium text-severity-low shadow-elevation">
           <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-severity-low" />
           Fix applied and re-verified — the exposure path is no longer reachable (proof-of-fix).
         </div>

@@ -77,7 +77,7 @@ function SensitivityBar({ value }: { value: number }) {
 
 function CopilotResponse({ answer }: { answer: CopilotAnswer }) {
   return (
-    <div className="rounded-lg border border-surface-border bg-surface p-4">
+    <div className="rounded-2xl border border-hairline bg-surface p-5 shadow-elevation">
       <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-ink-faint">
         <span aria-hidden className="grid h-5 w-5 place-items-center rounded-full bg-brand/10 text-[10px] font-semibold text-brand">
           C
@@ -228,7 +228,7 @@ export default function CopilotSimPage() {
             e.preventDefault();
             void ask(draft);
           }}
-          className="rounded-lg border border-surface-border bg-surface p-4"
+          className="rounded-2xl border border-hairline bg-surface p-5 shadow-elevation"
         >
           <div className="flex items-center gap-2">
             <input
@@ -273,7 +273,7 @@ export default function CopilotSimPage() {
                   </div>
                 </div>
                 {turn.loading ? (
-                  <div className="flex items-center gap-2 rounded-lg border border-surface-border bg-surface px-4 py-4 text-sm text-ink-soft">
+                  <div className="flex items-center gap-2 rounded-2xl border border-hairline bg-surface px-4 py-4 text-sm text-ink-soft shadow-elevation">
                     <span
                       aria-hidden
                       className="h-4 w-4 animate-spin rounded-full border-2 border-surface-border border-t-brand"

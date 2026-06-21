@@ -22,7 +22,7 @@ const alignClass = { left: "text-left", right: "text-right", center: "text-cente
 /** Crisp, instrument-grade table — eyebrow header, hairlines, comfortable rows. */
 export function DataTable<Row>({ columns, rows, rowKey, empty }: DataTableProps<Row>) {
   return (
-    <div className="overflow-hidden rounded-lg border border-hairline bg-surface shadow-elevation">
+    <div className="overflow-hidden rounded-2xl border border-hairline bg-surface shadow-elevation">
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>

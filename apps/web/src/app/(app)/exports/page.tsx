@@ -41,7 +41,7 @@ export default function ExportsPage() {
               {data.map((fmt) => (
                 <div
                   key={fmt.format}
-                  className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-surface-border bg-surface p-5"
+                  className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-hairline bg-surface p-5 shadow-elevation"
                 >
                   <div className="min-w-0">
                     <h2 className="text-sm font-semibold text-ink">{fmt.label}</h2>
@@ -49,7 +49,7 @@ export default function ExportsPage() {
                   </div>
                   <a
                     href={api.exportUrl(fmt.format)}
-                    className="inline-flex shrink-0 items-center rounded-md bg-brand px-3.5 py-2 text-sm font-medium text-white no-underline hover:bg-brand/90"
+                    className="inline-flex shrink-0 items-center rounded-full bg-brand px-5 py-2 text-sm font-medium text-white no-underline shadow-elevation transition-all hover:bg-brand-strong active:translate-y-px"
                     download
                   >
                     Download
@@ -64,7 +64,7 @@ export default function ExportsPage() {
 
         <div>
           <h2 className="mb-2 text-sm font-semibold text-ink">How exports work</h2>
-          <div className="rounded-lg border border-surface-border bg-surface p-4">
+          <div className="rounded-2xl border border-hairline bg-surface p-5 shadow-elevation">
             <p className="text-sm text-ink-soft">
               Each download is a pure transform of the most recent scan result. Critical and high findings are routed to
               ticketing tools (Jira, ServiceNow); every finding flows to the CSV, Sentinel, Defender, and Purview

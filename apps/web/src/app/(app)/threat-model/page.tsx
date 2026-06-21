@@ -58,7 +58,7 @@ export default function ThreatModelPage() {
       </div>
 
       <h2 className="eyebrow mb-2.5 mt-8">Coverage matrix</h2>
-      <div className="overflow-hidden rounded-lg border border-hairline bg-surface shadow-elevation">
+      <div className="overflow-hidden rounded-2xl border border-hairline bg-surface shadow-elevation">
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="border-b border-hairline bg-surface-subtle text-left">
