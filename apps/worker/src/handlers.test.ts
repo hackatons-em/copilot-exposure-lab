@@ -21,7 +21,7 @@ describe("dispatch", () => {
   it("runs a scan job and reports the finding count", async () => {
     const res = await dispatch({ store }, { id: "j2", workspaceId: "ws-1", type: "scan", payload: {} });
     expect(res.ok).toBe(true);
-    if (res.ok) expect((res.detail as { findingCount: number }).findingCount).toBe(8);
+    if (res.ok) expect((res.detail as { findingCount: number }).findingCount).toBe(9);
   });
 
   it("report-gen uploads the artifact to blob storage and records the url", async () => {

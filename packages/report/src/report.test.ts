@@ -11,7 +11,7 @@ const model = buildReportModel({ workspace: graph.workspace, scanResult, scenari
 
 describe("buildReportModel", () => {
   it("joins findings with evidence and remediation", () => {
-    expect(model.findings).toHaveLength(8);
+    expect(model.findings).toHaveLength(9);
     const salary = model.findings.find((f) => f.finding.resourceId === "f-salary")!;
     expect(salary.evidence.length).toBeGreaterThan(0);
     expect(salary.remediation).toBeTruthy();

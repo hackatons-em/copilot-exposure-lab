@@ -6,7 +6,7 @@
 
 ## 1. Executive Summary
 
-This assessment surfaced **8 exposure findings** — 1 critical, 4 high, 3 medium, 0 low. The highest-risk paths are listed below; each has an evidence chain and a Microsoft-native remediation. Risk scores are deterministic and evidence-backed.
+This assessment surfaced **9 exposure findings** — 1 critical, 4 high, 4 medium, 0 low. The highest-risk paths are listed below; each has an evidence chain and a Microsoft-native remediation. Risk scores are deterministic and evidence-backed.
 
 ## 2. Findings by Severity
 
@@ -19,6 +19,7 @@ This assessment surfaced **8 exposure findings** — 1 critical, 4 high, 3 mediu
 | High | 70 | Sensitive file exposed to a broad department group | `f-msa` |
 | Medium | 66 | Sensitive file exposed to a broad department group | `f-launch` |
 | Medium | 59 | Agent owned by a departed or inactive maker | `a-helpdesk` |
+| Medium | 55 | Agent or flow uses a risky data-egress connector | `a-salesflow` |
 | Medium | 55 | Sensitive file is missing a sensitivity label | `f-token` |
 
 ## 3. Scope and Methodology
@@ -163,6 +164,7 @@ Scenarios run:
 | High | Sensitive file exposed to a broad department group | SharePoint permissions + Entra group membership | medium | todo |
 | Medium | Sensitive file exposed to a broad department group | SharePoint permissions + Entra group membership | medium | todo |
 | Medium | Agent owned by a departed or inactive maker | Power Platform managed environments + ownership review | low | todo |
+| Medium | Agent or flow uses a risky data-egress connector | Microsoft 365 admin controls | medium | todo |
 | Medium | Sensitive file is missing a sensitivity label | Microsoft Purview sensitivity labels + auto-labeling | low | todo |
 
 ## 6. Proof-of-Fix

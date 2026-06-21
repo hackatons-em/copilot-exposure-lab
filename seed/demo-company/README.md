@@ -6,7 +6,7 @@ Metadata-only seed for the Copilot Exposure Lab demo. No document content — on
 |---|---|
 | `workspace.json` | workspace + tenant connection (demo-seed mode, requested Graph scopes) |
 | `principals.json` | 9 users (incl. 1 offboarded maker) + 8 groups (incl. "Everyone Except External Users") |
-| `resources.json` | 7 SharePoint sites, 5 sensitive files, 1 Copilot Studio agent |
+| `resources.json` | 7 SharePoint sites, 5 sensitive files, 2 agents (a Copilot Studio helpdesk bot + a Power Automate flow) |
 | `grants.json` | permission grants — direct, inherited (via parent site), org-wide link, and guest |
 | `scenarios.json` | 5 exposure scenarios (normal-employee, contractor-guest, broad-sharing, sensitive-file, agent-action) |
 

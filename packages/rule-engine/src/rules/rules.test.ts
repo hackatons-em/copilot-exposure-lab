@@ -5,6 +5,7 @@ import {
   agentSendActionRule,
   allRules,
   broadDeptAccessRule,
+  connectorRiskRule,
   inheritedBroadReadRule,
   missingLabelRule,
   orgWideLinkRule,
@@ -70,6 +71,18 @@ describe("agent-send-action rule", () => {
     const hit = hits.find((h) => h.resourceId === "a-helpdesk");
     expect(hit).toBeDefined();
     expect(hit!.scoring.agentActionRisk).toBeGreaterThan(0.7);
+  });
+});
+
+describe("risky-connector rule", () => {
+  const hits = connectorRiskRule.evaluate(ctx);
+  it("flags the Power Automate flow with risky egress connectors", () => {
+    const hit = hits.find((h) => h.resourceId === "a-salesflow");
+    expect(hit).toBeDefined();
+    expect(hit!.evidence.some((e) => /HTTPWebhook|SQLServer/.test(e.statement))).toBe(true);
+  });
+  it("does not flag the helpdesk agent's governed connectors", () => {
+    expect(hits.some((h) => h.resourceId === "a-helpdesk")).toBe(false);
   });
 });
 

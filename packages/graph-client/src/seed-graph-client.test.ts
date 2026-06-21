@@ -9,7 +9,7 @@ describe("loadSeedGraph (Acme demo company)", () => {
     expect(graph.connection.mode).toBe("demo-seed");
   });
 
-  it("has the expected cast: 9 users + 8 groups, 7 sites, 5 files, 1 agent", () => {
+  it("has the expected cast: 9 users + 8 groups, 7 sites, 5 files, 2 agents", () => {
     const users = graph.principals.filter((p) => p.kind === "user");
     const groups = graph.principals.filter((p) => p.kind === "group");
     const sites = graph.resources.filter((r) => r.kind === "site");
@@ -19,7 +19,7 @@ describe("loadSeedGraph (Acme demo company)", () => {
     expect(groups).toHaveLength(8);
     expect(sites).toHaveLength(7);
     expect(files).toHaveLength(5);
-    expect(agents).toHaveLength(1);
+    expect(agents).toHaveLength(2);
   });
 
   it("encodes issue 1: salary file reachable via an org-wide link to Everyone", () => {

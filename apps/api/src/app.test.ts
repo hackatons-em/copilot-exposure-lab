@@ -28,20 +28,20 @@ describe("workspace lifecycle + scan", () => {
   it("seeds the demo company", async () => {
     const res = await app.inject({ method: "POST", url: `/api/workspaces/${wsId}/connections/demo/seed` });
     expect(res.statusCode).toBe(201);
-    expect(res.json().counts.resources).toBe(13);
+    expect(res.json().counts.resources).toBe(14);
   });
 
   it("runs a scan and returns the band distribution", async () => {
     const res = await app.inject({ method: "POST", url: `/api/workspaces/${wsId}/scans`, payload: {} });
     expect(res.statusCode).toBe(201);
     const body = res.json();
-    expect(body.findingCount).toBe(8);
+    expect(body.findingCount).toBe(9);
     expect(body.bands.critical).toBeGreaterThanOrEqual(1);
   });
 
   it("lists findings and filters by severity", async () => {
     const all = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/findings` });
-    expect(all.json()).toHaveLength(8);
+    expect(all.json()).toHaveLength(9);
     const critical = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/findings?severity=critical` });
     expect(critical.json()).toHaveLength(1);
   });

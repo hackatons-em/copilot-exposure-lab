@@ -29,13 +29,13 @@ describe("DrizzleStore over a real (pglite) Postgres", () => {
   it("creates a workspace and seeds the demo company", async () => {
     await store.createWorkspace({ id: "ws-pg", name: "Acme Health Finance Ltd" });
     const seeded = await store.seedDemo("ws-pg");
-    expect(seeded.counts.resources).toBe(13);
+    expect(seeded.counts.resources).toBe(14);
     expect(seeded.counts.principals).toBe(17);
   });
 
-  it("runs a scan and persists 8 findings (1 critical, 4 high, 3 medium)", async () => {
+  it("runs a scan and persists 9 findings (1 critical, 4 high, 4 medium)", async () => {
     const summary = await store.runScan("ws-pg");
-    expect(summary.findingCount).toBe(8);
+    expect(summary.findingCount).toBe(9);
     expect(summary.bands.critical).toBe(1);
     expect(summary.bands.high).toBe(4);
   });

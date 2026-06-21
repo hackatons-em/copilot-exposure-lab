@@ -163,5 +163,21 @@
     "connectors": ["Office365Outlook", "HTTPWithAzureAD"],
     "authMode": "maker",
     "publication": "unmanaged"
+  },
+  {
+    "id": "a-salesflow",
+    "sourceId": "agent-cccc-2002",
+    "kind": "agent",
+    "name": "Sales Outreach Flow",
+    "path": "/power-automate/flows/SalesOutreachFlow",
+    "url": "https://make.powerautomate.com/environments/acme/flows/SalesOutreachFlow",
+    "ownerPrincipalId": "u-grace",
+    "sensitivityLabel": null,
+    "sensitivityTags": ["agent", "power-automate", "flow"],
+    "businessCriticality": "medium",
+    "agentActions": ["http.request"],
+    "connectors": ["HTTPWebhook", "SQLServer"],
+    "authMode": "maker",
+    "publication": "unmanaged"
   }
 ]

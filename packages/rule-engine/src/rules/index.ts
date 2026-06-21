@@ -1,5 +1,6 @@
 import { agentSendActionRule } from "./agent-send-action.js";
 import { broadDeptAccessRule } from "./broad-dept-access.js";
+import { connectorRiskRule } from "./connector-risk.js";
 import { inheritedBroadReadRule } from "./inherited-broad-read.js";
 import { missingLabelRule } from "./missing-label.js";
 import { orgWideLinkRule } from "./org-wide-link.js";
@@ -16,6 +17,7 @@ export const allRules: readonly ExposureRule[] = [
   missingLabelRule,
   agentSendActionRule,
   orphanedAgentOwnerRule,
+  connectorRiskRule,
 ];
 
 export {
@@ -26,5 +28,6 @@ export {
   missingLabelRule,
   agentSendActionRule,
   orphanedAgentOwnerRule,
+  connectorRiskRule,
 };
 export type { ExposureRule, RuleContext, RuleHit, ScoringInputs, EvidenceInput } from "./types.js";

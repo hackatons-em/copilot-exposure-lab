@@ -34,7 +34,7 @@ describe("worker queue (pglite)", () => {
     expect(handled).toBe(true);
     const [job] = await db.select().from(jobs).where(eq(jobs.id, id));
     expect(job!.status).toBe("completed");
-    expect(await store.listFindings("ws-job")).toHaveLength(8);
+    expect(await store.listFindings("ws-job")).toHaveLength(9);
   });
 
   it("returns false when the queue is empty", async () => {

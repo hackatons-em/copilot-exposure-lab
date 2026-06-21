@@ -18,6 +18,7 @@ describe("scan — golden output over the Acme demo seed", () => {
         "70 high broad-dept-access f-msa",
         "66 medium broad-dept-access f-launch",
         "59 medium orphaned-agent-owner a-helpdesk",
+        "55 medium risky-connector a-salesflow",
         "55 medium missing-label f-token",
       ].join("\n"),
     );
