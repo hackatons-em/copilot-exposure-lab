@@ -31,13 +31,22 @@ export function breadthScore(pg: PermissionGraph, access: EffectiveAccess): numb
   if (access.audience === "external") return 0.3;
   if (access.audience === "single") return 0.1;
   // group
-  return clamp01(Math.max(0.3, access.breadth / 60));
+  return clamp01(Math.max(0.3, access.breadth / 50));
+}
+
+/**
+ * 0..1 AI/agent surfacing risk for a permission finding: the more broadly a
+ * sensitive resource is reachable, the more readily Copilot/agents surface it.
+ * This is the product thesis applied to scoring.
+ */
+export function aiSurfacingRisk(breadthRaw: number): number {
+  return clamp01(0.5 + 0.45 * breadthRaw);
 }
 
 /** 0..1 reach outside the organization. */
 export function externalReachScore(access: EffectiveAccess): number {
   if (access.audience === "anyone") return 1;
-  if (access.audience === "external") return 0.7;
+  if (access.audience === "external") return 0.8;
   if (access.audience === "org-wide") return 0.25;
   return 0.1;
 }

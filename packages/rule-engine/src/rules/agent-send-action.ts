@@ -41,8 +41,8 @@ export const agentSendActionRule: ExposureRule = {
           },
         ],
         scoring: {
-          sensitivity: 0.5,
-          exposureBreadth: 0.4,
+          sensitivity: 0.6,
+          exposureBreadth: 0.5,
           externalReach: resource.agentActions.some((a) => a.startsWith("external") || a === "mail.send") ? 0.7 : 0.3,
           agentActionRisk: agentActionRiskScore(resource),
           governanceGap: governanceGapScore(resource),

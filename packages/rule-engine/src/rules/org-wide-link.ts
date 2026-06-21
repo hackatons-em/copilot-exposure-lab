@@ -1,7 +1,7 @@
 import {
+  aiSurfacingRisk,
   breadthScore,
   criticalityScore,
-  externalReachScore,
   governanceGapScore,
   topSensitivityLabel,
 } from "./shared.js";
@@ -60,9 +60,11 @@ export const orgWideLinkRule: ExposureRule = {
           scoring: {
             sensitivity: sens.rawScore,
             exposureBreadth: breadthScore(ctx.pg, access),
-            externalReach: externalReachScore(access),
-            agentActionRisk: 0,
-            governanceGap: governanceGapScore(resource),
+            // Org-wide links are a known exfiltration vector (forwardable, leaks beyond intent).
+            externalReach: access.audience === "anyone" ? 1 : 0.8,
+            agentActionRisk: aiSurfacingRisk(breadthScore(ctx.pg, access)),
+            // The org-wide link itself is a governance gap, independent of the file's label.
+            governanceGap: Math.max(governanceGapScore(resource), 0.5),
             businessCriticality: criticalityScore(resource),
             confidence: 1,
           },

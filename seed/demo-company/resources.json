@@ -94,7 +94,7 @@
     "ownerPrincipalId": "u-alice",
     "sensitivityLabel": "Confidential",
     "sensitivityTags": ["salary", "compensation", "payroll", "HR"],
-    "businessCriticality": "high"
+    "businessCriticality": "critical"
   },
   {
     "id": "f-msa",
@@ -158,7 +158,7 @@
     "ownerPrincipalId": "u-tomas",
     "sensitivityLabel": null,
     "sensitivityTags": ["agent", "helpdesk", "copilot-studio"],
-    "businessCriticality": "medium",
+    "businessCriticality": "high",
     "agentActions": ["mail.send", "external.connector"],
     "connectors": ["Office365Outlook", "HTTPWithAzureAD"],
     "authMode": "maker",

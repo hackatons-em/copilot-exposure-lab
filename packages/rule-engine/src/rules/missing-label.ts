@@ -37,7 +37,7 @@ export const missingLabelRule: ExposureRule = {
           sensitivity: sens.rawScore,
           exposureBreadth: Math.min(1, maxBreadth / 60),
           externalReach: 0.1,
-          agentActionRisk: 0,
+          agentActionRisk: 0.6,
           governanceGap: 0.7,
           businessCriticality: criticalityScore(resource),
           confidence: 0.8,

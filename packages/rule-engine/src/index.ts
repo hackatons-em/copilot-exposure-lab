@@ -17,3 +17,13 @@ export type { ContextOptions } from "./context.js";
 export { allRules } from "./rules/index.js";
 export type { ExposureRule, RuleContext, RuleHit, ScoringInputs, EvidenceInput } from "./rules/types.js";
 export { BROAD_GROUP_THRESHOLD, SENSITIVE_THRESHOLD } from "./rules/shared.js";
+
+export { score } from "./scoring/scorer.js";
+export { bandFor, bandLabel } from "./scoring/bands.js";
+export { WEIGHTS, MAX_SCORE } from "./scoring/weights.js";
+export { remediationFor } from "./remediation/catalog.js";
+export type { RemediationTemplate } from "./remediation/catalog.js";
+export { SCENARIO_LENSES } from "./scenarios/registry.js";
+
+export { scan, runScenario } from "./pipeline.js";
+export type { ScanOptions } from "./pipeline.js";

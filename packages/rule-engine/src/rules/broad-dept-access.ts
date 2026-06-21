@@ -1,5 +1,6 @@
 import {
   SENSITIVE_THRESHOLD,
+  aiSurfacingRisk,
   breadthScore,
   criticalityScore,
   externalReachScore,
@@ -66,8 +67,8 @@ export const broadDeptAccessRule: ExposureRule = {
             sensitivity: sens.rawScore,
             exposureBreadth: breadthScore(ctx.pg, access),
             externalReach: externalReachScore(access),
-            agentActionRisk: 0,
-            governanceGap: governanceGapScore(resource),
+            agentActionRisk: aiSurfacingRisk(breadthScore(ctx.pg, access)),
+            governanceGap: Math.max(governanceGapScore(resource), 0.4),
             businessCriticality: criticalityScore(resource),
             confidence: 0.9,
           },
