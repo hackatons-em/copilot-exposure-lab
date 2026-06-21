@@ -1,0 +1,25 @@
+{
+  "name": "copilot-exposure-lab",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Microsoft-native security product that safely tests whether M365 Copilot, Copilot Studio agents, and SharePoint/OneDrive permissions could expose sensitive data.",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "pnpm -r --filter \"./packages/*\" --filter \"./apps/*\" build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "dev": "pnpm -r --parallel dev",
+    "seed:demo": "pnpm --filter @cel/worker seed:demo",
+    "demo:run": "pnpm --filter @cel/worker demo:run"
+  },
+  "devDependencies": {
+    "typescript": "5.7.3",
+    "@types/node": "22.10.5"
+  }
+}
