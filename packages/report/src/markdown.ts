@@ -1,7 +1,9 @@
 import type { Band } from "@cel/types";
-import type { ReportFinding, ReportModel } from "./model.js";
+import type { ReportExposure, ReportFinding, ReportModel, RoadmapItem } from "./model.js";
 
-const bandLabel = (b: Band): string => b.charAt(0).toUpperCase() + b.slice(1);
+const BANDS: Band[] = ["critical", "high", "medium", "low", "info"];
+
+const bandLabel = (b: string): string => b.charAt(0).toUpperCase() + b.slice(1);
 
 function pathLine(rf: ReportFinding): string {
   const steps = rf.finding.exposurePath?.steps ?? [];
@@ -20,7 +22,8 @@ function findingDetail(rf: ReportFinding): string {
   lines.push(`- **Status:** ${finding.status}`);
   lines.push(`- **Resource:** \`${finding.resourceId}\``);
   lines.push(`- **Summary:** ${finding.summary}`);
-  lines.push(`- **Business impact:** ${finding.businessImpact}`);
+  lines.push("");
+  lines.push(`> **Why this matters:** ${finding.businessImpact}`);
   lines.push("");
   lines.push(`**Exposure path:** ${pathLine(rf)}`);
   lines.push("");
@@ -37,6 +40,50 @@ function findingDetail(rf: ReportFinding): string {
   return lines.join("\n");
 }
 
+function exposureBlock(exposure: ReportExposure): string[] {
+  const out: string[] = [];
+  out.push(
+    `**Tenant exposure score: ${exposure.score}/100 (${bandLabel(exposure.band)}).** ` +
+      `Derived deterministically from the findings below — applying a fix and re-scanning lowers it.`,
+  );
+  if (exposure.drivers.length) {
+    out.push("");
+    out.push("Top drivers of the score:");
+    for (const d of exposure.drivers) out.push(`- ${d}`);
+  }
+  out.push("");
+  return out;
+}
+
+function heatMapTable(model: ReportModel): string[] {
+  const out: string[] = [];
+  out.push("| Rule | " + BANDS.map(bandLabel).join(" | ") + " | Total |");
+  out.push("|---|" + BANDS.map(() => "---:").join("|") + "|---:|");
+  for (const row of model.heatMap) {
+    const cells = BANDS.map((b) => (row.counts[b] > 0 ? String(row.counts[b]) : "·"));
+    out.push(`| \`${row.ruleId}\` | ${cells.join(" | ")} | ${row.total} |`);
+  }
+  return out;
+}
+
+function roadmapLane(title: string, items: RoadmapItem[]): string[] {
+  const out: string[] = [];
+  out.push(`**${title}**`);
+  out.push("");
+  if (items.length === 0) {
+    out.push("_None._");
+    out.push("");
+    return out;
+  }
+  out.push("| Finding | Microsoft control | Severity | Status |");
+  out.push("|---|---|---|---|");
+  for (const it of items) {
+    out.push(`| ${it.findingTitle} | ${it.microsoftControl} | ${bandLabel(it.band)} (${it.score}) | ${it.status} |`);
+  }
+  out.push("");
+  return out;
+}
+
 /** Deterministic Markdown report. Consumes only the model — no LLM, no time. */
 export function renderMarkdown(model: ReportModel): string {
   const out: string[] = [];
@@ -49,6 +96,7 @@ export function renderMarkdown(model: ReportModel): string {
 
   out.push("## 1. Executive Summary");
   out.push("");
+  if (model.exposure) out.push(...exposureBlock(model.exposure));
   out.push(
     `This assessment surfaced **${model.total} exposure findings** — ` +
       `${model.bandCounts.critical} critical, ${model.bandCounts.high} high, ${model.bandCounts.medium} medium, ` +
@@ -64,7 +112,25 @@ export function renderMarkdown(model: ReportModel): string {
     out.push("");
   }
 
-  out.push("## 2. Findings by Severity");
+  out.push("## 2. Top Risks by Business Impact");
+  out.push("");
+  if (model.topRisks.length === 0) {
+    out.push("_No findings._");
+  } else {
+    for (const r of model.topRisks) {
+      out.push(`${r.rank}. **${r.title}** — ${bandLabel(r.band)} (${r.score}/100). ${r.businessImpact}`);
+    }
+  }
+  out.push("");
+
+  out.push("## 3. Exposure by Rule");
+  out.push("");
+  out.push("Heat map of findings grouped by rule (rows) across severity bands (columns).");
+  out.push("");
+  out.push(...heatMapTable(model));
+  out.push("");
+
+  out.push("## 4. Findings by Severity");
   out.push("");
   out.push("| Severity | Score | Finding | Resource |");
   out.push("|---|---:|---|---|");
@@ -73,7 +139,7 @@ export function renderMarkdown(model: ReportModel): string {
   }
   out.push("");
 
-  out.push("## 3. Scope and Methodology");
+  out.push("## 5. Scope and Methodology");
   out.push("");
   for (const m of model.methodology) out.push(`- ${m}`);
   out.push("");
@@ -81,25 +147,20 @@ export function renderMarkdown(model: ReportModel): string {
   for (const s of model.scenarioRuns) out.push(`- **${s.title}** — ${s.summary}`);
   out.push("");
 
-  out.push("## 4. Critical & High Finding Detail");
+  out.push("## 6. Critical & High Finding Detail");
   out.push("");
   if (model.criticalAndHigh.length === 0) out.push("_No critical or high findings._");
   for (const rf of model.criticalAndHigh) out.push(findingDetail(rf));
 
-  out.push("## 5. Remediation Plan");
+  out.push("## 7. Remediation Roadmap");
   out.push("");
-  out.push("| Priority | Finding | Microsoft control | Effort | Status |");
-  out.push("|---|---|---|---|---|");
-  for (const { finding, remediation } of model.findings) {
-    out.push(
-      `| ${bandLabel(finding.risk.band)} | ${finding.title} | ${remediation?.microsoftControl ?? "—"} | ${
-        remediation?.estimatedEffort ?? "—"
-      } | ${remediation?.status ?? "todo"} |`,
-    );
-  }
+  out.push("Remediation sequenced by effort — quick wins first, most severe within each lane.");
   out.push("");
+  out.push(...roadmapLane("Quick wins (low effort)", model.roadmap.quickWins));
+  out.push(...roadmapLane("Planned (medium effort)", model.roadmap.planned));
+  out.push(...roadmapLane("Project (high effort)", model.roadmap.project));
 
-  out.push("## 6. Proof-of-Fix");
+  out.push("## 8. Proof-of-Fix");
   out.push("");
   if (model.resolved.length === 0) {
     out.push("_No findings have been remediated and re-verified yet._");
@@ -110,12 +171,12 @@ export function renderMarkdown(model: ReportModel): string {
   }
   out.push("");
 
-  out.push("## 7. Limitations");
+  out.push("## 9. Limitations");
   out.push("");
   for (const l of model.limitations) out.push(`- ${l}`);
   out.push("");
 
-  out.push("## 8. Data Handling");
+  out.push("## 10. Data Handling");
   out.push("");
   for (const d of model.dataHandling) out.push(`- ${d}`);
   out.push("");

@@ -234,6 +234,7 @@ export class MemoryStore implements Store {
       workspace: state.workspace,
       scanResult: state.result,
       scenarios: state.graph.scenarios,
+      exposure: tenantExposureScore(state.result),
     });
     // Env-gated AI narrative — undefined by default (deterministic), never affects scoring.
     model.llmSummary = await generateLlmSummary(model);

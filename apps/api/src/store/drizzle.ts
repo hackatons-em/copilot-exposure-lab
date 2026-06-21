@@ -473,7 +473,12 @@ export class DrizzleStore implements Store {
     if (!graph || !result) throw Object.assign(new Error("run a scan before generating a report"), { statusCode: 409 });
     // Build the model first so the (env-gated) AI narrative can summarize it.
     // undefined by default => no change to rendered output; never affects scoring.
-    const model = buildReportModel({ workspace: graph.workspace, scanResult: result, scenarios: graph.scenarios });
+    const model = buildReportModel({
+      workspace: graph.workspace,
+      scanResult: result,
+      scenarios: graph.scenarios,
+      exposure: tenantExposureScore(result),
+    });
     model.llmSummary = await generateLlmSummary(model);
     const report: Report = {
       id: `rep-${randomUUID()}`,
@@ -526,7 +531,12 @@ export class DrizzleStore implements Store {
     const graph = await this.getGraph(workspaceId);
     const result = await this.getScanResult(workspaceId);
     if (!report || !graph || !result) return undefined;
-    const model = buildReportModel({ workspace: graph.workspace, scanResult: result, scenarios: graph.scenarios });
+    const model = buildReportModel({
+      workspace: graph.workspace,
+      scanResult: result,
+      scenarios: graph.scenarios,
+      exposure: tenantExposureScore(result),
+    });
     // Reuse the narrative computed at creation time (env-gated; undefined by default).
     model.llmSummary = report.llmSummary;
     const content = report.format === "html" ? renderHtml(model) : renderMarkdown(model);
