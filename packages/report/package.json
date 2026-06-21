@@ -16,7 +16,9 @@
     "sample": "tsx scripts/gen-sample.ts"
   },
   "dependencies": {
-    "@cel/types": "workspace:*"
+    "@ai-sdk/anthropic": "1.0.6",
+    "@cel/types": "workspace:*",
+    "ai": "4.0.30"
   },
   "devDependencies": {
     "@cel/config": "workspace:*",

@@ -1,6 +1,7 @@
 import cors from "@fastify/cors";
 import { type GraphProvider, MsGraphClient, createGraphRequester } from "@cel/graph-client";
 import { EXPORT_FORMATS, isExportFormat, runExport } from "@cel/integrations";
+import { simulateRetrieval } from "@cel/rule-engine";
 import Fastify, { type FastifyInstance } from "fastify";
 import { z } from "zod";
 import type { FindingStatus } from "@cel/types";
@@ -159,6 +160,23 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
     return store.listScenarios(id);
+  });
+
+  // ── Copilot retrieval simulation ───────────────────────────
+  // What M365 Copilot, grounded on what an actor can access, could surface to
+  // them. Deterministic, metadata-only — a read, so no audit event required.
+  app.get("/api/workspaces/:id/retrieval", async (req) => {
+    const { id } = req.params as { id: string };
+    await requireWorkspace(id);
+    const graph = await store.getTenantGraph(id);
+    if (!graph) throw Object.assign(new Error("no connection — seed or connect first"), { statusCode: 404 });
+    const { actorId } = req.query as { actorId?: string };
+    const fallbackActor =
+      graph.scenarios.find((s) => s.key === "normal-employee")?.actorPrincipalId ??
+      graph.principals.find((p) => p.kind === "user")?.id;
+    const resolvedActor = actorId ?? fallbackActor;
+    if (!resolvedActor) throw Object.assign(new Error("no actor available to simulate"), { statusCode: 404 });
+    return simulateRetrieval(graph, { actorId: resolvedActor });
   });
 
   // ── Scans ──────────────────────────────────────────────────

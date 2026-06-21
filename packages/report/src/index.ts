@@ -3,3 +3,4 @@ export { buildReportModel } from "./model.js";
 export type { ReportModel, ReportFinding, BuildReportInput } from "./model.js";
 export { renderMarkdown } from "./markdown.js";
 export { renderHtml } from "./html.js";
+export { generateLlmSummary } from "./llm.js";

@@ -17,7 +17,7 @@ import {
   workspaces,
 } from "@cel/db";
 import { type GraphProvider, SeedGraphClient } from "@cel/graph-client";
-import { buildReportModel, renderHtml, renderMarkdown } from "@cel/report";
+import { buildReportModel, generateLlmSummary, renderHtml, renderMarkdown } from "@cel/report";
 import { scan } from "@cel/rule-engine";
 import type {
   AuditEvent,
@@ -159,6 +159,11 @@ export class DrizzleStore implements Store {
 
   async listScenarios(workspaceId: string): Promise<Scenario[]> {
     return (await this.getGraph(workspaceId))?.scenarios ?? [];
+  }
+
+  /** Public accessor for the assembled tenant graph (delegates to the private builder). */
+  async getTenantGraph(workspaceId: string): Promise<TenantGraph | undefined> {
+    return this.getGraph(workspaceId);
   }
 
   /** Assemble the TenantGraph from persisted rows. */
@@ -426,6 +431,10 @@ export class DrizzleStore implements Store {
     const graph = await this.getGraph(workspaceId);
     const result = await this.getScanResult(workspaceId);
     if (!graph || !result) throw Object.assign(new Error("run a scan before generating a report"), { statusCode: 409 });
+    // Build the model first so the (env-gated) AI narrative can summarize it.
+    // undefined by default => no change to rendered output; never affects scoring.
+    const model = buildReportModel({ workspace: graph.workspace, scanResult: result, scenarios: graph.scenarios });
+    model.llmSummary = await generateLlmSummary(model);
     const report: Report = {
       id: `rep-${randomUUID()}`,
       workspaceId,
@@ -433,6 +442,7 @@ export class DrizzleStore implements Store {
       format,
       scenarioRunIds: result.scenarioRuns.map((r) => r.id),
       findingIds: result.findings.map((f) => f.id),
+      llmSummary: model.llmSummary,
     };
     await this.db.insert(reportsTable).values({
       id: report.id,
@@ -440,6 +450,7 @@ export class DrizzleStore implements Store {
       format,
       scenarioRunIds: report.scenarioRunIds,
       findingIds: report.findingIds,
+      llmSummary: report.llmSummary,
     });
     return report;
   }
@@ -476,6 +487,8 @@ export class DrizzleStore implements Store {
     const result = await this.getScanResult(workspaceId);
     if (!report || !graph || !result) return undefined;
     const model = buildReportModel({ workspace: graph.workspace, scanResult: result, scenarios: graph.scenarios });
+    // Reuse the narrative computed at creation time (env-gated; undefined by default).
+    model.llmSummary = report.llmSummary;
     const content = report.format === "html" ? renderHtml(model) : renderMarkdown(model);
     const ext = report.format === "html" ? "html" : "md";
     return { format: report.format, content, filename: `copilot-exposure-report-${reportId}.${ext}` };

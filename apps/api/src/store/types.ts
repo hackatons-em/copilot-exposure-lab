@@ -12,6 +12,7 @@ import type {
   Scenario,
   ScenarioRun,
   TenantConnection,
+  TenantGraph,
   Workspace,
 } from "@cel/types";
 
@@ -95,6 +96,9 @@ export interface Store {
   listConnections(workspaceId: string): Promise<TenantConnection[]>;
   listResources(workspaceId: string): Promise<Resource[]>;
   listScenarios(workspaceId: string): Promise<Scenario[]>;
+
+  /** The normalized tenant graph for a workspace, or undefined if none ingested yet. */
+  getTenantGraph(workspaceId: string): Promise<TenantGraph | undefined>;
 
   /** Run the deterministic engine over the workspace's stored graph and persist results. */
   runScan(workspaceId: string, opts?: { actorId?: string }): Promise<ScanRunSummary>;

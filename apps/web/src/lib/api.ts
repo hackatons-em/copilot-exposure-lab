@@ -81,6 +81,24 @@ export interface ExportFormatInfo {
   description: string;
 }
 
+/** One thing M365 Copilot could surface to an actor (GET /retrieval). */
+export interface RetrievalItem {
+  resourceId: string;
+  name: string;
+  sensitivity: number;
+  reachable: boolean;
+  via: string;
+  score: number;
+  topSignals: string[];
+}
+
+/** Shape returned by GET /retrieval. */
+export interface RetrievalResult {
+  actorId: string;
+  actorName: string;
+  items: RetrievalItem[];
+}
+
 /** What a schedule enqueues when it fires. */
 export type ScheduleAction = "scan" | "report";
 
@@ -190,6 +208,11 @@ export const api = {
 
   listScenarios(): Promise<Scenario[]> {
     return request<Scenario[]>(`/api/workspaces/${ws}/scenarios`);
+  },
+
+  /** Simulate what M365 Copilot could surface to an actor (defaults to the normal-employee persona). */
+  getRetrieval(actorId?: string): Promise<RetrievalResult> {
+    return request<RetrievalResult>(`/api/workspaces/${ws}/retrieval${qs({ actorId })}`);
   },
 
   runScan(actorId?: string): Promise<ScanRunSummary> {

@@ -20,6 +20,11 @@ export interface ReportModel {
   methodology: string[];
   limitations: string[];
   dataHandling: string[];
+  /**
+   * Optional, env-gated AI narrative. Never affects scoring or findings — purely
+   * a summary of the already-computed counts/titles. Unset by default.
+   */
+  llmSummary?: string;
 }
 
 const BANDS: Band[] = ["critical", "high", "medium", "low", "info"];

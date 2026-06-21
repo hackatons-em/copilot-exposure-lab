@@ -93,6 +93,20 @@ describe("workspace lifecycle + scan", () => {
     expect(dl.body).toContain("# Copilot Exposure Assessment Report");
   });
 
+  it("simulates Copilot retrieval for the default actor and a chosen actor", async () => {
+    // Default actor (normal-employee scenario -> Bob) surfaces the org-wide salary file.
+    const def = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/retrieval` });
+    expect(def.statusCode).toBe(200);
+    const body = def.json() as { actorId: string; actorName: string; items: { resourceId: string; via: string }[] };
+    expect(body.actorId).toBe("u-bob");
+    expect(body.items.some((i) => i.resourceId === "f-salary")).toBe(true);
+
+    // Explicit actor id is honored.
+    const explicit = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/retrieval?actorId=u-bob` });
+    expect(explicit.statusCode).toBe(200);
+    expect(explicit.json().actorId).toBe("u-bob");
+  });
+
   it("downloads a deterministic security-tool export and rejects unknown formats", async () => {
     const csv = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/exports/csv` });
     expect(csv.statusCode).toBe(200);
@@ -267,6 +281,16 @@ describe("live Microsoft Graph connection", () => {
       payload: { tenantId: "t" },
     });
     expect(res.statusCode).toBe(400);
+  });
+});
+
+describe("retrieval without a connection", () => {
+  it("404s when no graph has been ingested yet", async () => {
+    const created = await app.inject({ method: "POST", url: "/api/workspaces", payload: { name: "Empty Co" } });
+    const emptyId = created.json().id as string;
+    const res = await app.inject({ method: "GET", url: `/api/workspaces/${emptyId}/retrieval` });
+    expect(res.statusCode).toBe(404);
+    expect(res.json().error).toContain("no connection");
   });
 });
 

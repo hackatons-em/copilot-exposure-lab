@@ -10,6 +10,7 @@ const NAV: { href: string; label: string }[] = [
   { href: "/overview", label: "Overview" },
   { href: "/findings", label: "Findings" },
   { href: "/scenarios", label: "Scenarios" },
+  { href: "/copilot-sim", label: "Copilot sim" },
   { href: "/resources", label: "Resources" },
   { href: "/remediation", label: "Remediation" },
   { href: "/reports", label: "Reports" },

@@ -39,6 +39,16 @@ function findingDetail(rf: ReportFinding): string {
   </section>`;
 }
 
+/** Optional AI narrative callout — clearly flagged, rendered only when set. */
+function llmCallout(model: ReportModel): string {
+  if (!model.llmSummary) return "";
+  return `<aside class="ai-summary" style="border:1px solid #cdd5e0;border-left:4px solid #4a5160;border-radius:6px;background:#f7f8fa;padding:12px 16px;margin:12px 0">
+    <p style="margin:0 0 6px;font-weight:600">AI narrative summary</p>
+    <p style="margin:0 0 6px;font-size:12px;color:#4a5160"><em>AI-generated narrative — does not affect scoring or findings.</em></p>
+    <p style="margin:0">${esc(model.llmSummary)}</p>
+  </aside>`;
+}
+
 /** Deterministic, print-friendly HTML report. */
 export function renderHtml(model: ReportModel): string {
   const rows = model.findings
@@ -73,6 +83,7 @@ export function renderHtml(model: ReportModel): string {
   <p>This assessment surfaced <strong>${model.total} exposure findings</strong> — ${model.bandCounts.critical} critical,
      ${model.bandCounts.high} high, ${model.bandCounts.medium} medium, ${model.bandCounts.low} low. Risk scores are
      deterministic and evidence-backed; every finding traces to a source object and carries a Microsoft-native remediation.</p>
+  ${llmCallout(model)}
 
   <h2>2. Findings by Severity</h2>
   <table><thead><tr><th>Severity</th><th>Score</th><th>Finding</th><th>Resource</th></tr></thead><tbody>${rows}</tbody></table>

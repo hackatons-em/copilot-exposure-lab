@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { type GraphProvider, SeedGraphClient } from "@cel/graph-client";
-import { buildReportModel, renderHtml, renderMarkdown } from "@cel/report";
+import { buildReportModel, generateLlmSummary, renderHtml, renderMarkdown } from "@cel/report";
 import { scan } from "@cel/rule-engine";
 import type {
   AuditEvent,
@@ -120,6 +120,10 @@ export class MemoryStore implements Store {
     return this.require(workspaceId).graph?.scenarios ?? [];
   }
 
+  async getTenantGraph(workspaceId: string): Promise<TenantGraph | undefined> {
+    return this.require(workspaceId).graph;
+  }
+
   async runScan(workspaceId: string, opts: { actorId?: string } = {}): Promise<ScanRunSummary> {
     const state = this.require(workspaceId);
     if (!state.graph) throw Object.assign(new Error("no connection — seed demo data first"), { statusCode: 409 });
@@ -205,6 +209,8 @@ export class MemoryStore implements Store {
       scanResult: state.result,
       scenarios: state.graph.scenarios,
     });
+    // Env-gated AI narrative — undefined by default (deterministic), never affects scoring.
+    model.llmSummary = await generateLlmSummary(model);
     const content = format === "html" ? renderHtml(model) : renderMarkdown(model);
     const report: Report = {
       id: `rep-${randomUUID()}`,
@@ -213,6 +219,7 @@ export class MemoryStore implements Store {
       format,
       scenarioRunIds: state.result.scenarioRuns.map((r) => r.id),
       findingIds: state.result.findings.map((f) => f.id),
+      llmSummary: model.llmSummary,
     };
     state.reports.set(report.id, { report, content });
     return report;

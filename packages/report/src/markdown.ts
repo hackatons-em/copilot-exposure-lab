@@ -57,6 +57,13 @@ export function renderMarkdown(model: ReportModel): string {
   );
   out.push("");
 
+  if (model.llmSummary) {
+    out.push("> **AI narrative summary**  ");
+    out.push("> _AI-generated narrative — does not affect scoring or findings._  ");
+    for (const line of model.llmSummary.split("\n")) out.push(`> ${line}`);
+    out.push("");
+  }
+
   out.push("## 2. Findings by Severity");
   out.push("");
   out.push("| Severity | Score | Finding | Resource |");
