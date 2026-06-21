@@ -83,6 +83,49 @@ describe("workspace lifecycle + scan", () => {
     expect(body.remediation).toBeTruthy();
   });
 
+  it("explains why a finding's resource scored sensitive", async () => {
+    const list = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/findings?severity=critical` });
+    const fid = list.json()[0].id as string;
+    const detail = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/findings/${fid}` });
+    const body = detail.json();
+    expect(body.sensitivity).toBeTruthy();
+    expect(body.sensitivity.rawScore).toBeGreaterThan(0);
+    expect(body.finding.threat.techniques.length).toBeGreaterThan(0);
+  });
+
+  it("generates an advisory fix script wired to the finding", async () => {
+    const list = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/findings?severity=critical` });
+    const fid = list.json()[0].id as string;
+    const res = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/findings/${fid}/fix-script` });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().language).toBe("powershell");
+    expect(res.json().script).toContain("Remove-MgDriveItemPermission");
+    expect(res.json().caveats.join(" ")).toMatch(/review/i);
+  });
+
+  it("returns the threat-model matrix", async () => {
+    const res = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/threat-model` });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().rows.length).toBeGreaterThan(0);
+    expect(res.json().techniques.some((t: { id: string }) => t.id === "T1213.002")).toBe(true);
+  });
+
+  it("paginates findings and reports the total count", async () => {
+    const res = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/findings?limit=2&offset=0` });
+    expect(res.json()).toHaveLength(2);
+    expect(res.headers["x-total-count"]).toBe("9");
+  });
+
+  it("serves an OpenAPI spec and a Swagger UI page", async () => {
+    const spec = await app.inject({ method: "GET", url: "/openapi.json" });
+    expect(spec.statusCode).toBe(200);
+    expect(spec.json().openapi).toBe("3.0.3");
+    expect(spec.json().paths["/api/workspaces/{id}/findings"]).toBeTruthy();
+    const docs = await app.inject({ method: "GET", url: "/docs" });
+    expect(docs.statusCode).toBe(200);
+    expect(docs.body).toContain("swagger-ui");
+  });
+
   it("applies a fix (proof-of-fix) and marks the finding resolved", async () => {
     const list = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/findings?severity=critical` });
     const fid = list.json()[0].id as string;

@@ -21,7 +21,8 @@ import {
   simulateRetrieval,
   tenantExposureScore,
 } from "@cel/rule-engine";
-import Fastify, { type FastifyInstance } from "fastify";
+import Fastify, { type FastifyInstance, type FastifyReply } from "fastify";
+import { buildOpenApiDocument, SWAGGER_UI_HTML } from "./openapi.js";
 import { z } from "zod";
 import type { FindingStatus } from "@cel/types";
 import {
@@ -198,7 +199,27 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     if (!ws) throw Object.assign(new Error("workspace not found"), { statusCode: 404 });
   }
 
+  // Opt-in pagination for large list endpoints. Backward compatible: with no
+  // limit/offset the full array is returned (so existing clients are unaffected).
+  // Always sets X-Total-Count so a paging client knows the size.
+  function paginate<T>(items: T[], query: { limit?: string; offset?: string }, reply: FastifyReply): T[] {
+    void reply.header("x-total-count", String(items.length));
+    const offset = Math.max(0, Number(query.offset ?? 0) || 0);
+    if (query.limit === undefined) return offset > 0 ? items.slice(offset) : items;
+    const limit = Math.max(0, Number(query.limit) || 0);
+    return items.slice(offset, offset + limit);
+  }
+
   app.get("/health", PUBLIC, async () => ({ ok: true, service: "cel-api" }));
+
+  // ── API documentation (public) ─────────────────────────────
+  // OpenAPI 3 spec + a zero-dependency Swagger UI (loads swagger-ui-dist from a
+  // CDN and points at /openapi.json). Lives on the API so the spec stays the
+  // single source of truth; linked from the marketing footer, not the app nav.
+  app.get("/openapi.json", PUBLIC, async () => buildOpenApiDocument());
+  app.get("/docs", PUBLIC, async (_req, reply) =>
+    reply.header("content-type", "text/html; charset=utf-8").send(SWAGGER_UI_HTML),
+  );
 
   // ── Workspaces ─────────────────────────────────────────────
   app.post("/api/workspaces", perm("manage"), async (req, reply) => {
@@ -294,10 +315,11 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     return store.listConnections(id);
   });
 
-  app.get("/api/workspaces/:id/resources", perm("view"), async (req) => {
+  app.get("/api/workspaces/:id/resources", perm("view"), async (req, reply) => {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
-    return store.listResources(id);
+    const q = req.query as { limit?: string; offset?: string };
+    return paginate(await store.listResources(id), q, reply);
   });
 
   app.get("/api/workspaces/:id/scenarios", perm("view"), async (req) => {
@@ -400,11 +422,12 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
   });
 
   // ── Findings ───────────────────────────────────────────────
-  app.get("/api/workspaces/:id/findings", perm("view"), async (req) => {
+  app.get("/api/workspaces/:id/findings", perm("view"), async (req, reply) => {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
-    const q = req.query as { severity?: string; status?: string; scenarioId?: string };
-    return store.listFindings(id, q);
+    const q = req.query as { severity?: string; status?: string; scenarioId?: string; limit?: string; offset?: string };
+    const findings = await store.listFindings(id, q);
+    return paginate(findings, q, reply);
   });
 
   app.get("/api/workspaces/:id/findings/:fid", perm("view"), async (req) => {
@@ -550,10 +573,11 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
   });
 
   // ── Audit ──────────────────────────────────────────────────
-  app.get("/api/workspaces/:id/audit-events", perm("view"), async (req) => {
+  app.get("/api/workspaces/:id/audit-events", perm("view"), async (req, reply) => {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
-    return store.listAudit(id);
+    const q = req.query as { limit?: string; offset?: string };
+    return paginate(await store.listAudit(id), q, reply);
   });
 
   // ── Change notifications ───────────────────────────────────
