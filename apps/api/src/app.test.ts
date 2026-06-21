@@ -121,6 +121,47 @@ describe("workspace lifecycle + scan", () => {
   });
 });
 
+describe("multi-system connectors", () => {
+  it("seeds Google Workspace into a workspace and scans it through the same engine", async () => {
+    const created = await app.inject({ method: "POST", url: "/api/workspaces", payload: { name: "GWS Co" } });
+    const gwsId = created.json().id as string;
+
+    const seeded = await app.inject({
+      method: "POST",
+      url: `/api/workspaces/${gwsId}/connections/google-workspace/seed`,
+    });
+    expect(seeded.statusCode).toBe(201);
+    expect(seeded.json().connection.mode).toBe("google-workspace");
+
+    const scan = await app.inject({ method: "POST", url: `/api/workspaces/${gwsId}/scans`, payload: {} });
+    expect(scan.statusCode).toBe(201);
+    expect(scan.json().findingCount).toBeGreaterThanOrEqual(3);
+    expect(scan.json().bands.critical).toBeGreaterThanOrEqual(1);
+
+    const audit = await app.inject({ method: "GET", url: `/api/workspaces/${gwsId}/audit-events` });
+    const actions = audit.json().map((e: { action: string }) => e.action);
+    expect(actions).toContain("connection.google-workspace.seed");
+  });
+
+  it("seeds the combined multi-system demo (findings span systems)", async () => {
+    const created = await app.inject({ method: "POST", url: "/api/workspaces", payload: { name: "All Systems Co" } });
+    const multiId = created.json().id as string;
+    const seeded = await app.inject({
+      method: "POST",
+      url: `/api/workspaces/${multiId}/connections/multi-system/seed`,
+    });
+    expect(seeded.statusCode).toBe(201);
+    expect(seeded.json().connection.mode).toBe("multi-system");
+    const scan = await app.inject({ method: "POST", url: `/api/workspaces/${multiId}/scans`, payload: {} });
+    expect(scan.json().findingCount).toBeGreaterThanOrEqual(9);
+  });
+
+  it("rejects an unknown system with 400", async () => {
+    const res = await app.inject({ method: "POST", url: `/api/workspaces/${wsId}/connections/dropbox/seed` });
+    expect(res.statusCode).toBe(400);
+  });
+});
+
 describe("schedules", () => {
   let scheduleId: string;
 

@@ -2,7 +2,7 @@
 
 import { useCallback, useState, type FormEvent } from "react";
 import type { TenantConnection } from "@cel/types";
-import { api } from "@/lib/api";
+import { api, type ConnectableSystem } from "@/lib/api";
 import { formatDateTime, titleCase } from "@/lib/format";
 import { useAsync } from "@/lib/useAsync";
 import { useWorkspace } from "@/components/WorkspaceProvider";
@@ -46,6 +46,34 @@ export default function SettingsPage() {
   const [connecting, setConnecting] = useState(false);
   const [connectError, setConnectError] = useState<string | undefined>(undefined);
   const [connectSuccess, setConnectSuccess] = useState<string | undefined>(undefined);
+
+  // Multi-system connectors (Google Workspace, Slack, Salesforce, combined).
+  const [systemBusy, setSystemBusy] = useState<ConnectableSystem | undefined>(undefined);
+  const [systemMessage, setSystemMessage] = useState<{ ok: boolean; text: string } | undefined>(undefined);
+
+  const handleConnectSystem = useCallback(
+    async (system: ConnectableSystem, label: string) => {
+      if (systemBusy) return;
+      setSystemBusy(system);
+      setSystemMessage(undefined);
+      try {
+        const result = await api.connectSystem(system);
+        const summary = await api.runScan();
+        const principals = result.counts.principals ?? 0;
+        const resources = result.counts.resources ?? 0;
+        setSystemMessage({
+          ok: true,
+          text: `Connected ${label} — ${principals} principals, ${resources} resources, ${summary.findingCount} findings.`,
+        });
+        bumpDataVersion();
+      } catch (err) {
+        setSystemMessage({ ok: false, text: err instanceof Error ? err.message : `Could not connect ${label}.` });
+      } finally {
+        setSystemBusy(undefined);
+      }
+    },
+    [bumpDataVersion, systemBusy],
+  );
 
   const setField = useCallback(
     (key: keyof ConnectFields, value: string) => setFields((prev) => ({ ...prev, [key]: value })),
@@ -285,6 +313,67 @@ export default function SettingsPage() {
           />
         </div>
       </section>
+
+      <section className="mt-6 rounded-lg border border-surface-border bg-surface p-5">
+        <h2 className="text-sm font-semibold text-ink">Connect another system</h2>
+        <p className="mt-1 text-sm text-ink-soft">
+          The same deterministic exposure engine runs over more than Microsoft 365. Each connector normalizes its
+          world (Google Drive sharing, Slack channels and Slack Connect, Salesforce objects/reports and org-wide
+          defaults) into the standard tenant graph, so the existing rules fire unchanged. Metadata only.
+        </p>
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {SYSTEM_OPTIONS.map((opt) => (
+            <button
+              key={opt.system}
+              type="button"
+              onClick={() => void handleConnectSystem(opt.system, opt.label)}
+              disabled={systemBusy !== undefined}
+              className="flex flex-col items-start gap-1 rounded-md border border-surface-border bg-surface px-4 py-3 text-left transition hover:border-brand/50 hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <span className="text-sm font-medium text-ink">
+                {systemBusy === opt.system ? `Connecting ${opt.label}…` : opt.label}
+              </span>
+              <span className="text-xs text-ink-soft">{opt.description}</span>
+            </button>
+          ))}
+        </div>
+
+        {systemMessage ? (
+          <p className={`mt-3 text-xs ${systemMessage.ok ? "text-ink-soft" : "text-severity-critical"}`}>
+            {systemMessage.text}
+          </p>
+        ) : null}
+      </section>
     </>
   );
 }
+
+interface SystemOption {
+  system: ConnectableSystem;
+  label: string;
+  description: string;
+}
+
+const SYSTEM_OPTIONS: SystemOption[] = [
+  {
+    system: "google-workspace",
+    label: "Google Workspace",
+    description: "Shared Drives, files, Google Groups, and external collaborators.",
+  },
+  {
+    system: "slack",
+    label: "Slack",
+    description: "Channels, shared files, channel membership, and Slack Connect.",
+  },
+  {
+    system: "salesforce",
+    label: "Salesforce",
+    description: "Objects, reports, org-wide defaults, role groups, and community users.",
+  },
+  {
+    system: "multi-system",
+    label: "Multi-system demo (all combined)",
+    description: "M365 + Google + Slack + Salesforce merged into one graph.",
+  },
+];

@@ -41,7 +41,14 @@ export const scenarioKey = z.enum([
 ]);
 export type ScenarioKey = z.infer<typeof scenarioKey>;
 
-export const connectionMode = z.enum(["demo-seed", "live-graph"]);
+export const connectionMode = z.enum([
+  "demo-seed",
+  "live-graph",
+  "google-workspace",
+  "slack",
+  "salesforce",
+  "multi-system",
+]);
 export type ConnectionMode = z.infer<typeof connectionMode>;
 
 /** Severity bands. Stored lowercase; display layer capitalizes. */

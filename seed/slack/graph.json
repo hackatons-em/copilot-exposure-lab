@@ -1,0 +1,260 @@
+{
+  "workspace": {
+    "id": "ws-slack-acme",
+    "name": "Acme Slack",
+    "createdAt": "2026-06-01T09:00:00.000Z"
+  },
+  "connection": {
+    "id": "conn-slack-demo",
+    "workspaceId": "ws-slack-acme",
+    "mode": "slack",
+    "tenantName": "acme.slack.com",
+    "connectedAt": "2026-06-01T09:05:00.000Z",
+    "scopes": ["channels:read", "groups:read", "users:read", "files:read", "team:read"]
+  },
+  "principals": [
+    {
+      "id": "slack-u-jordan",
+      "sourceId": "slack-U0A0001",
+      "kind": "user",
+      "displayName": "Jordan Blake",
+      "email": "jordan.blake@acmehealthfinance.com",
+      "jobTitle": "Finance Analyst",
+      "department": "Finance",
+      "isExternal": false,
+      "memberOf": ["slack-g-general", "slack-g-finance"],
+      "active": true
+    },
+    {
+      "id": "slack-u-amira",
+      "sourceId": "slack-U0A0002",
+      "kind": "user",
+      "displayName": "Amira Hassan",
+      "email": "amira.hassan@acmehealthfinance.com",
+      "jobTitle": "Platform Engineer",
+      "department": "Engineering",
+      "isExternal": false,
+      "memberOf": ["slack-g-general", "slack-g-eng"],
+      "active": true
+    },
+    {
+      "id": "slack-u-rob",
+      "sourceId": "slack-U0A0003",
+      "kind": "user",
+      "displayName": "Rob Tanaka",
+      "email": "rob.tanaka@acmehealthfinance.com",
+      "jobTitle": "Workspace Admin",
+      "department": "IT",
+      "isExternal": false,
+      "memberOf": ["slack-g-general"],
+      "active": true
+    },
+    {
+      "id": "slack-u-partner",
+      "sourceId": "slack-W0B0001",
+      "kind": "external",
+      "displayName": "Casey Vendor (BlueRiver Partners)",
+      "email": "casey@blueriver-partners.com",
+      "jobTitle": "External Partner",
+      "department": "External",
+      "isExternal": true,
+      "memberOf": ["slack-g-connect"],
+      "active": true
+    },
+    {
+      "id": "slack-g-general",
+      "sourceId": "slack-C0GENERAL",
+      "kind": "group",
+      "displayName": "#general (public channel members)",
+      "membershipKind": "everyone-except-external",
+      "memberCount": 210,
+      "memberOf": [],
+      "active": true
+    },
+    {
+      "id": "slack-g-finance",
+      "sourceId": "slack-Cfin",
+      "kind": "group",
+      "displayName": "#finance",
+      "membershipKind": "security",
+      "memberCount": 18,
+      "memberOf": [],
+      "active": true
+    },
+    {
+      "id": "slack-g-eng",
+      "sourceId": "slack-Ceng",
+      "kind": "group",
+      "displayName": "#engineering",
+      "membershipKind": "security",
+      "memberCount": 47,
+      "memberOf": [],
+      "active": true
+    },
+    {
+      "id": "slack-g-connect",
+      "sourceId": "slack-Cconnect",
+      "kind": "group",
+      "displayName": "#acme-blueriver (Slack Connect)",
+      "membershipKind": "distribution",
+      "memberCount": 12,
+      "memberOf": [],
+      "active": true
+    }
+  ],
+  "resources": [
+    {
+      "id": "slack-c-general",
+      "sourceId": "slack-channel-general",
+      "kind": "site",
+      "name": "#general",
+      "path": "/channels/general",
+      "url": "https://acme.slack.com/archives/C0GENERAL",
+      "ownerPrincipalId": "slack-u-rob",
+      "sensitivityLabel": "General",
+      "sensitivityTags": [],
+      "businessCriticality": "low"
+    },
+    {
+      "id": "slack-c-finance",
+      "sourceId": "slack-channel-finance",
+      "kind": "site",
+      "name": "#finance",
+      "path": "/channels/finance",
+      "url": "https://acme.slack.com/archives/Cfin",
+      "ownerPrincipalId": "slack-u-jordan",
+      "sensitivityLabel": "Confidential",
+      "sensitivityTags": ["finance"],
+      "businessCriticality": "high"
+    },
+    {
+      "id": "slack-c-connect",
+      "sourceId": "slack-channel-connect",
+      "kind": "site",
+      "name": "#acme-blueriver",
+      "path": "/channels/acme-blueriver",
+      "url": "https://acme.slack.com/archives/Cconnect",
+      "ownerPrincipalId": "slack-u-jordan",
+      "sensitivityLabel": "Confidential",
+      "sensitivityTags": ["partner", "confidential"],
+      "businessCriticality": "high"
+    },
+    {
+      "id": "slack-f-payroll",
+      "sourceId": "slack-file-payroll",
+      "kind": "file",
+      "name": "q2_payroll_export.csv",
+      "path": "/channels/general/files/q2_payroll_export.csv",
+      "url": "https://files.slack.com/files-pri/q2_payroll_export.csv",
+      "parentId": "slack-c-general",
+      "ownerPrincipalId": "slack-u-jordan",
+      "sensitivityLabel": "Confidential",
+      "sensitivityTags": ["payroll", "salary", "finance"],
+      "businessCriticality": "critical"
+    },
+    {
+      "id": "slack-f-acq",
+      "sourceId": "slack-file-acq",
+      "kind": "file",
+      "name": "acquisition_targets_2026.pdf",
+      "path": "/channels/finance/files/acquisition_targets_2026.pdf",
+      "url": "https://files.slack.com/files-pri/acquisition_targets_2026.pdf",
+      "parentId": "slack-c-finance",
+      "ownerPrincipalId": "slack-u-jordan",
+      "sensitivityLabel": "Confidential",
+      "sensitivityTags": ["acquisition", "confidential", "finance"],
+      "businessCriticality": "critical"
+    },
+    {
+      "id": "slack-f-token",
+      "sourceId": "slack-file-token",
+      "kind": "file",
+      "name": "ci_deploy_token_backup.txt",
+      "path": "/channels/general/files/ci_deploy_token_backup.txt",
+      "url": "https://files.slack.com/files-pri/ci_deploy_token_backup.txt",
+      "parentId": "slack-c-general",
+      "ownerPrincipalId": "slack-u-amira",
+      "sensitivityLabel": null,
+      "sensitivityTags": ["token", "secret", "password", "security"],
+      "businessCriticality": "high"
+    }
+  ],
+  "grants": [
+    {
+      "id": "slack-pg-general-everyone",
+      "resourceId": "slack-c-general",
+      "principalId": "slack-g-general",
+      "right": "read",
+      "via": "direct",
+      "sourcePermissionId": "slack-perm-general-members"
+    },
+    {
+      "id": "slack-pg-finance-team",
+      "resourceId": "slack-c-finance",
+      "principalId": "slack-g-finance",
+      "right": "read",
+      "via": "direct",
+      "sourcePermissionId": "slack-perm-finance-members"
+    },
+    {
+      "id": "slack-pg-acq-broad",
+      "resourceId": "slack-f-acq",
+      "principalId": "slack-g-eng",
+      "right": "read",
+      "via": "direct",
+      "sourcePermissionId": "slack-perm-acq-eng"
+    },
+    {
+      "id": "slack-pg-connect-external",
+      "resourceId": "slack-c-connect",
+      "principalId": "slack-u-partner",
+      "right": "read",
+      "via": "guest",
+      "sourcePermissionId": "slack-perm-connect-partner"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "sc-normal-employee",
+      "key": "normal-employee",
+      "title": "Normal employee",
+      "description": "What sensitive data can a normal employee reach through everyday channel membership and broad public channels?",
+      "actorPrincipalId": "slack-u-amira",
+      "scope": ["channels"],
+      "includeAgents": false
+    },
+    {
+      "id": "sc-contractor-guest",
+      "key": "contractor-guest",
+      "title": "Contractor / guest",
+      "description": "What can an external Slack Connect partner still reach in shared channels?",
+      "actorPrincipalId": "slack-u-partner",
+      "scope": ["channels"],
+      "includeAgents": false
+    },
+    {
+      "id": "sc-broad-sharing",
+      "key": "broad-sharing",
+      "title": "Broad sharing",
+      "description": "Which sensitive files are exposed through large public channels or broad channel membership?",
+      "scope": ["channels"],
+      "includeAgents": false
+    },
+    {
+      "id": "sc-sensitive-file",
+      "key": "sensitive-file",
+      "title": "Sensitive file",
+      "description": "Which high-sensitivity files are reachable beyond their intended audience?",
+      "scope": ["channels"],
+      "includeAgents": false
+    },
+    {
+      "id": "sc-agent-action",
+      "key": "agent-action",
+      "title": "Agent action",
+      "description": "Which bots/integrations can take risky actions or run under unsafe ownership and permissions?",
+      "scope": ["agents"],
+      "includeAgents": true
+    }
+  ]
+}

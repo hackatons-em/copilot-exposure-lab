@@ -51,6 +51,9 @@ export interface SeedResult {
   counts: Record<string, number>;
 }
 
+/** Multi-system connectors that normalize into the same TenantGraph. */
+export type ConnectableSystem = "google-workspace" | "slack" | "salesforce" | "multi-system";
+
 /** Body for POST /connections/microsoft/start. The client secret is sent once, never stored. */
 export interface ConnectMicrosoftBody {
   tenantId: string;
@@ -185,6 +188,14 @@ export const api = {
 
   seedDemo(): Promise<SeedResult> {
     return request<SeedResult>(`/api/workspaces/${ws}/connections/demo/seed`, { method: "POST" });
+  },
+
+  /**
+   * Connect another system (Google Workspace, Slack, Salesforce, or the combined
+   * multi-system demo). The same deterministic engine then scans it unchanged.
+   */
+  connectSystem(system: ConnectableSystem): Promise<SeedResult> {
+    return request<SeedResult>(`/api/workspaces/${ws}/connections/${system}/seed`, { method: "POST" });
   },
 
   /**

@@ -177,6 +177,9 @@ importers:
       '@cel/config':
         specifier: workspace:*
         version: link:../config
+      '@cel/rule-engine':
+        specifier: workspace:*
+        version: link:../rule-engine
 
   packages/integrations:
     dependencies:

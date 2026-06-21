@@ -18,6 +18,7 @@
     "@cel/types": "workspace:*"
   },
   "devDependencies": {
-    "@cel/config": "workspace:*"
+    "@cel/config": "workspace:*",
+    "@cel/rule-engine": "workspace:*"
   }
 }

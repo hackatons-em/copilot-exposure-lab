@@ -1,0 +1,263 @@
+{
+  "workspace": {
+    "id": "ws-sfdc-acme",
+    "name": "Acme Salesforce",
+    "createdAt": "2026-06-01T09:00:00.000Z"
+  },
+  "connection": {
+    "id": "conn-sfdc-demo",
+    "workspaceId": "ws-sfdc-acme",
+    "mode": "salesforce",
+    "tenantName": "acme.my.salesforce.com",
+    "connectedAt": "2026-06-01T09:05:00.000Z",
+    "scopes": ["api", "refresh_token", "sfap_api"]
+  },
+  "principals": [
+    {
+      "id": "sfdc-u-dana",
+      "sourceId": "sfdc-005000000000001",
+      "kind": "user",
+      "displayName": "Dana Whitfield",
+      "email": "dana.whitfield@acmehealthfinance.com",
+      "jobTitle": "VP Sales",
+      "department": "Sales",
+      "isExternal": false,
+      "memberOf": ["sfdc-g-all-internal", "sfdc-g-sales"],
+      "active": true
+    },
+    {
+      "id": "sfdc-u-pavel",
+      "sourceId": "sfdc-005000000000002",
+      "kind": "user",
+      "displayName": "Pavel Novotny",
+      "email": "pavel.novotny@acmehealthfinance.com",
+      "jobTitle": "Revenue Operations",
+      "department": "Operations",
+      "isExternal": false,
+      "memberOf": ["sfdc-g-all-internal", "sfdc-g-revops"],
+      "active": true
+    },
+    {
+      "id": "sfdc-u-admin",
+      "sourceId": "sfdc-005000000000003",
+      "kind": "user",
+      "displayName": "Olivia Brooks",
+      "email": "olivia.brooks@acmehealthfinance.com",
+      "jobTitle": "Salesforce Administrator",
+      "department": "IT",
+      "isExternal": false,
+      "memberOf": ["sfdc-g-all-internal"],
+      "active": true
+    },
+    {
+      "id": "sfdc-u-portal",
+      "sourceId": "sfdc-005000000000004",
+      "kind": "external",
+      "displayName": "Hiro Tanaka (Customer Community)",
+      "email": "hiro.tanaka@bigcustomer.example",
+      "jobTitle": "Community Portal User",
+      "department": "External",
+      "isExternal": true,
+      "memberOf": ["sfdc-g-community"],
+      "active": true
+    },
+    {
+      "id": "sfdc-g-all-internal",
+      "sourceId": "sfdc-grp-all-internal",
+      "kind": "group",
+      "displayName": "All Internal Users",
+      "membershipKind": "everyone-except-external",
+      "memberCount": 340,
+      "memberOf": [],
+      "active": true
+    },
+    {
+      "id": "sfdc-g-sales",
+      "sourceId": "sfdc-grp-sales",
+      "kind": "group",
+      "displayName": "Sales Role Hierarchy",
+      "membershipKind": "security",
+      "memberCount": 88,
+      "memberOf": [],
+      "active": true
+    },
+    {
+      "id": "sfdc-g-revops",
+      "sourceId": "sfdc-grp-revops",
+      "kind": "group",
+      "displayName": "RevOps Public Group",
+      "membershipKind": "security",
+      "memberCount": 9,
+      "memberOf": [],
+      "active": true
+    },
+    {
+      "id": "sfdc-g-community",
+      "sourceId": "sfdc-grp-community",
+      "kind": "group",
+      "displayName": "Customer Community Users",
+      "membershipKind": "distribution",
+      "memberCount": 1500,
+      "memberOf": [],
+      "active": true
+    }
+  ],
+  "resources": [
+    {
+      "id": "sfdc-o-opportunity",
+      "sourceId": "sfdc-obj-opportunity",
+      "kind": "site",
+      "name": "Opportunity Object",
+      "path": "/objects/Opportunity",
+      "url": "https://acme.my.salesforce.com/o/Opportunity/home",
+      "ownerPrincipalId": "sfdc-u-admin",
+      "sensitivityLabel": "Confidential",
+      "sensitivityTags": ["customer", "financial"],
+      "businessCriticality": "high"
+    },
+    {
+      "id": "sfdc-o-contract",
+      "sourceId": "sfdc-obj-contract",
+      "kind": "site",
+      "name": "Contract Object",
+      "path": "/objects/Contract",
+      "url": "https://acme.my.salesforce.com/o/Contract/home",
+      "ownerPrincipalId": "sfdc-u-admin",
+      "sensitivityLabel": "Confidential",
+      "sensitivityTags": ["contract", "customer", "legal"],
+      "businessCriticality": "high"
+    },
+    {
+      "id": "sfdc-r-pipeline",
+      "sourceId": "sfdc-report-pipeline",
+      "kind": "file",
+      "name": "Executive Pipeline & Compensation Report",
+      "path": "/reports/exec_pipeline_compensation",
+      "url": "https://acme.my.salesforce.com/reports/exec_pipeline_compensation",
+      "parentId": "sfdc-o-opportunity",
+      "ownerPrincipalId": "sfdc-u-dana",
+      "sensitivityLabel": "Confidential",
+      "sensitivityTags": ["compensation", "salary", "financial", "executive"],
+      "businessCriticality": "critical"
+    },
+    {
+      "id": "sfdc-r-contracts",
+      "sourceId": "sfdc-report-contracts",
+      "kind": "file",
+      "name": "All Customer Contracts Export",
+      "path": "/reports/all_customer_contracts",
+      "url": "https://acme.my.salesforce.com/reports/all_customer_contracts",
+      "parentId": "sfdc-o-contract",
+      "ownerPrincipalId": "sfdc-u-pavel",
+      "sensitivityLabel": "Confidential",
+      "sensitivityTags": ["contract", "customer", "legal"],
+      "businessCriticality": "high"
+    },
+    {
+      "id": "sfdc-r-apikeys",
+      "sourceId": "sfdc-report-apikeys",
+      "kind": "file",
+      "name": "Integration API Secret Inventory",
+      "path": "/reports/integration_api_secrets",
+      "url": "https://acme.my.salesforce.com/reports/integration_api_secrets",
+      "parentId": "sfdc-o-opportunity",
+      "ownerPrincipalId": "sfdc-u-pavel",
+      "sensitivityLabel": null,
+      "sensitivityTags": ["secret", "token", "password", "security"],
+      "businessCriticality": "high"
+    }
+  ],
+  "grants": [
+    {
+      "id": "sfdc-pg-pipeline-owd",
+      "resourceId": "sfdc-r-pipeline",
+      "principalId": "sfdc-g-all-internal",
+      "right": "read",
+      "via": "orgwide",
+      "linkScope": "org-wide",
+      "sourcePermissionId": "sfdc-owd-pipeline"
+    },
+    {
+      "id": "sfdc-pg-contract-sales",
+      "resourceId": "sfdc-r-contracts",
+      "principalId": "sfdc-g-sales",
+      "right": "read",
+      "via": "direct",
+      "sourcePermissionId": "sfdc-share-contracts-sales"
+    },
+    {
+      "id": "sfdc-pg-opp-community",
+      "resourceId": "sfdc-o-opportunity",
+      "principalId": "sfdc-u-portal",
+      "right": "read",
+      "via": "guest",
+      "sourcePermissionId": "sfdc-share-opp-community"
+    },
+    {
+      "id": "sfdc-pg-apikeys-revops",
+      "resourceId": "sfdc-r-apikeys",
+      "principalId": "sfdc-g-sales",
+      "right": "read",
+      "via": "direct",
+      "sourcePermissionId": "sfdc-share-apikeys-sales"
+    },
+    {
+      "id": "sfdc-pg-opp-sales",
+      "resourceId": "sfdc-o-opportunity",
+      "principalId": "sfdc-g-sales",
+      "right": "read",
+      "via": "direct"
+    },
+    {
+      "id": "sfdc-pg-contract-owner",
+      "resourceId": "sfdc-o-contract",
+      "principalId": "sfdc-u-admin",
+      "right": "owner",
+      "via": "direct"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "sc-normal-employee",
+      "key": "normal-employee",
+      "title": "Normal employee",
+      "description": "What sensitive records can a normal internal user reach through org-wide defaults and role hierarchies?",
+      "actorPrincipalId": "sfdc-u-dana",
+      "scope": ["objects", "reports"],
+      "includeAgents": false
+    },
+    {
+      "id": "sc-contractor-guest",
+      "key": "contractor-guest",
+      "title": "Contractor / guest",
+      "description": "What can an external community/portal user still reach on sensitive objects?",
+      "actorPrincipalId": "sfdc-u-portal",
+      "scope": ["objects"],
+      "includeAgents": false
+    },
+    {
+      "id": "sc-broad-sharing",
+      "key": "broad-sharing",
+      "title": "Broad sharing",
+      "description": "Which sensitive objects/reports are exposed through org-wide-default read or broad role groups?",
+      "scope": ["objects", "reports"],
+      "includeAgents": false
+    },
+    {
+      "id": "sc-sensitive-file",
+      "key": "sensitive-file",
+      "title": "Sensitive file",
+      "description": "Which high-sensitivity reports are reachable beyond their intended audience?",
+      "scope": ["reports"],
+      "includeAgents": false
+    },
+    {
+      "id": "sc-agent-action",
+      "key": "agent-action",
+      "title": "Agent action",
+      "description": "Which flows/agents can take risky actions or run under unsafe ownership and permissions?",
+      "scope": ["agents"],
+      "includeAgents": true
+    }
+  ]
+}

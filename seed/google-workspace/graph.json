@@ -1,0 +1,280 @@
+{
+  "workspace": {
+    "id": "ws-gws-acme",
+    "name": "Acme Google Workspace",
+    "createdAt": "2026-06-01T09:00:00.000Z"
+  },
+  "connection": {
+    "id": "conn-gws-demo",
+    "workspaceId": "ws-gws-acme",
+    "mode": "google-workspace",
+    "tenantName": "acmehealthfinance.com (Google Workspace)",
+    "connectedAt": "2026-06-01T09:05:00.000Z",
+    "scopes": [
+      "admin.directory.user.readonly",
+      "admin.directory.group.readonly",
+      "drive.metadata.readonly"
+    ]
+  },
+  "principals": [
+    {
+      "id": "gws-u-priya",
+      "sourceId": "gws-114000000000000000001",
+      "kind": "user",
+      "displayName": "Priya Nair",
+      "email": "priya.nair@acmehealthfinance.com",
+      "jobTitle": "People Operations Lead",
+      "department": "Human Resources",
+      "isExternal": false,
+      "memberOf": ["gws-g-everyone", "gws-g-hr"],
+      "active": true
+    },
+    {
+      "id": "gws-u-marco",
+      "sourceId": "gws-114000000000000000002",
+      "kind": "user",
+      "displayName": "Marco Reyes",
+      "email": "marco.reyes@acmehealthfinance.com",
+      "jobTitle": "Engineering Manager",
+      "department": "Engineering",
+      "isExternal": false,
+      "memberOf": ["gws-g-everyone", "gws-g-engineering"],
+      "active": true
+    },
+    {
+      "id": "gws-u-lena",
+      "sourceId": "gws-114000000000000000003",
+      "kind": "user",
+      "displayName": "Lena Fischer",
+      "email": "lena.fischer@acmehealthfinance.com",
+      "jobTitle": "General Counsel",
+      "department": "Legal",
+      "isExternal": false,
+      "memberOf": ["gws-g-everyone", "gws-g-legal"],
+      "active": true
+    },
+    {
+      "id": "gws-u-sven",
+      "sourceId": "gws-114000000000000000004",
+      "kind": "user",
+      "displayName": "Sven Halvorsen",
+      "email": "sven.halvorsen@acmehealthfinance.com",
+      "jobTitle": "Workspace Administrator",
+      "department": "IT",
+      "isExternal": false,
+      "memberOf": ["gws-g-everyone"],
+      "active": true
+    },
+    {
+      "id": "gws-u-extern",
+      "sourceId": "gws-114000000000000000005",
+      "kind": "user",
+      "displayName": "Diego Costa",
+      "email": "diego.costa@northwind-agency.com",
+      "jobTitle": "External Brand Consultant",
+      "department": "External",
+      "isExternal": true,
+      "memberOf": [],
+      "active": true
+    },
+    {
+      "id": "gws-g-everyone",
+      "sourceId": "gws-grp-everyone",
+      "kind": "group",
+      "displayName": "All Staff (acmehealthfinance.com)",
+      "membershipKind": "everyone-except-external",
+      "memberCount": 120,
+      "memberOf": [],
+      "active": true
+    },
+    {
+      "id": "gws-g-hr",
+      "sourceId": "gws-grp-hr",
+      "kind": "group",
+      "displayName": "HR Department",
+      "membershipKind": "security",
+      "memberCount": 38,
+      "memberOf": [],
+      "active": true
+    },
+    {
+      "id": "gws-g-engineering",
+      "sourceId": "gws-grp-eng",
+      "kind": "group",
+      "displayName": "Engineering",
+      "membershipKind": "security",
+      "memberCount": 64,
+      "memberOf": [],
+      "active": true
+    },
+    {
+      "id": "gws-g-legal",
+      "sourceId": "gws-grp-legal",
+      "kind": "group",
+      "displayName": "Legal",
+      "membershipKind": "security",
+      "memberCount": 6,
+      "memberOf": [],
+      "active": true
+    }
+  ],
+  "resources": [
+    {
+      "id": "gws-d-hr",
+      "sourceId": "gws-drive-hr",
+      "kind": "drive",
+      "name": "HR Shared Drive",
+      "path": "/SharedDrives/HR",
+      "url": "https://drive.google.com/drive/folders/gws-drive-hr",
+      "ownerPrincipalId": "gws-u-priya",
+      "sensitivityLabel": "Confidential",
+      "sensitivityTags": ["HR"],
+      "businessCriticality": "high"
+    },
+    {
+      "id": "gws-d-legal",
+      "sourceId": "gws-drive-legal",
+      "kind": "drive",
+      "name": "Legal Shared Drive",
+      "path": "/SharedDrives/Legal",
+      "url": "https://drive.google.com/drive/folders/gws-drive-legal",
+      "ownerPrincipalId": "gws-u-lena",
+      "sensitivityLabel": "Confidential",
+      "sensitivityTags": ["legal", "confidential"],
+      "businessCriticality": "high"
+    },
+    {
+      "id": "gws-f-salary",
+      "sourceId": "gws-file-salary",
+      "kind": "file",
+      "name": "2026_salary_bands.gsheet",
+      "path": "/SharedDrives/HR/Compensation/2026_salary_bands.gsheet",
+      "url": "https://docs.google.com/spreadsheets/d/gws-file-salary",
+      "parentId": "gws-d-hr",
+      "ownerPrincipalId": "gws-u-priya",
+      "sensitivityLabel": "Confidential",
+      "sensitivityTags": ["salary", "compensation", "payroll", "HR"],
+      "businessCriticality": "critical"
+    },
+    {
+      "id": "gws-f-msa",
+      "sourceId": "gws-file-msa",
+      "kind": "file",
+      "name": "northwind_master_contract.gdoc",
+      "path": "/SharedDrives/Legal/northwind_master_contract.gdoc",
+      "url": "https://docs.google.com/document/d/gws-file-msa",
+      "parentId": "gws-d-legal",
+      "ownerPrincipalId": "gws-u-lena",
+      "sensitivityLabel": "Confidential",
+      "sensitivityTags": ["customer", "contract", "legal"],
+      "businessCriticality": "high"
+    },
+    {
+      "id": "gws-f-creds",
+      "sourceId": "gws-file-creds",
+      "kind": "file",
+      "name": "prod_service_account_secret.gdoc",
+      "path": "/SharedDrives/Legal/prod_service_account_secret.gdoc",
+      "url": "https://docs.google.com/document/d/gws-file-creds",
+      "parentId": "gws-d-legal",
+      "ownerPrincipalId": "gws-u-marco",
+      "sensitivityLabel": null,
+      "sensitivityTags": ["secret", "password", "token", "security"],
+      "businessCriticality": "high"
+    }
+  ],
+  "grants": [
+    {
+      "id": "gws-pg-salary-anyone",
+      "resourceId": "gws-f-salary",
+      "principalId": "gws-g-everyone",
+      "right": "read",
+      "via": "link",
+      "linkScope": "anyone",
+      "sourcePermissionId": "gws-perm-salary-anyonelink"
+    },
+    {
+      "id": "gws-pg-msa-broadgroup",
+      "resourceId": "gws-f-msa",
+      "principalId": "gws-g-engineering",
+      "right": "read",
+      "via": "direct",
+      "sourcePermissionId": "gws-perm-msa-eng"
+    },
+    {
+      "id": "gws-pg-legal-extern",
+      "resourceId": "gws-d-legal",
+      "principalId": "gws-u-extern",
+      "right": "read",
+      "via": "guest",
+      "expirationAt": "2025-11-30T00:00:00.000Z",
+      "sourcePermissionId": "gws-perm-legal-guest"
+    },
+    {
+      "id": "gws-pg-creds-eng",
+      "resourceId": "gws-f-creds",
+      "principalId": "gws-g-engineering",
+      "right": "read",
+      "via": "direct",
+      "sourcePermissionId": "gws-perm-creds-eng"
+    },
+    {
+      "id": "gws-pg-hr-owner",
+      "resourceId": "gws-d-hr",
+      "principalId": "gws-u-priya",
+      "right": "owner",
+      "via": "direct"
+    },
+    {
+      "id": "gws-pg-legal-team",
+      "resourceId": "gws-d-legal",
+      "principalId": "gws-g-legal",
+      "right": "read",
+      "via": "direct"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "sc-normal-employee",
+      "key": "normal-employee",
+      "title": "Normal employee",
+      "description": "What sensitive data can a normal employee reach through everyday permissions, broad groups, and sharing links?",
+      "actorPrincipalId": "gws-u-marco",
+      "scope": ["drive"],
+      "includeAgents": false
+    },
+    {
+      "id": "sc-contractor-guest",
+      "key": "contractor-guest",
+      "title": "Contractor / guest",
+      "description": "What can a contractor or external guest still reach, including access that should have expired?",
+      "actorPrincipalId": "gws-u-extern",
+      "scope": ["drive"],
+      "includeAgents": false
+    },
+    {
+      "id": "sc-broad-sharing",
+      "key": "broad-sharing",
+      "title": "Broad sharing",
+      "description": "Which sensitive resources are exposed through anyone-with-the-link sharing or large groups?",
+      "scope": ["drive"],
+      "includeAgents": false
+    },
+    {
+      "id": "sc-sensitive-file",
+      "key": "sensitive-file",
+      "title": "Sensitive file",
+      "description": "Which high-sensitivity files are reachable beyond their intended audience?",
+      "scope": ["drive"],
+      "includeAgents": false
+    },
+    {
+      "id": "sc-agent-action",
+      "key": "agent-action",
+      "title": "Agent action",
+      "description": "Which automation/agents can take risky actions or run under unsafe ownership and permissions?",
+      "scope": ["agents"],
+      "includeAgents": true
+    }
+  ]
+}

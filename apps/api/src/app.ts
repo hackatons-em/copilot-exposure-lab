@@ -1,5 +1,13 @@
 import cors from "@fastify/cors";
-import { type GraphProvider, MsGraphClient, createGraphRequester } from "@cel/graph-client";
+import {
+  GoogleWorkspaceClient,
+  type GraphProvider,
+  MsGraphClient,
+  MultiSystemClient,
+  SalesforceClient,
+  SlackClient,
+  createGraphRequester,
+} from "@cel/graph-client";
 import { EXPORT_FORMATS, isExportFormat, runExport } from "@cel/integrations";
 import { simulateRetrieval } from "@cel/rule-engine";
 import Fastify, { type FastifyInstance } from "fastify";
@@ -35,6 +43,17 @@ function defaultGraphProviderFactory(input: GraphProviderInput): GraphProvider {
     tenantName: input.tenantName,
   });
 }
+
+/**
+ * Multi-system connectors that normalize their world into the same TenantGraph
+ * the rule engine consumes. Each factory builds a metadata-only seed provider.
+ */
+const SYSTEM_PROVIDERS: Record<string, () => GraphProvider> = {
+  "google-workspace": () => new GoogleWorkspaceClient(),
+  slack: () => new SlackClient(),
+  salesforce: () => new SalesforceClient(),
+  "multi-system": () => new MultiSystemClient(),
+};
 
 const createWorkspaceBody = z.object({ id: z.string().optional(), name: z.string().min(1) });
 const scanBody = z.object({ actorId: z.string().optional() }).optional();
@@ -140,6 +159,27 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
       action: "connection.microsoft.start",
       targetId: result.connection.id,
       detail: { tenantName: result.connection.tenantName, mode: result.connection.mode },
+    });
+    return reply.status(201).send(result);
+  });
+
+  // Connect another system (Google Workspace, Slack, Salesforce, or the combined
+  // multi-system demo). Each builds a metadata-only provider that normalizes into
+  // the same TenantGraph, so the unchanged deterministic engine scans it as-is.
+  app.post("/api/workspaces/:id/connections/:system/seed", async (req, reply) => {
+    const { id, system } = req.params as { id: string; system: string };
+    await requireWorkspace(id);
+    const factory = SYSTEM_PROVIDERS[system];
+    if (!factory) {
+      throw Object.assign(new Error(`unknown system: ${system}`), { statusCode: 400 });
+    }
+    const result = await store.ingestGraph(id, factory());
+    await store.logAudit({
+      workspaceId: id,
+      actor: "api",
+      action: `connection.${system}.seed`,
+      targetId: result.connection.id,
+      detail: { mode: result.connection.mode },
     });
     return reply.status(201).send(result);
   });
