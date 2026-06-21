@@ -20,6 +20,14 @@ param(
 # NOTE: do NOT use $ErrorActionPreference='Stop' here — Azure CLI writes
 # warnings to stderr, which PowerShell would otherwise promote to a terminating
 # error. We check $LASTEXITCODE explicitly after each az call instead.
+
+# Force UTF-8 for the Python-based Azure CLI. Otherwise `az acr build` crashes
+# while STREAMING remote build logs that contain non-cp1252 chars (e.g. a thin
+# space  ) on a Windows console — a client-side encoding error that fails the
+# deploy even though the cloud build itself succeeded.
+$env:PYTHONUTF8 = "1"
+$env:PYTHONIOENCODING = "utf-8"
+
 $repoRoot = Resolve-Path "$PSScriptRoot/../.."
 $pwPlain = [System.Net.NetworkCredential]::new("", $PgAdminPassword).Password
 
