@@ -64,6 +64,15 @@ describe("DrizzleStore over a real (pglite) Postgres", () => {
     expect(afterRescan!.finding.status).toBe("resolved");
   });
 
+  it("records exposure snapshots + drift across scans", async () => {
+    // Two scans have run by now (initial + the proof-of-fix re-scan).
+    const snaps = await store.listSnapshots("ws-pg");
+    expect(snaps.length).toBeGreaterThanOrEqual(2);
+    const drift = await store.getDrift("ws-pg");
+    expect(drift).toBeDefined();
+    expect(drift!.scoreDelta).toBeLessThanOrEqual(0); // fix lowered exposure
+  });
+
   it("generates a downloadable report", async () => {
     const report = await store.createReport("ws-pg", "markdown");
     const content = await store.getReportContent("ws-pg", report.id);

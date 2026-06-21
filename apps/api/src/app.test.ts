@@ -127,6 +127,17 @@ describe("workspace lifecycle + scan", () => {
     const bad = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/exports/pdf` });
     expect(bad.statusCode).toBe(400);
   });
+
+  it("tracks exposure history + drift across scans", async () => {
+    // A scan already ran and the critical was fixed; re-scan to make a 2nd snapshot.
+    await app.inject({ method: "POST", url: `/api/workspaces/${wsId}/scans`, payload: {} });
+    const res = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/scan-history` });
+    const body = res.json();
+    expect(body.snapshots.length).toBeGreaterThanOrEqual(2);
+    expect(body.drift).not.toBeNull();
+    // the fix dropped exposure, so the latest score is <= the prior one
+    expect(body.drift.scoreDelta).toBeLessThanOrEqual(0);
+  });
 });
 
 describe("multi-system connectors", () => {

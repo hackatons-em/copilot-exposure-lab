@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import type { Finding, Resource } from "@cel/types";
-import { api, type TenantExposure } from "@/lib/api";
+import { api, type ScanHistory, type TenantExposure } from "@/lib/api";
 import { bandRank } from "@/lib/format";
 import { useAsync } from "@/lib/useAsync";
 import { useWorkspace } from "@/components/WorkspaceProvider";
@@ -13,6 +13,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { ErrorState, LoadingState } from "@/components/States";
 import { ExposureGauge } from "@/components/ExposureGauge";
 import { MetricCard } from "@/components/MetricCard";
+import { TrendChart } from "@/components/TrendChart";
 import { PageHeader } from "@/components/PageHeader";
 import { SeverityBadge } from "@/components/SeverityBadge";
 import { TrustCopy } from "@/components/TrustCopy";
@@ -21,6 +22,7 @@ interface OverviewData {
   findings: Finding[];
   resources: Resource[];
   exposure: TenantExposure;
+  history: ScanHistory;
 }
 
 function resourceName(resources: Resource[], id: string): string {
@@ -31,12 +33,13 @@ export default function OverviewPage() {
   const { dataVersion, runAssessment, scanning } = useWorkspace();
 
   const { data, loading, error, reload } = useAsync<OverviewData>(async () => {
-    const [findings, resources, exposure] = await Promise.all([
+    const [findings, resources, exposure, history] = await Promise.all([
       api.listFindings(),
       api.listResources(),
       api.getExposure(),
+      api.getScanHistory(),
     ]);
-    return { findings, resources, exposure };
+    return { findings, resources, exposure, history };
   }, [dataVersion]);
 
   const sorted = useMemo(() => {
@@ -171,6 +174,29 @@ export default function OverviewPage() {
           <MetricCard label="Risky agents" value={metrics.riskyAgents} />
         </div>
       </div>
+
+      {data?.history.drift && (
+        <div
+          className="mt-4 rounded-lg border px-4 py-2.5 text-sm"
+          style={{
+            borderColor: data.history.drift.scoreDelta <= 0 ? "#bfe3cf" : "#f2c7c2",
+            backgroundColor: data.history.drift.scoreDelta <= 0 ? "#f0faf4" : "#fcf2f1",
+          }}
+        >
+          <span className="font-semibold text-ink">Since last scan:</span>{" "}
+          <span className="text-ink-soft">
+            exposure {data.history.drift.scoreDelta <= 0 ? "down" : "up"}{" "}
+            {Math.abs(data.history.drift.scoreDelta)} pts · {data.history.drift.newFindingIds.length} new ·{" "}
+            {data.history.drift.resolvedFindingIds.length} resolved
+          </span>
+        </div>
+      )}
+
+      {data?.history && (
+        <div className="mt-4">
+          <TrendChart snapshots={data.history.snapshots} />
+        </div>
+      )}
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">

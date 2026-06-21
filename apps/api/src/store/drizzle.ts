@@ -10,6 +10,7 @@ import {
   remediationTasks,
   reports as reportsTable,
   resources as resourcesTable,
+  scanSnapshots,
   scenarioRuns,
   scenarios as scenariosTable,
   schedules as schedulesTable,
@@ -18,7 +19,7 @@ import {
 } from "@cel/db";
 import { type GraphProvider, SeedGraphClient } from "@cel/graph-client";
 import { buildReportModel, generateLlmSummary, renderHtml, renderMarkdown } from "@cel/report";
-import { scan } from "@cel/rule-engine";
+import { scan, tenantExposureScore } from "@cel/rule-engine";
 import type {
   AuditEvent,
   Finding,
@@ -32,13 +33,16 @@ import type {
   TenantGraph,
   Workspace,
 } from "@cel/types";
-import { and, asc, eq, lte } from "drizzle-orm";
+import { and, asc, desc, eq, lte } from "drizzle-orm";
+import { computeDrift } from "./drift.js";
 import type {
   CreateScheduleInput,
+  ExposureDrift,
   FindingDetail,
   FindingFilter,
   ReportContent,
   ScanRunSummary,
+  ScanSnapshot,
   Schedule,
   ScheduleAction,
   Store,
@@ -254,7 +258,43 @@ export class DrizzleStore implements Store {
     await this.persistScan(workspaceId, result);
     const bands: Record<string, number> = {};
     for (const f of result.findings) bands[f.risk.band] = (bands[f.risk.band] ?? 0) + 1;
+    const exposure = tenantExposureScore(result);
+    await this.db.insert(scanSnapshots).values({
+      id: `snap-${randomUUID()}`,
+      workspaceId,
+      takenAt: result.generatedAt,
+      exposureScore: exposure.score,
+      band: exposure.band,
+      bands: exposure.bands,
+      findingCount: exposure.findingCount,
+      fingerprints: result.findings.filter((f) => f.status !== "resolved").map((f) => f.id),
+    });
     return { scanRunId: `scan-${randomUUID()}`, findingCount: result.findings.length, bands, generatedAt: result.generatedAt };
+  }
+
+  async listSnapshots(workspaceId: string, limit = 30): Promise<ScanSnapshot[]> {
+    const rows = await this.db
+      .select()
+      .from(scanSnapshots)
+      .where(eq(scanSnapshots.workspaceId, workspaceId))
+      .orderBy(desc(scanSnapshots.takenAt))
+      .limit(limit);
+    return rows.map((r) => ({
+      id: r.id,
+      workspaceId: r.workspaceId,
+      takenAt: r.takenAt,
+      exposureScore: r.exposureScore,
+      band: r.band,
+      bands: r.bands,
+      findingCount: r.findingCount,
+      fingerprints: r.fingerprints,
+    }));
+  }
+
+  async getDrift(workspaceId: string): Promise<ExposureDrift | undefined> {
+    const latest = await this.listSnapshots(workspaceId, 2);
+    if (latest.length < 2) return undefined;
+    return computeDrift(latest[0]!, latest[1]!);
   }
 
   private async persistScan(workspaceId: string, result: ScanResult): Promise<void> {

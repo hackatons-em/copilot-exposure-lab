@@ -41,6 +41,27 @@ export interface ScanRunSummary {
   generatedAt: string;
 }
 
+/** Point-in-time exposure snapshot, captured on every scan (trend + drift). */
+export interface ScanSnapshot {
+  id: string;
+  workspaceId: string;
+  takenAt: string;
+  exposureScore: number;
+  band: string;
+  bands: Record<string, number>;
+  findingCount: number;
+  fingerprints: string[];
+}
+
+/** Change between the two most recent snapshots. */
+export interface ExposureDrift {
+  scoreDelta: number;
+  criticalDelta: number;
+  newFindingIds: string[];
+  resolvedFindingIds: string[];
+  previousAt?: string;
+}
+
 /** What a schedule enqueues when it fires. */
 export type ScheduleAction = "scan" | "report";
 
@@ -113,6 +134,11 @@ export interface Store {
   ): Promise<Finding | undefined>;
 
   getScanResult(workspaceId: string): Promise<ScanResult | undefined>;
+
+  /** Exposure snapshots, most recent first (capped at `limit`). */
+  listSnapshots(workspaceId: string, limit?: number): Promise<ScanSnapshot[]>;
+  /** Drift between the two most recent snapshots, or undefined if fewer than two. */
+  getDrift(workspaceId: string): Promise<ExposureDrift | undefined>;
 
   createReport(workspaceId: string, format: ReportFormat): Promise<Report>;
   getReport(workspaceId: string, reportId: string): Promise<Report | undefined>;

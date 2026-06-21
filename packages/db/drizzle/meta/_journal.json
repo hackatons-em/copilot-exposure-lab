@@ -15,6 +15,13 @@
       "when": 1782063138941,
       "tag": "0001_marvelous_epoch",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782067405725,
+      "tag": "0002_tired_matthew_murdock",
+      "breakpoints": true
     }
   ]
 }

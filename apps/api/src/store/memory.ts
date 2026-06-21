@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { type GraphProvider, SeedGraphClient } from "@cel/graph-client";
 import { buildReportModel, generateLlmSummary, renderHtml, renderMarkdown } from "@cel/report";
-import { scan } from "@cel/rule-engine";
+import { scan, tenantExposureScore } from "@cel/rule-engine";
 import type {
   AuditEvent,
   Band,
@@ -17,14 +17,17 @@ import type {
 } from "@cel/types";
 import type {
   CreateScheduleInput,
+  ExposureDrift,
   FindingDetail,
   FindingFilter,
   ReportContent,
   ScanRunSummary,
+  ScanSnapshot,
   Schedule,
   Store,
   UpdateScheduleInput,
 } from "./types.js";
+import { computeDrift } from "./drift.js";
 
 interface WorkspaceState {
   workspace: Workspace;
@@ -35,6 +38,7 @@ interface WorkspaceState {
   audit: AuditEvent[];
   reports: Map<string, { report: Report; content: string }>;
   schedules: Map<string, Schedule>;
+  snapshots: ScanSnapshot[];
 }
 
 const nowIso = (): string => new Date().toISOString();
@@ -62,6 +66,7 @@ export class MemoryStore implements Store {
       audit: [],
       reports: new Map(),
       schedules: new Map(),
+      snapshots: [],
     });
     return workspace;
   }
@@ -135,6 +140,17 @@ export class MemoryStore implements Store {
     state.result = result;
     const bands: Record<string, number> = {};
     for (const f of result.findings) bands[f.risk.band] = (bands[f.risk.band] ?? 0) + 1;
+    const exposure = tenantExposureScore(result);
+    state.snapshots.push({
+      id: `snap-${randomUUID()}`,
+      workspaceId,
+      takenAt: result.generatedAt,
+      exposureScore: exposure.score,
+      band: exposure.band,
+      bands: exposure.bands,
+      findingCount: exposure.findingCount,
+      fingerprints: result.findings.filter((f) => f.status !== "resolved").map((f) => f.id),
+    });
     return {
       scanRunId: `scan-${randomUUID()}`,
       findingCount: result.findings.length,
@@ -145,6 +161,16 @@ export class MemoryStore implements Store {
 
   async getScanResult(workspaceId: string): Promise<ScanResult | undefined> {
     return this.require(workspaceId).result;
+  }
+
+  async listSnapshots(workspaceId: string, limit = 30): Promise<ScanSnapshot[]> {
+    return [...this.require(workspaceId).snapshots].reverse().slice(0, limit);
+  }
+
+  async getDrift(workspaceId: string): Promise<ExposureDrift | undefined> {
+    const snaps = this.require(workspaceId).snapshots;
+    if (snaps.length < 2) return undefined;
+    return computeDrift(snaps[snaps.length - 1]!, snaps[snaps.length - 2]!);
   }
 
   async getScenarioRun(workspaceId: string, scenarioIdOrKey: string): Promise<ScenarioRun | undefined> {

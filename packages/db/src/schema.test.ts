@@ -4,8 +4,8 @@ import { describe, expect, it } from "vitest";
 import { evidenceItems, findings, jobs, schema, workspaces } from "./schema.js";
 
 describe("db schema", () => {
-  it("declares all 14 data-model tables", () => {
-    expect(Object.keys(schema)).toHaveLength(14);
+  it("declares all 15 data-model tables", () => {
+    expect(Object.keys(schema)).toHaveLength(15);
   });
 
   it("maps to snake_case table names", () => {

@@ -216,6 +216,20 @@ export const schedules = pgTable("schedules", {
   createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
 });
 
+/** Point-in-time exposure snapshot — one per scan, for trend + drift. */
+export const scanSnapshots = pgTable("scan_snapshots", {
+  id: text("id").primaryKey(),
+  workspaceId: text("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+  takenAt: timestamp("taken_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
+  exposureScore: integer("exposure_score").notNull(),
+  band: text("band").notNull(),
+  bands: jsonb("bands").$type<Record<string, number>>().default({}).notNull(),
+  findingCount: integer("finding_count").notNull(),
+  fingerprints: jsonb("fingerprints").$type<string[]>().default([]).notNull(),
+});
+
 export const schema = {
   workspaces,
   tenantConnections,
@@ -231,4 +245,5 @@ export const schema = {
   auditEvents,
   jobs,
   schedules,
+  scanSnapshots,
 };

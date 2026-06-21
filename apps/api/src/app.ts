@@ -320,6 +320,14 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     return tenantExposureScore(result);
   });
 
+  // ── Continuous monitoring: trend + drift ───────────────────
+  app.get("/api/workspaces/:id/scan-history", perm("view"), async (req) => {
+    const { id } = req.params as { id: string };
+    await requireWorkspace(id);
+    const [snapshots, drift] = await Promise.all([store.listSnapshots(id, 30), store.getDrift(id)]);
+    return { snapshots, drift: drift ?? null };
+  });
+
   // ── Scans ──────────────────────────────────────────────────
   app.post("/api/workspaces/:id/scans", perm("scan"), async (req, reply) => {
     const { id } = req.params as { id: string };

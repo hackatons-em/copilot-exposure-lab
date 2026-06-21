@@ -111,6 +111,30 @@ export interface TenantExposure {
   drivers: string[];
 }
 
+/** One exposure snapshot in the trend (GET /scan-history). */
+export interface ScanSnapshot {
+  id: string;
+  takenAt: string;
+  exposureScore: number;
+  band: string;
+  bands: Record<string, number>;
+  findingCount: number;
+}
+
+/** Change between the two most recent snapshots. */
+export interface ExposureDrift {
+  scoreDelta: number;
+  criticalDelta: number;
+  newFindingIds: string[];
+  resolvedFindingIds: string[];
+  previousAt?: string;
+}
+
+export interface ScanHistory {
+  snapshots: ScanSnapshot[];
+  drift: ExposureDrift | null;
+}
+
 /** What a schedule enqueues when it fires. */
 export type ScheduleAction = "scan" | "report";
 
@@ -245,6 +269,11 @@ export const api = {
   /** Headline tenant exposure score (deterministic aggregate of the latest scan). */
   getExposure(): Promise<TenantExposure> {
     return request<TenantExposure>(`/api/workspaces/${ws}/exposure`);
+  },
+
+  /** Exposure snapshots over time + drift since the last scan. */
+  getScanHistory(): Promise<ScanHistory> {
+    return request<ScanHistory>(`/api/workspaces/${ws}/scan-history`);
   },
 
   runScan(actorId?: string): Promise<ScanRunSummary> {
