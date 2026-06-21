@@ -57,7 +57,7 @@ the **Web** and **API** URLs.
 ## Verify the demo
 
 1. Open the printed **Web** URL → `/overview` → **Run exposure assessment**.
-2. Confirm **1 critical / 4 high / 3 medium** (8 findings).
+2. Confirm **1 critical / 4 high / 4 medium** (9 findings).
 3. Open the salary finding → evidence chain → **Apply fix & re-verify**.
 4. **Reports → Generate → Download** the CISO report.
 

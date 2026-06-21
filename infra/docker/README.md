@@ -20,7 +20,7 @@ seeds the demo company, and runs the first scan automatically.
 ## The <5-minute demo flow
 
 1. Open the dashboard → **Run exposure assessment**.
-2. See the band distribution: **1 critical, 4 high, 3 medium** (8 findings).
+2. See the band distribution: **1 critical, 4 high, 4 medium** (9 findings).
 3. Open the critical **salary** finding → the evidence chain
    `Bob Novak → Everyone Except External Users → organization-wide link → 2026_salary_plan.xlsx`.
 4. **Apply fix & re-verify** → the finding flips to resolved (proof-of-fix).

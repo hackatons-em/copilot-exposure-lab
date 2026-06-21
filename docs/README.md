@@ -27,3 +27,10 @@ The complete build manual for Copilot Exposure Lab lives verbatim under [`spec/`
 
 - `SETUP-GRAPH.md` — Entra app registration + admin consent for the live Microsoft Graph connector.
 - `SETUP-AZURE.md` — provision + deploy to Azure (Container Apps, Postgres, etc.).
+
+### Enterprise & GTM (deliverables)
+
+Polished, customer-facing documents built from the spec and the real product.
+
+- **Enterprise** ([`enterprise/`](./enterprise)) — [security packet](./enterprise/SECURITY_PACKET.md), [customer-cloud deployment](./enterprise/CUSTOMER_CLOUD_DEPLOYMENT.md), and [support & SLA](./enterprise/SUPPORT_AND_SLA.md) for the procurement/security review before a pilot.
+- **GTM** ([`gtm/`](./gtm)) — [one-pager](./gtm/ONE_PAGER.md) and [outbound sequences](./gtm/OUTBOUND_SEQUENCES.md) (4 emails + 2 LinkedIn touches).
