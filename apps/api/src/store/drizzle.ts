@@ -19,7 +19,7 @@ import {
 } from "@cel/db";
 import { type GraphProvider, SeedGraphClient } from "@cel/graph-client";
 import { buildReportModel, generateLlmSummary, renderHtml, renderMarkdown } from "@cel/report";
-import { scan, tenantExposureScore } from "@cel/rule-engine";
+import { scan, tenantExposureScore, threatFor } from "@cel/rule-engine";
 import type {
   AuditEvent,
   Finding,
@@ -360,6 +360,9 @@ export class DrizzleStore implements Store {
       resourceId: row.resourceId,
       principalId: row.actorPrincipalId ?? undefined,
       risk: row.risk ?? { total: row.score, band: row.severity as Finding["risk"]["band"], components: [] },
+      // Threat mapping is a pure function of the rule — recompute on read rather than
+      // persist it, so it always tracks the catalog (no column, no migration).
+      threat: threatFor(row.ruleId),
       exposurePath: row.exposurePath ?? undefined,
       evidenceIds: row.evidenceIds,
       remediationTaskId: row.remediationTaskId ?? undefined,

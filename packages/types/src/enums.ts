@@ -38,6 +38,8 @@ export const scenarioKey = z.enum([
   "broad-sharing",
   "sensitive-file",
   "agent-action",
+  "departing-employee",
+  "ransomware-blast-radius",
 ]);
 export type ScenarioKey = z.infer<typeof scenarioKey>;
 

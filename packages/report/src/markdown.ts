@@ -66,6 +66,31 @@ function heatMapTable(model: ReportModel): string[] {
   return out;
 }
 
+function threatCoverageBlock(model: ReportModel): string[] {
+  const out: string[] = [];
+  const { techniques, controls, tactics } = model.threatCoverage;
+  out.push(
+    "Each finding maps deterministically (by rule) to the adversary techniques it enables and the controls that " +
+      "address it. These framework references route findings into existing security programs; they never influence the score.",
+  );
+  out.push("");
+  if (techniques.length === 0) {
+    out.push("_No ATT&CK techniques mapped — the open findings are governance gaps; see controls below._");
+  } else {
+    out.push(`**MITRE ATT&CK** — ${techniques.length} technique(s) across ${tactics.length} tactic(s): ${tactics.join(", ")}.`);
+    out.push("");
+    out.push("| Technique | Name | Tactic |");
+    out.push("|---|---|---|");
+    for (const t of techniques) out.push(`| \`${t.id}\` | ${t.name} | ${t.tactic} |`);
+    out.push("");
+  }
+  if (controls.length) {
+    out.push("**Mapped controls:** " + controls.map((c) => `${c.framework} ${c.id} (${c.name})`).join(" · "));
+    out.push("");
+  }
+  return out;
+}
+
 function roadmapLane(title: string, items: RoadmapItem[]): string[] {
   const out: string[] = [];
   out.push(`**${title}**`);
@@ -118,19 +143,24 @@ export function renderMarkdown(model: ReportModel): string {
     out.push("_No findings._");
   } else {
     for (const r of model.topRisks) {
-      out.push(`${r.rank}. **${r.title}** — ${bandLabel(r.band)} (${r.score}/100). ${r.businessImpact}`);
+      const mitre = r.techniqueIds.length ? ` _(MITRE ${r.techniqueIds.join(", ")})_` : "";
+      out.push(`${r.rank}. **${r.title}** — ${bandLabel(r.band)} (${r.score}/100).${mitre} ${r.businessImpact}`);
     }
   }
   out.push("");
 
-  out.push("## 3. Exposure by Rule");
+  out.push("## 3. Threat Framework Coverage");
+  out.push("");
+  out.push(...threatCoverageBlock(model));
+
+  out.push("## 4. Exposure by Rule");
   out.push("");
   out.push("Heat map of findings grouped by rule (rows) across severity bands (columns).");
   out.push("");
   out.push(...heatMapTable(model));
   out.push("");
 
-  out.push("## 4. Findings by Severity");
+  out.push("## 5. Findings by Severity");
   out.push("");
   out.push("| Severity | Score | Finding | Resource |");
   out.push("|---|---:|---|---|");
@@ -139,7 +169,7 @@ export function renderMarkdown(model: ReportModel): string {
   }
   out.push("");
 
-  out.push("## 5. Scope and Methodology");
+  out.push("## 6. Scope and Methodology");
   out.push("");
   for (const m of model.methodology) out.push(`- ${m}`);
   out.push("");
@@ -147,12 +177,12 @@ export function renderMarkdown(model: ReportModel): string {
   for (const s of model.scenarioRuns) out.push(`- **${s.title}** — ${s.summary}`);
   out.push("");
 
-  out.push("## 6. Critical & High Finding Detail");
+  out.push("## 7. Critical & High Finding Detail");
   out.push("");
   if (model.criticalAndHigh.length === 0) out.push("_No critical or high findings._");
   for (const rf of model.criticalAndHigh) out.push(findingDetail(rf));
 
-  out.push("## 7. Remediation Roadmap");
+  out.push("## 8. Remediation Roadmap");
   out.push("");
   out.push("Remediation sequenced by effort — quick wins first, most severe within each lane.");
   out.push("");
@@ -160,7 +190,7 @@ export function renderMarkdown(model: ReportModel): string {
   out.push(...roadmapLane("Planned (medium effort)", model.roadmap.planned));
   out.push(...roadmapLane("Project (high effort)", model.roadmap.project));
 
-  out.push("## 8. Proof-of-Fix");
+  out.push("## 9. Proof-of-Fix");
   out.push("");
   if (model.resolved.length === 0) {
     out.push("_No findings have been remediated and re-verified yet._");
@@ -171,12 +201,12 @@ export function renderMarkdown(model: ReportModel): string {
   }
   out.push("");
 
-  out.push("## 9. Limitations");
+  out.push("## 10. Limitations");
   out.push("");
   for (const l of model.limitations) out.push(`- ${l}`);
   out.push("");
 
-  out.push("## 10. Data Handling");
+  out.push("## 11. Data Handling");
   out.push("");
   for (const d of model.dataHandling) out.push(`- ${d}`);
   out.push("");

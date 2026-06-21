@@ -15,6 +15,7 @@ import { ExposurePath } from "@/components/ExposurePath";
 import { FindingStatusPill } from "@/components/StatusPill";
 import { RemediationCard } from "@/components/RemediationCard";
 import { ScoreBreakdown } from "@/components/ScoreBreakdown";
+import { ThreatChips } from "@/components/ThreatChips";
 
 interface DetailBundle {
   detail: FindingDetail;
@@ -172,6 +173,14 @@ export default function FindingDetailPage() {
         <div className="space-y-6">
           <Section title="Risk score">
             <ScoreBreakdown risk={finding.risk} />
+          </Section>
+
+          <Section title="Threat & controls">
+            <ThreatChips techniques={finding.threat.techniques} controls={finding.threat.controls} />
+            <p className="mt-3 text-[11px] leading-relaxed text-ink-faint">
+              Mapped deterministically from the rule — the adversary behavior this exposure enables and the
+              control-framework safeguards that address it.
+            </p>
           </Section>
         </div>
       </div>

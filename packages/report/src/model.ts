@@ -1,4 +1,14 @@
-import type { Band, EvidenceItem, Finding, RemediationTask, ScanResult, Scenario, Workspace } from "@cel/types";
+import type {
+  Band,
+  ControlRef,
+  EvidenceItem,
+  Finding,
+  RemediationTask,
+  ScanResult,
+  Scenario,
+  ThreatTechnique,
+  Workspace,
+} from "@cel/types";
 
 export interface ReportFinding {
   finding: Finding;
@@ -40,6 +50,16 @@ export interface TopRisk {
   band: Band;
   score: number;
   businessImpact: string;
+  /** MITRE ATT&CK technique ids this risk maps to (may be empty for governance gaps). */
+  techniqueIds: string[];
+}
+
+/** Distinct threat-framework coverage across the assessed findings. */
+export interface ThreatCoverage {
+  techniques: ThreatTechnique[];
+  controls: ControlRef[];
+  /** Distinct ATT&CK tactics touched, sorted. */
+  tactics: string[];
 }
 
 /** One remediation roadmap entry, grouped by effort lane. */
@@ -74,6 +94,8 @@ export interface ReportModel {
   heatMap: HeatMapRow[];
   /** Top 5 findings by score, with their one-line business impact. */
   topRisks: TopRisk[];
+  /** ATT&CK techniques + controls the assessed findings map to (board-level framework context). */
+  threatCoverage: ThreatCoverage;
   /** Remediation roadmap, sequenced by effort (quick wins first). */
   roadmap: RemediationRoadmap;
   scenarioRuns: { title: string; summary: string }[];
@@ -175,7 +197,25 @@ export function buildReportModel(input: BuildReportInput): ReportModel {
     band: finding.risk.band,
     score: finding.risk.total,
     businessImpact: finding.businessImpact,
+    techniqueIds: finding.threat.techniques.map((t) => t.id),
   }));
+
+  // Threat-framework coverage across unresolved findings — deduped + deterministically sorted.
+  const techById = new Map<string, ThreatTechnique>();
+  const ctrlByKey = new Map<string, ControlRef>();
+  for (const f of scanResult.findings) {
+    if (f.status === "resolved") continue;
+    for (const t of f.threat.techniques) techById.set(t.id, t);
+    for (const c of f.threat.controls) ctrlByKey.set(`${c.framework}|${c.id}`, c);
+  }
+  const coverageTechniques = [...techById.values()].sort((a, b) => (a.id < b.id ? -1 : 1));
+  const threatCoverage: ThreatCoverage = {
+    techniques: coverageTechniques,
+    controls: [...ctrlByKey.values()].sort((a, b) =>
+      `${a.framework}|${a.id}`.localeCompare(`${b.framework}|${b.id}`),
+    ),
+    tactics: [...new Set(coverageTechniques.map((t) => t.tactic))].sort(),
+  };
 
   const scenarioTitle = (id: string): string => scenarios.find((s) => s.id === id)?.title ?? id;
 
@@ -192,6 +232,7 @@ export function buildReportModel(input: BuildReportInput): ReportModel {
     resolved: findings.filter((f) => f.finding.status === "resolved"),
     heatMap: buildHeatMap(scanResult.findings),
     topRisks,
+    threatCoverage,
     roadmap: buildRoadmap(findings),
     scenarioRuns: scanResult.scenarioRuns.map((r) => ({ title: scenarioTitle(r.scenarioId), summary: r.summary })),
     methodology: [

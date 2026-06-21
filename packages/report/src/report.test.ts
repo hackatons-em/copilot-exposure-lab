@@ -69,17 +69,24 @@ describe("renderMarkdown", () => {
     for (const heading of [
       "## 1. Executive Summary",
       "## 2. Top Risks by Business Impact",
-      "## 3. Exposure by Rule",
-      "## 4. Findings by Severity",
-      "## 5. Scope and Methodology",
-      "## 6. Critical & High Finding Detail",
-      "## 7. Remediation Roadmap",
-      "## 8. Proof-of-Fix",
-      "## 9. Limitations",
-      "## 10. Data Handling",
+      "## 3. Threat Framework Coverage",
+      "## 4. Exposure by Rule",
+      "## 5. Findings by Severity",
+      "## 6. Scope and Methodology",
+      "## 7. Critical & High Finding Detail",
+      "## 8. Remediation Roadmap",
+      "## 9. Proof-of-Fix",
+      "## 10. Limitations",
+      "## 11. Data Handling",
     ]) {
       expect(md).toContain(heading);
     }
+  });
+
+  it("renders the threat framework coverage with a MITRE technique", () => {
+    expect(md).toContain("## 3. Threat Framework Coverage");
+    expect(md).toContain("MITRE ATT&CK");
+    expect(md).toContain("T1213.002");
   });
 
   it("renders the tenant exposure score line with drivers", () => {

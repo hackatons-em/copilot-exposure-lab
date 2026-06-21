@@ -81,14 +81,37 @@ function heatMap(model: ReportModel): string {
 function topRisks(model: ReportModel): string {
   if (model.topRisks.length === 0) return "<p><em>No findings.</em></p>";
   const items = model.topRisks
-    .map(
-      (r) =>
-        `<li><strong>${esc(r.title)}</strong> ${badge(r.band)} <span class="score">${r.score}/100</span><br><span style="font-size:13px;color:#4a5160">${esc(
-          r.businessImpact,
-        )}</span></li>`,
-    )
+    .map((r) => {
+      const mitre = r.techniqueIds.length
+        ? ` <span class="mitre" style="font-size:11px;color:#4733b8">${r.techniqueIds.map(esc).join(", ")}</span>`
+        : "";
+      return `<li><strong>${esc(r.title)}</strong> ${badge(r.band)} <span class="score">${r.score}/100</span>${mitre}<br><span style="font-size:13px;color:#4a5160">${esc(
+        r.businessImpact,
+      )}</span></li>`;
+    })
     .join("");
   return `<ol class="top-risks">${items}</ol>`;
+}
+
+/** Board-level threat-framework coverage: ATT&CK techniques + mapped controls. */
+function threatCoverage(model: ReportModel): string {
+  const { techniques, controls, tactics } = model.threatCoverage;
+  const intro = `<p style="font-size:13px;color:#4a5160">Each finding maps deterministically (by rule) to the adversary technique it enables and the control that addresses it. Framework context only — it never influences the score.</p>`;
+  const techBlock =
+    techniques.length === 0
+      ? `<p><em>No ATT&amp;CK techniques mapped — the open findings are governance gaps; see controls below.</em></p>`
+      : `<p style="font-size:13px"><strong>MITRE ATT&amp;CK</strong> — ${techniques.length} technique(s) across ${tactics.length} tactic(s): ${esc(
+          tactics.join(", "),
+        )}.</p>
+         <table><thead><tr><th>Technique</th><th>Name</th><th>Tactic</th></tr></thead><tbody>${techniques
+           .map((t) => `<tr><td><code>${esc(t.id)}</code></td><td>${esc(t.name)}</td><td>${esc(t.tactic)}</td></tr>`)
+           .join("")}</tbody></table>`;
+  const ctrlBlock = controls.length
+    ? `<p style="font-size:13px"><strong>Mapped controls:</strong> ${controls
+        .map((c) => `${esc(c.framework)} ${esc(c.id)} (${esc(c.name)})`)
+        .join(" &middot; ")}</p>`
+    : "";
+  return `${intro}${techBlock}${ctrlBlock}`;
 }
 
 function roadmapLane(title: string, items: RoadmapItem[]): string {
@@ -178,33 +201,36 @@ export function renderHtml(model: ReportModel): string {
   <h2>2. Top Risks by Business Impact</h2>
   ${topRisks(model)}
 
-  <h2>3. Exposure by Rule</h2>
+  <h2>3. Threat Framework Coverage</h2>
+  ${threatCoverage(model)}
+
+  <h2>4. Exposure by Rule</h2>
   <p>Heat map of findings grouped by rule (rows) across severity bands (columns).</p>
   ${heatMap(model)}
 
-  <h2>4. Findings by Severity</h2>
+  <h2>5. Findings by Severity</h2>
   <table><thead><tr><th>Severity</th><th>Score</th><th>Finding</th><th>Resource</th></tr></thead><tbody>${rows}</tbody></table>
 
-  <h2>5. Scope &amp; Methodology</h2>
+  <h2>6. Scope &amp; Methodology</h2>
   <ul>${model.methodology.map((m) => `<li>${esc(m)}</li>`).join("")}</ul>
   <p>Scenarios run:</p><ul>${scenarios}</ul>
 
-  <h2>6. Critical &amp; High Finding Detail</h2>
+  <h2>7. Critical &amp; High Finding Detail</h2>
   ${details || "<p><em>No critical or high findings.</em></p>"}
 
-  <h2>7. Remediation Roadmap</h2>
+  <h2>8. Remediation Roadmap</h2>
   <p>Remediation sequenced by effort — quick wins first, most severe within each lane.</p>
   ${roadmapLane("Quick wins (low effort)", model.roadmap.quickWins)}
   ${roadmapLane("Planned (medium effort)", model.roadmap.planned)}
   ${roadmapLane("Project (high effort)", model.roadmap.project)}
 
-  <h2>8. Proof-of-Fix</h2>
+  <h2>9. Proof-of-Fix</h2>
   ${proof}
 
-  <h2>9. Limitations</h2>
+  <h2>10. Limitations</h2>
   <ul>${model.limitations.map((l) => `<li>${esc(l)}</li>`).join("")}</ul>
 
-  <h2>10. Data Handling</h2>
+  <h2>11. Data Handling</h2>
   <ul>${model.dataHandling.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>
 </body></html>`;
 }

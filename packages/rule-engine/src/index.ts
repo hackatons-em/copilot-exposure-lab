@@ -28,6 +28,8 @@ export { bandFor, bandLabel } from "./scoring/bands.js";
 export { WEIGHTS, MAX_SCORE } from "./scoring/weights.js";
 export { remediationFor } from "./remediation/catalog.js";
 export type { RemediationTemplate } from "./remediation/catalog.js";
+export { threatFor, buildThreatModel } from "./threat/catalog.js";
+export type { ThreatModel, ThreatModelRow } from "./threat/catalog.js";
 export { SCENARIO_LENSES } from "./scenarios/registry.js";
 
 export { scan, runScenario } from "./pipeline.js";

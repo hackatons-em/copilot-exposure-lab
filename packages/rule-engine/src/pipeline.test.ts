@@ -79,6 +79,23 @@ describe("scenarios", () => {
     const run = runScenario(graph, "contractor-guest", { now: NOW });
     expect(run.findings.some((f) => f.ruleId === "stale-external-access")).toBe(true);
   });
+
+  it("departing-employee surfaces access that outlived its holder (departed owner + expired guest), not Bob's live reach", () => {
+    const run = runScenario(graph, "departing-employee", { now: NOW });
+    const ruleIds = run.findings.map((f) => f.ruleId);
+    expect(ruleIds).toContain("orphaned-agent-owner");
+    expect(ruleIds).toContain("stale-external-access");
+    // The org-wide salary link runs through only active principals — not a departure risk.
+    expect(run.findings.some((f) => f.resourceId === "f-salary")).toBe(false);
+  });
+
+  it("ransomware-blast-radius surfaces the high-impact reachable + egress surface, excluding medium noise", () => {
+    const run = runScenario(graph, "ransomware-blast-radius", { now: NOW });
+    const resourceIds = run.findings.map((f) => f.resourceId);
+    expect(resourceIds).toContain("f-salary"); // critical org-wide link
+    expect(resourceIds).toContain("a-helpdesk"); // agent egress path
+    expect(resourceIds).not.toContain("f-launch"); // medium broad-dept — below the blast bar
+  });
 });
 
 describe("proof-of-fix", () => {

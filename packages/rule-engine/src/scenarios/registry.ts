@@ -42,4 +42,23 @@ export const SCENARIO_LENSES: Record<ScenarioKey, ScenarioLens> = {
 
   // Risky Copilot Studio-style agents.
   "agent-action": (f) => AGENT_RULES.has(f.ruleId),
+
+  // Access that outlived its holder: a departed agent owner, an expired guest, or
+  // any exposure path running through a now-inactive principal. The persistence
+  // risk that offboarding missed (ATT&CK Valid Accounts).
+  "departing-employee": (f, { pg }) => {
+    if (f.ruleId === "orphaned-agent-owner" || f.ruleId === "stale-external-access") return true;
+    const steps = f.exposurePath?.steps ?? [];
+    return steps.some(
+      (s) => (s.objectType === "user" || s.objectType === "group") && pg.principal(s.objectId)?.active === false,
+    );
+  },
+
+  // The high-impact surface a single compromised identity could reach and damage:
+  // broadly-shared sensitive resources (critical/high) plus agents with send/egress
+  // capability (an automated exfiltration path). "One phished account → this much."
+  "ransomware-blast-radius": (f) =>
+    (PERMISSION_RULES.has(f.ruleId) && (f.risk.band === "critical" || f.risk.band === "high")) ||
+    f.ruleId === "agent-send-action" ||
+    f.ruleId === "risky-connector",
 };

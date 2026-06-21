@@ -16,6 +16,36 @@ import type {
  * at a concrete source object.
  */
 
+/** A MITRE ATT&CK technique a finding maps to (the adversary behavior it enables). */
+export interface ThreatTechnique {
+  /** ATT&CK technique id, e.g. "T1530" or sub-technique "T1213.002". */
+  id: string;
+  name: string;
+  /** ATT&CK tactic, e.g. "Collection", "Exfiltration", "Persistence". */
+  tactic: string;
+  /** Canonical MITRE reference URL. */
+  url: string;
+}
+
+/** A control-framework reference the finding maps to (the safeguard that addresses it). */
+export interface ControlRef {
+  /** Framework, e.g. "NIST 800-53" or "CISA". */
+  framework: string;
+  /** Control id within the framework, e.g. "AC-6". */
+  id: string;
+  name: string;
+}
+
+/**
+ * Threat-framework context for a finding: which adversary techniques the exposure
+ * enables and which controls address it. Deterministic, keyed off the rule — never
+ * generated. `techniques` may be empty for pure governance gaps (controls only).
+ */
+export interface ThreatMapping {
+  techniques: ThreatTechnique[];
+  controls: ControlRef[];
+}
+
 /** One hop in an exposure path: principal -> group -> link -> resource. */
 export interface PathStep {
   objectType: SourceObjectType;
@@ -88,6 +118,8 @@ export interface Finding {
   /** The actor/principal at the start of the exposure path, if applicable. */
   principalId?: string;
   risk: RiskScore;
+  /** MITRE ATT&CK techniques + control references this exposure maps to (deterministic, by rule). */
+  threat: ThreatMapping;
   exposurePath?: ExposurePath;
   evidenceIds: string[];
   remediationTaskId?: string;

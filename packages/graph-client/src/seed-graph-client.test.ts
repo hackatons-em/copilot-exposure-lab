@@ -88,6 +88,6 @@ describe("SeedGraphClient", () => {
     expect(await client.listUsers()).toHaveLength(9);
     expect(await client.listGroups()).toHaveLength(8);
     expect(await client.listSites()).toHaveLength(7);
-    expect(await client.listScenarios()).toHaveLength(5);
+    expect(await client.listScenarios()).toHaveLength(7);
   });
 });

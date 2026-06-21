@@ -72,6 +72,8 @@ export const DEFAULT_SCENARIOS: Scenario[] = [
   { id: "sc-broad-sharing", key: "broad-sharing", title: "Broad sharing", description: "What is exposed through org-wide links or large groups?", scope: ["sharepoint", "onedrive"], includeAgents: false },
   { id: "sc-sensitive-file", key: "sensitive-file", title: "Sensitive file", description: "Which high-sensitivity files are over-reachable?", scope: ["sharepoint", "onedrive"], includeAgents: false },
   { id: "sc-agent-action", key: "agent-action", title: "Agent action", description: "Which agents can take risky actions?", scope: ["agents"], includeAgents: true },
+  { id: "sc-departing-employee", key: "departing-employee", title: "Departing employee", description: "What access outlived its holder — departed owners, expired guests, grants to disabled accounts?", scope: ["sharepoint", "onedrive", "agents"], includeAgents: true },
+  { id: "sc-ransomware-blast-radius", key: "ransomware-blast-radius", title: "Ransomware blast radius", description: "What could one compromised identity reach and damage — broadly-shared sensitive data plus agent egress paths?", scope: ["sharepoint", "onedrive", "agents"], includeAgents: true },
 ];
 
 const linkScopeFor = (scope?: string): PermissionGrant["linkScope"] =>

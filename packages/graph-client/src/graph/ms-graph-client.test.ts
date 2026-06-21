@@ -80,7 +80,7 @@ describe("MsGraphClient", () => {
     // user1 is a member of group1 (resolved via membership pass)
     expect(graph.principals.find((p) => p.id === "user1")!.memberOf).toContain("group1");
     expect(graph.resources.some((r) => r.kind === "file" && r.name.includes("salary"))).toBe(true);
-    expect(graph.scenarios).toHaveLength(5);
+    expect(graph.scenarios).toHaveLength(7);
     expect(checkpoints.map((c2) => c2.phase)).toEqual(["users", "groups", "memberships", "resources", "permissions"]);
   });
 

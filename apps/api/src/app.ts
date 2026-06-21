@@ -10,7 +10,14 @@ import {
   createGraphRequester,
 } from "@cel/graph-client";
 import { EXPORT_FORMATS, isExportFormat, runExport } from "@cel/integrations";
-import { buildExposureGraphModel, simulateCopilotAnswer, simulateRetrieval, tenantExposureScore } from "@cel/rule-engine";
+import {
+  allRules,
+  buildExposureGraphModel,
+  buildThreatModel,
+  simulateCopilotAnswer,
+  simulateRetrieval,
+  tenantExposureScore,
+} from "@cel/rule-engine";
 import Fastify, { type FastifyInstance } from "fastify";
 import { z } from "zod";
 import type { FindingStatus } from "@cel/types";
@@ -294,6 +301,15 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     const { id } = req.params as { id: string };
     await requireWorkspace(id);
     return store.listScenarios(id);
+  });
+
+  // The deterministic rules × MITRE ATT&CK × control-framework matrix. Tenant-
+  // independent (keyed off the rule registry), but workspace-scoped for a uniform
+  // client. A read — no audit event.
+  app.get("/api/workspaces/:id/threat-model", perm("view"), async (req) => {
+    const { id } = req.params as { id: string };
+    await requireWorkspace(id);
+    return buildThreatModel(allRules);
   });
 
   // ── Copilot retrieval simulation ───────────────────────────

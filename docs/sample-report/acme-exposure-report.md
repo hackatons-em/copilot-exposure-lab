@@ -17,13 +17,29 @@ This assessment surfaced **9 exposure findings** — 1 critical, 4 high, 4 mediu
 
 ## 2. Top Risks by Business Impact
 
-1. **Sensitive file shared through an organization-wide link** — Critical (91/100). Any of 7 users — and anyone a link is forwarded to — can open 2026_salary_plan.xlsx. Copilot can surface it to all of them.
-2. **Sensitive file inherits broad read from its parent site** — High (75/100). 2026_acquisition_strategy.pptx is readable by the whole organization through inherited site permissions — likely unintended for board-level content.
-3. **Agent can take a risky external action** — High (71/100). Helpdesk Assistant could send sensitive summaries to external recipients on a user's behalf. Combined with broad data access, that is an exfiltration path.
-4. **External guest retains access to a confidential resource** — High (70/100). A contractor/guest outside the company can reach Project Phoenix. If their account or domain is compromised, so is this content.
-5. **Sensitive file exposed to a broad department group** — High (70/100). 42 people in Sales Team can open master_services_agreement.pdf, far beyond its intended audience.
+1. **Sensitive file shared through an organization-wide link** — Critical (91/100). _(MITRE T1213.002, T1530)_ Any of 7 users — and anyone a link is forwarded to — can open 2026_salary_plan.xlsx. Copilot can surface it to all of them.
+2. **Sensitive file inherits broad read from its parent site** — High (75/100). _(MITRE T1213.002, T1530)_ 2026_acquisition_strategy.pptx is readable by the whole organization through inherited site permissions — likely unintended for board-level content.
+3. **Agent can take a risky external action** — High (71/100). _(MITRE T1567)_ Helpdesk Assistant could send sensitive summaries to external recipients on a user's behalf. Combined with broad data access, that is an exfiltration path.
+4. **External guest retains access to a confidential resource** — High (70/100). _(MITRE T1078.004, T1530)_ A contractor/guest outside the company can reach Project Phoenix. If their account or domain is compromised, so is this content.
+5. **Sensitive file exposed to a broad department group** — High (70/100). _(MITRE T1213.002)_ 42 people in Sales Team can open master_services_agreement.pdf, far beyond its intended audience.
 
-## 3. Exposure by Rule
+## 3. Threat Framework Coverage
+
+Each finding maps deterministically (by rule) to the adversary techniques it enables and the controls that address it. These framework references route findings into existing security programs; they never influence the score.
+
+**MITRE ATT&CK** — 5 technique(s) across 3 tactic(s): Collection, Exfiltration, Persistence.
+
+| Technique | Name | Tactic |
+|---|---|---|
+| `T1078` | Valid Accounts | Persistence |
+| `T1078.004` | Valid Accounts: Cloud Accounts | Persistence |
+| `T1213.002` | Data from Information Repositories: SharePoint | Collection |
+| `T1530` | Data from Cloud Storage | Collection |
+| `T1567` | Exfiltration Over Web Service | Exfiltration |
+
+**Mapped controls:** CISA SCuBA M365 guest (Review and expire external guest access) · CISA SCuBA M365 sharing (Restrict external & org-wide sharing of sensitive content) · CISA SCuBA Purview (Apply and enforce sensitivity labels) · NIST 800-53 AC-2 (Account Management) · NIST 800-53 AC-3 (Access Enforcement) · NIST 800-53 AC-6 (Least Privilege) · NIST 800-53 CM-7 (Least Functionality) · NIST 800-53 RA-2 (Security Categorization) · NIST 800-53 SC-7 (Boundary Protection)
+
+## 4. Exposure by Rule
 
 Heat map of findings grouped by rule (rows) across severity bands (columns).
 
@@ -38,7 +54,7 @@ Heat map of findings grouped by rule (rows) across severity bands (columns).
 | `orphaned-agent-owner` | · | · | 1 | · | · | 1 |
 | `risky-connector` | · | · | 1 | · | · | 1 |
 
-## 4. Findings by Severity
+## 5. Findings by Severity
 
 | Severity | Score | Finding | Resource |
 |---|---:|---|---|
@@ -52,7 +68,7 @@ Heat map of findings grouped by rule (rows) across severity bands (columns).
 | Medium | 55 | Agent or flow uses a risky data-egress connector | `a-salesflow` |
 | Medium | 55 | Sensitive file is missing a sensitivity label | `f-token` |
 
-## 5. Scope and Methodology
+## 6. Scope and Methodology
 
 - Metadata ingestion of users, groups, sites, drives, files, permissions, sharing links, and agents.
 - Permission-graph construction (group expansion, inheritance, links, guests, org-wide access).
@@ -65,8 +81,10 @@ Scenarios run:
 - **Broad sharing** — Broad sharing: 4 finding(s) — 1 critical, 2 high, 1 medium.
 - **Sensitive file** — Sensitive file: 5 finding(s) — 1 critical, 2 high, 2 medium.
 - **Agent action** — Agent action: 2 finding(s) — 1 high, 1 medium.
+- **Departing employee** — Departing employee: 2 finding(s) — 1 high, 1 medium.
+- **Ransomware blast radius** — Ransomware blast radius: 5 finding(s) — 1 critical, 3 high, 1 medium.
 
-## 6. Critical & High Finding Detail
+## 7. Critical & High Finding Detail
 
 ### fnd-c1be79bf — Sensitive file shared through an organization-wide link
 
@@ -188,7 +206,7 @@ Scenarios run:
   1. Review and break role inheritance where the broad grant flows down.
   1. Confirm the new audience with the content owner.
 
-## 7. Remediation Roadmap
+## 8. Remediation Roadmap
 
 Remediation sequenced by effort — quick wins first, most severe within each lane.
 
@@ -215,17 +233,17 @@ Remediation sequenced by effort — quick wins first, most severe within each la
 
 _None._
 
-## 8. Proof-of-Fix
+## 9. Proof-of-Fix
 
 _No findings have been remediated and re-verified yet._
 
-## 9. Limitations
+## 10. Limitations
 
 - Metadata-only mode may miss content-sensitive issues inside documents.
 - Findings depend on the approved scan scope.
 - This product does not guarantee Copilot safety; it surfaces and prioritizes exposure paths.
 
-## 10. Data Handling
+## 11. Data Handling
 
 - Document contents, email bodies, and credentials are not stored.
 - Only metadata, permission grants, findings, evidence references, and reports are retained.

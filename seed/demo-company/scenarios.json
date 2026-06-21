@@ -40,5 +40,23 @@
     "description": "Which Copilot Studio-style agents can take risky actions or run under unsafe ownership and permissions?",
     "scope": ["agents"],
     "includeAgents": true
+  },
+  {
+    "id": "sc-departing-employee",
+    "key": "departing-employee",
+    "title": "Departing employee",
+    "description": "What access outlived its holder — a departed agent owner, an expired guest, or grants to disabled accounts that offboarding never revoked?",
+    "actorPrincipalId": "u-tomas",
+    "scope": ["sharepoint", "onedrive", "agents"],
+    "includeAgents": true
+  },
+  {
+    "id": "sc-ransomware-blast-radius",
+    "key": "ransomware-blast-radius",
+    "title": "Ransomware blast radius",
+    "description": "If a single employee account were compromised, what sensitive data could it reach and which agents could exfiltrate it? The high-impact surface, ranked.",
+    "actorPrincipalId": "u-bob",
+    "scope": ["sharepoint", "onedrive", "agents"],
+    "includeAgents": true
   }
 ]

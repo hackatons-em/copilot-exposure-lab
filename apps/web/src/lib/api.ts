@@ -1,5 +1,6 @@
 import type {
   AuditEvent,
+  ControlRef,
   EvidenceItem,
   Finding,
   FindingStatus,
@@ -10,6 +11,8 @@ import type {
   Scenario,
   ScenarioRun,
   TenantConnection,
+  ThreatMapping,
+  ThreatTechnique,
   Workspace,
 } from "@cel/types";
 import { API_KEY, API_URL, WORKSPACE_ID } from "./config";
@@ -208,6 +211,20 @@ export interface ExposureGraphModel {
   edges: ExposureGraphEdge[];
 }
 
+/** One rule's row in the threat-model matrix (GET /threat-model). */
+export interface ThreatModelRow {
+  ruleId: string;
+  title: string;
+  threat: ThreatMapping;
+}
+
+/** The deterministic rules × MITRE ATT&CK × controls matrix (GET /threat-model). */
+export interface ThreatModel {
+  rows: ThreatModelRow[];
+  techniques: ThreatTechnique[];
+  controls: ControlRef[];
+}
+
 const ws = WORKSPACE_ID;
 
 /**
@@ -302,6 +319,11 @@ export const api = {
 
   listScenarios(): Promise<Scenario[]> {
     return request<Scenario[]>(`/api/workspaces/${ws}/scenarios`);
+  },
+
+  /** The rules × MITRE ATT&CK × control-framework matrix (deterministic, by rule). */
+  getThreatModel(): Promise<ThreatModel> {
+    return request<ThreatModel>(`/api/workspaces/${ws}/threat-model`);
   },
 
   /** Simulate what M365 Copilot could surface to an actor (defaults to the normal-employee persona). */

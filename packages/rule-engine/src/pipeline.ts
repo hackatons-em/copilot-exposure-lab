@@ -2,6 +2,7 @@ import type { Band, EvidenceItem, Finding, RemediationTask, ScanResult, Scenario
 import { createRuleContext } from "./context.js";
 import { evidenceId, fingerprint, findingId, remediationId } from "./fingerprint.js";
 import { remediationFor } from "./remediation/catalog.js";
+import { threatFor } from "./threat/catalog.js";
 import { allRules } from "./rules/index.js";
 import type { RuleHit } from "./rules/types.js";
 import { SCENARIO_LENSES } from "./scenarios/registry.js";
@@ -98,6 +99,7 @@ export function scan(graph: TenantGraph, opts: ScanOptions = {}): ScanResult {
       resourceId: hit.resourceId,
       principalId: hit.principalId,
       risk,
+      threat: threatFor(hit.ruleId),
       exposurePath: hit.exposurePath,
       evidenceIds,
       remediationTaskId: remId,
