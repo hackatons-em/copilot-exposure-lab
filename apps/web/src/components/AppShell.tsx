@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { Button } from "./Button";
+import { PlayDemoButton } from "./guided/PlayDemoButton";
 import { Logo } from "./Logo";
 import { useWorkspace } from "./WorkspaceProvider";
 
@@ -131,6 +132,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 {lastRun.message}
               </span>
             ) : null}
+            <PlayDemoButton />
             <Button onClick={() => void runAssessment()} busy={scanning}>
               {scanning ? "Running assessment…" : "Run exposure assessment"}
             </Button>
