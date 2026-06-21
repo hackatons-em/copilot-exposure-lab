@@ -2,6 +2,7 @@ import cors from "@fastify/cors";
 import {
   GoogleWorkspaceClient,
   type GraphProvider,
+  LargeTenantClient,
   MsGraphClient,
   MultiSystemClient,
   SalesforceClient,
@@ -99,6 +100,9 @@ const SYSTEM_PROVIDERS: Record<string, () => GraphProvider> = {
   slack: () => new SlackClient(),
   salesforce: () => new SalesforceClient(),
   "multi-system": () => new MultiSystemClient(),
+  // Seeded enterprise-scale tenant (~1k users / ~5k resources / ~6k grants) — proves
+  // the deterministic engine + exposure graph hold up at real scale.
+  "large-demo": () => new LargeTenantClient(),
 };
 
 const createWorkspaceBody = z.object({ id: z.string().optional(), name: z.string().min(1) });

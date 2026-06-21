@@ -18,3 +18,8 @@ export { GoogleWorkspaceClient, loadGoogleWorkspaceGraph, GOOGLE_WORKSPACE_SEED_
 export { SlackClient, loadSlackGraph, SLACK_SEED_DIR } from "./systems/slack-client.js";
 export { SalesforceClient, loadSalesforceGraph, SALESFORCE_SEED_DIR } from "./systems/salesforce-client.js";
 export { MultiSystemClient, loadMultiSystemGraph, mergeSystemGraphs } from "./systems/multi-system-client.js";
+
+// Deterministic synthetic enterprise tenant for scale proof + benchmarks.
+export { generateLargeTenant } from "./large-tenant.js";
+export type { LargeTenantOptions } from "./large-tenant.js";
+export { LargeTenantClient } from "./large-tenant-client.js";

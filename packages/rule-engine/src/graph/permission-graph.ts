@@ -37,6 +37,8 @@ export class PermissionGraph {
   private readonly principals: Map<string, Principal>;
   private readonly resources: Map<string, Resource>;
   private readonly grantsByResource: Map<string, PermissionGrant[]>;
+  /** Memoized membership closures — the graph is immutable, so safe to cache. */
+  private readonly membersCache = new Map<string, Principal[]>();
 
   constructor(private readonly graph: TenantGraph) {
     this.principals = byId(graph.principals);
@@ -82,6 +84,14 @@ export class PermissionGraph {
 
   /** Concrete user principals that belong to a principal (expands nested groups). */
   membersOf(principalId: string): Principal[] {
+    const cached = this.membersCache.get(principalId);
+    if (cached) return cached;
+    const computed = this.computeMembersOf(principalId);
+    this.membersCache.set(principalId, computed);
+    return computed;
+  }
+
+  private computeMembersOf(principalId: string): Principal[] {
     const p = this.principals.get(principalId);
     if (!p) return [];
     if (p.kind === "user" || p.kind === "external" || p.kind === "link") return p.kind === "link" ? [] : [p];

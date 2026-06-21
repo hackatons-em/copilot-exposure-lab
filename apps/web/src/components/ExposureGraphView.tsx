@@ -160,6 +160,79 @@ const NODE_TYPES = { exposure: ExposureNode } as const;
 
 const ARROW: EdgeMarker = { type: MarkerType.ArrowClosed, width: 16, height: 16 };
 
+/** Severity ordering — critical first. Used to keep the highest-risk chains. */
+const BAND_RANK: Record<Band, number> = { critical: 0, high: 1, medium: 2, low: 3, info: 4 };
+
+interface CappedGraph {
+  model: ExposureGraphModel;
+  shownFindings: number;
+  totalFindings: number;
+  shownNodes: number;
+  totalNodes: number;
+  truncated: boolean;
+}
+
+/**
+ * At enterprise scale a tenant has thousands of nodes — unreadable and slow to lay
+ * out. Keep whole exposure chains (never orphan nodes) for the highest-severity
+ * findings first, until a node budget is hit. Returns the capped model plus the
+ * counts needed for a "showing top N of M" note. No-op when already under budget.
+ */
+function capToTopRisk(model: ExposureGraphModel, maxNodes: number): CappedGraph {
+  const totalNodes = model.nodes.length;
+  const allFindingIds = new Set<string>();
+  for (const n of model.nodes) for (const fid of n.findingIds) allFindingIds.add(fid);
+  const totalFindings = allFindingIds.size;
+
+  if (totalNodes <= maxNodes) {
+    return { model, shownFindings: totalFindings, totalFindings, shownNodes: totalNodes, totalNodes, truncated: false };
+  }
+
+  // Best (lowest) band rank each finding touches → rank findings by severity.
+  const findingRank = new Map<string, number>();
+  for (const n of model.nodes) {
+    const r = BAND_RANK[n.risk];
+    for (const fid of n.findingIds) {
+      findingRank.set(fid, Math.min(findingRank.get(fid) ?? 99, r));
+    }
+  }
+  const nodesByFinding = new Map<string, string[]>();
+  for (const n of model.nodes) {
+    for (const fid of n.findingIds) {
+      const list = nodesByFinding.get(fid) ?? [];
+      list.push(n.id);
+      nodesByFinding.set(fid, list);
+    }
+  }
+  const orderedFindings = [...findingRank.keys()].sort((a, b) => {
+    const byRank = (findingRank.get(a) ?? 99) - (findingRank.get(b) ?? 99);
+    return byRank !== 0 ? byRank : a < b ? -1 : 1; // stable, deterministic
+  });
+
+  const keptNodeIds = new Set<string>();
+  const keptFindings = new Set<string>();
+  for (const fid of orderedFindings) {
+    const nodeIds = nodesByFinding.get(fid) ?? [];
+    const projected = new Set(keptNodeIds);
+    for (const id of nodeIds) projected.add(id);
+    if (projected.size > maxNodes && keptNodeIds.size > 0) break;
+    for (const id of nodeIds) keptNodeIds.add(id);
+    keptFindings.add(fid);
+    if (keptNodeIds.size >= maxNodes) break;
+  }
+
+  const nodes = model.nodes.filter((n) => keptNodeIds.has(n.id));
+  const edges = model.edges.filter((e) => keptNodeIds.has(e.source) && keptNodeIds.has(e.target));
+  return {
+    model: { nodes, edges },
+    shownFindings: keptFindings.size,
+    totalFindings,
+    shownNodes: nodes.length,
+    totalNodes,
+    truncated: true,
+  };
+}
+
 /** Run dagre and return positioned React Flow nodes + edges. */
 function layout(model: ExposureGraphModel, focusFindingId?: string): { nodes: ExposureFlowNode[]; edges: Edge[] } {
   const g = new Dagre.graphlib.Graph();
@@ -236,10 +309,18 @@ export interface ExposureGraphViewProps {
   focusFindingId?: string;
   /** Container height in px (default 560 for the page; ~320 for the mini-graph). */
   height?: number;
+  /** Max nodes rendered before aggregating to the top-risk subgraph (full-graph view). */
+  maxNodes?: number;
 }
 
-export function ExposureGraphView({ model, focusFindingId, height = 560 }: ExposureGraphViewProps) {
-  const { nodes, edges } = useMemo(() => layout(model, focusFindingId), [model, focusFindingId]);
+export function ExposureGraphView({ model, focusFindingId, height = 560, maxNodes = 80 }: ExposureGraphViewProps) {
+  // A single-finding mini-graph is always small; only the full graph needs capping.
+  const capped = useMemo(
+    () => (focusFindingId ? null : capToTopRisk(model, maxNodes)),
+    [model, focusFindingId, maxNodes],
+  );
+  const renderModel = capped ? capped.model : model;
+  const { nodes, edges } = useMemo(() => layout(renderModel, focusFindingId), [renderModel, focusFindingId]);
 
   if (model.nodes.length === 0) {
     return (
@@ -258,8 +339,18 @@ export function ExposureGraphView({ model, focusFindingId, height = 560 }: Expos
   return (
     <div
       className="overflow-hidden rounded-lg border border-hairline bg-surface-subtle shadow-elevation"
-      style={{ height, width: "100%" }}
+      style={{ height, width: "100%", position: "relative" }}
     >
+      {capped?.truncated && (
+        <div
+          className="absolute left-3 top-3 z-10 rounded-md border border-hairline bg-surface/95 px-2.5 py-1.5 font-mono text-[11px] tabular-nums text-ink-soft shadow-elevation backdrop-blur"
+          title="At scale the graph aggregates to the highest-severity exposure chains so it stays readable."
+        >
+          Showing top {capped.shownFindings.toLocaleString()} of {capped.totalFindings.toLocaleString()} exposure paths
+          {" · "}
+          {capped.shownNodes} of {capped.totalNodes.toLocaleString()} nodes
+        </div>
+      )}
       <ReactFlow
         nodes={nodes}
         edges={edges}
