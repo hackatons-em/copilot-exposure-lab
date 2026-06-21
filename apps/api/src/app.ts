@@ -14,6 +14,7 @@ import {
   allRules,
   buildExposureGraphModel,
   buildThreatModel,
+  classifySensitivity,
   generateFixScript,
   remediationFor,
   simulateCopilotAnswer,
@@ -411,7 +412,11 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     await requireWorkspace(id);
     const detail = await store.getFinding(id, fid);
     if (!detail) throw Object.assign(new Error("finding not found"), { statusCode: 404 });
-    return detail;
+    // Explainability: why this resource scored sensitive (classifier signals, traceable).
+    const resources = await store.listResources(id);
+    const resource = resources.find((r) => r.id === detail.finding.resourceId);
+    const sensitivity = resource ? classifySensitivity(resource) : undefined;
+    return { ...detail, sensitivity };
   });
 
   // The exact, copy-pasteable Microsoft fix for a finding, wired to its real source

@@ -41,11 +41,27 @@ export interface ScanRunSummary {
   generatedAt: string;
 }
 
+/** One matched sensitivity signal (why a resource scored sensitive). */
+export interface SensitivitySignal {
+  signal: string;
+  weight: number;
+  matchedIn: string;
+  sourceObjectId: string;
+}
+
+/** Deterministic sensitivity explanation for the finding's resource. */
+export interface SensitivityExplanation {
+  signals: SensitivitySignal[];
+  rawScore: number;
+}
+
 /** Shape returned by GET /findings/:id. */
 export interface FindingDetail {
   finding: Finding;
   evidence: EvidenceItem[];
   remediation?: RemediationTask;
+  /** Why the resource scored sensitive — classifier signals (may be absent). */
+  sensitivity?: SensitivityExplanation;
 }
 
 /** Shape returned by POST /connections/demo/seed. */
@@ -123,6 +139,13 @@ export interface CopilotAnswer {
   exposed: boolean;
 }
 
+/** Where the tenant score sits vs a synthetic baseline of comparable tenants. */
+export interface PeerPercentile {
+  worseThanPct: number;
+  sampleSize: number;
+  synthetic: boolean;
+}
+
 /** Headline tenant exposure (GET /exposure). */
 export interface TenantExposure {
   score: number;
@@ -130,6 +153,8 @@ export interface TenantExposure {
   findingCount: number;
   bands: Record<string, number>;
   drivers: string[];
+  /** Peer percentile context (synthetic baseline). Optional for older payloads. */
+  peer?: PeerPercentile;
 }
 
 /** One exposure snapshot in the trend (GET /scan-history). */

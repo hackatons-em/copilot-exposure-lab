@@ -91,8 +91,17 @@ export default function FindingDetailPage() {
   }
 
   const { detail, resource, graph } = data;
-  const { finding, evidence, remediation } = detail;
+  const { finding, evidence, remediation, sensitivity } = detail;
   const resolved = finding.status === "resolved";
+
+  const confidenceRaw = finding.risk.components.find((c) => c.key === "confidence")?.raw ?? 0.6;
+  const confidenceLevel = confidenceRaw >= 0.8 ? "high" : confidenceRaw >= 0.5 ? "medium" : "low";
+  const confidenceColor =
+    confidenceLevel === "high" ? "text-severity-low" : confidenceLevel === "medium" ? "text-severity-medium" : "text-severity-high";
+  const sensitivitySignals = (sensitivity?.signals ?? [])
+    .filter((s) => !s.signal.startsWith("label:"))
+    .map((s) => s.signal);
+  const sensitivityLabelSignal = (sensitivity?.signals ?? []).find((s) => s.signal.startsWith("label:"));
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -176,6 +185,40 @@ export default function FindingDetailPage() {
         <div className="space-y-6">
           <Section title="Risk score">
             <ScoreBreakdown risk={finding.risk} />
+
+            <div className="mt-4 flex items-center justify-between border-t border-hairline pt-3">
+              <span className="text-xs font-medium text-ink-soft">Confidence</span>
+              <span className={`font-mono text-xs font-semibold capitalize ${confidenceColor}`}>
+                {confidenceLevel} · {confidenceRaw.toFixed(2)}
+              </span>
+            </div>
+
+            {sensitivity ? (
+              <div className="mt-3 border-t border-hairline pt-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-ink-soft">Why it scored sensitive</span>
+                  <span className="font-mono text-xs font-semibold text-ink">{sensitivity.rawScore.toFixed(2)}</span>
+                </div>
+                <p className="mt-1.5 text-[11px] leading-relaxed text-ink-faint">
+                  {sensitivitySignals.length > 0 ? (
+                    <>
+                      Matched{" "}
+                      {sensitivitySignals.map((s, i) => (
+                        <span key={s}>
+                          {i > 0 ? ", " : ""}
+                          <span className="font-mono text-ink-soft">{s}</span>
+                        </span>
+                      ))}
+                      {sensitivityLabelSignal ? ` · ${sensitivityLabelSignal.signal.replace("label:", "label ")}` : ""}.
+                    </>
+                  ) : sensitivityLabelSignal ? (
+                    <>Carries the {sensitivityLabelSignal.signal.replace("label:", "")} sensitivity label.</>
+                  ) : (
+                    "No keyword or label signals — scored on exposure, not content sensitivity."
+                  )}
+                </p>
+              </div>
+            ) : null}
           </Section>
 
           <Section title="Threat & controls">

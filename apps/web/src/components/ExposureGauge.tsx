@@ -76,6 +76,16 @@ export function ExposureGauge({ exposure }: { exposure: TenantExposure }) {
       >
         {BAND_LABEL(exposure.band)}
       </span>
+      {exposure.peer && (
+        <p
+          className="mt-2 text-center text-[11px] leading-tight text-ink-faint"
+          title={`Compared against a synthetic baseline of ${exposure.peer.sampleSize} tenants. Illustrative until real pilot data exists.`}
+        >
+          More exposed than{" "}
+          <span className="font-mono font-semibold text-ink-soft tabular-nums">{exposure.peer.worseThanPct}%</span> of
+          comparable tenants<span className="align-super text-[9px]">†</span>
+        </p>
+      )}
       {exposure.drivers.length > 0 && (
         <p className="mt-3 text-center text-xs leading-relaxed text-ink-soft">
           Driven by: {exposure.drivers.slice(0, 2).join("; ")}

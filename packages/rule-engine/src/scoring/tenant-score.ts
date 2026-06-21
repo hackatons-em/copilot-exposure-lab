@@ -1,5 +1,6 @@
 import type { Band, Finding } from "@cel/types";
 import { bandFor } from "./bands.js";
+import { tenantPercentile, type PeerPercentile } from "./percentile.js";
 
 export interface TenantExposure {
   /** 0-100 tenant-level exposure score (deterministic aggregate of findings). */
@@ -11,6 +12,8 @@ export interface TenantExposure {
   bands: Record<Band, number>;
   /** Titles of the top contributing findings. */
   drivers: string[];
+  /** Where this score sits vs a synthetic baseline of comparable tenants. */
+  peer: PeerPercentile;
 }
 
 const emptyBands = (): Record<Band, number> => ({ critical: 0, high: 0, medium: 0, low: 0, info: 0 });
@@ -25,7 +28,9 @@ export function tenantExposureScore(scanResult: { findings: Finding[] }): Tenant
   const active = scanResult.findings.filter((f) => f.status !== "resolved" && f.status !== "accepted-risk");
   const bands = emptyBands();
   for (const f of active) bands[f.risk.band] += 1;
-  if (active.length === 0) return { score: 0, band: "info", findingCount: 0, bands, drivers: [] };
+  if (active.length === 0) {
+    return { score: 0, band: "info", findingCount: 0, bands, drivers: [], peer: tenantPercentile(0) };
+  }
 
   const max = active.reduce((m, f) => Math.max(m, f.risk.total), 0);
   const raw = max + 2 * bands.critical + bands.high + 0.3 * bands.medium;
@@ -35,5 +40,5 @@ export function tenantExposureScore(scanResult: { findings: Finding[] }): Tenant
     .slice(0, 3)
     .map((f) => f.title);
 
-  return { score, band: bandFor(score), findingCount: active.length, bands, drivers };
+  return { score, band: bandFor(score), findingCount: active.length, bands, drivers, peer: tenantPercentile(score) };
 }
