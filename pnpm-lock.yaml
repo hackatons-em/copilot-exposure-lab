@@ -41,6 +41,16 @@ importers:
 
   packages/config: {}
 
+  packages/graph-client:
+    dependencies:
+      '@cel/types':
+        specifier: workspace:*
+        version: link:../types
+    devDependencies:
+      '@cel/config':
+        specifier: workspace:*
+        version: link:../config
+
   packages/types:
     dependencies:
       zod:

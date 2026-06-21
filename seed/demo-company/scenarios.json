@@ -1,0 +1,44 @@
+[
+  {
+    "id": "sc-normal-employee",
+    "key": "normal-employee",
+    "title": "Normal employee",
+    "description": "What sensitive data can a normal employee reach through everyday permissions, broad groups, and sharing links?",
+    "actorPrincipalId": "u-bob",
+    "scope": ["sharepoint", "onedrive"],
+    "includeAgents": false
+  },
+  {
+    "id": "sc-contractor-guest",
+    "key": "contractor-guest",
+    "title": "Contractor / guest",
+    "description": "What can a contractor or external guest still reach, including access that should have expired?",
+    "actorPrincipalId": "u-dev",
+    "scope": ["sharepoint"],
+    "includeAgents": false
+  },
+  {
+    "id": "sc-broad-sharing",
+    "key": "broad-sharing",
+    "title": "Broad sharing",
+    "description": "Which sensitive resources are exposed through organization-wide links or large department groups?",
+    "scope": ["sharepoint", "onedrive"],
+    "includeAgents": false
+  },
+  {
+    "id": "sc-sensitive-file",
+    "key": "sensitive-file",
+    "title": "Sensitive file",
+    "description": "Which high-sensitivity files (HR, legal, finance, board, security) are reachable beyond their intended audience?",
+    "scope": ["sharepoint", "onedrive"],
+    "includeAgents": false
+  },
+  {
+    "id": "sc-agent-action",
+    "key": "agent-action",
+    "title": "Agent action",
+    "description": "Which Copilot Studio-style agents can take risky actions or run under unsafe ownership and permissions?",
+    "scope": ["agents"],
+    "includeAgents": true
+  }
+]

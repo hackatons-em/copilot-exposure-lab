@@ -1,0 +1,190 @@
+[
+  {
+    "id": "u-alice",
+    "sourceId": "11111111-0000-0000-0000-00000000a001",
+    "kind": "user",
+    "displayName": "Alice Wong",
+    "email": "alice.wong@acmehealthfinance.com",
+    "jobTitle": "HR Director",
+    "department": "Human Resources",
+    "isExternal": false,
+    "memberOf": ["g-everyone", "g-hr-leadership"],
+    "active": true
+  },
+  {
+    "id": "u-bob",
+    "sourceId": "11111111-0000-0000-0000-00000000a002",
+    "kind": "user",
+    "displayName": "Bob Novak",
+    "email": "bob.novak@acmehealthfinance.com",
+    "jobTitle": "Product Manager",
+    "department": "Product",
+    "isExternal": false,
+    "memberOf": ["g-everyone", "g-engineering"],
+    "active": true
+  },
+  {
+    "id": "u-nina",
+    "sourceId": "11111111-0000-0000-0000-00000000a003",
+    "kind": "user",
+    "displayName": "Nina Shah",
+    "email": "nina.shah@acmehealthfinance.com",
+    "jobTitle": "Security Architect",
+    "department": "Security",
+    "isExternal": false,
+    "memberOf": ["g-everyone", "g-engineering"],
+    "active": true
+  },
+  {
+    "id": "u-omar",
+    "sourceId": "11111111-0000-0000-0000-00000000a004",
+    "kind": "user",
+    "displayName": "Omar Eriksson",
+    "email": "omar.eriksson@acmehealthfinance.com",
+    "jobTitle": "Microsoft 365 Administrator",
+    "department": "IT",
+    "isExternal": false,
+    "memberOf": ["g-everyone"],
+    "active": true
+  },
+  {
+    "id": "u-carla",
+    "sourceId": "11111111-0000-0000-0000-00000000a005",
+    "kind": "user",
+    "displayName": "Carla Mendes",
+    "email": "carla.mendes@acmehealthfinance.com",
+    "jobTitle": "Legal Counsel",
+    "department": "Legal",
+    "isExternal": false,
+    "memberOf": ["g-everyone", "g-legal"],
+    "active": true
+  },
+  {
+    "id": "u-dev",
+    "sourceId": "11111111-0000-0000-0000-00000000a006",
+    "kind": "user",
+    "displayName": "Dev Patel",
+    "email": "dev.patel@contoso-contractors.com",
+    "jobTitle": "Contractor — Launch Consultant",
+    "department": "External",
+    "isExternal": true,
+    "memberOf": ["g-contractors"],
+    "active": true
+  },
+  {
+    "id": "u-grace",
+    "sourceId": "11111111-0000-0000-0000-00000000a007",
+    "kind": "user",
+    "displayName": "Grace Miller",
+    "email": "grace.miller@acmehealthfinance.com",
+    "jobTitle": "Chief Financial Officer",
+    "department": "Finance",
+    "isExternal": false,
+    "memberOf": ["g-everyone", "g-finance-leadership", "g-executive"],
+    "active": true
+  },
+  {
+    "id": "u-helena",
+    "sourceId": "11111111-0000-0000-0000-00000000a008",
+    "kind": "user",
+    "displayName": "Helena Kim",
+    "email": "helena.kim@acmehealthfinance.com",
+    "jobTitle": "Chief Executive Officer",
+    "department": "Executive",
+    "isExternal": false,
+    "memberOf": ["g-everyone", "g-executive"],
+    "active": true
+  },
+  {
+    "id": "u-tomas",
+    "sourceId": "11111111-0000-0000-0000-00000000a009",
+    "kind": "user",
+    "displayName": "Tomas Berg",
+    "email": "tomas.berg@acmehealthfinance.com",
+    "jobTitle": "Former Automation Maker (offboarded)",
+    "department": "IT",
+    "isExternal": false,
+    "memberOf": [],
+    "active": false
+  },
+  {
+    "id": "g-everyone",
+    "sourceId": "22222222-0000-0000-0000-00000000b001",
+    "kind": "group",
+    "displayName": "Everyone Except External Users",
+    "membershipKind": "everyone-except-external",
+    "memberCount": 7,
+    "memberOf": [],
+    "active": true
+  },
+  {
+    "id": "g-hr-leadership",
+    "sourceId": "22222222-0000-0000-0000-00000000b002",
+    "kind": "group",
+    "displayName": "HR Leadership",
+    "membershipKind": "security",
+    "memberCount": 3,
+    "memberOf": [],
+    "active": true
+  },
+  {
+    "id": "g-finance-leadership",
+    "sourceId": "22222222-0000-0000-0000-00000000b003",
+    "kind": "group",
+    "displayName": "Finance Leadership",
+    "membershipKind": "security",
+    "memberCount": 4,
+    "memberOf": [],
+    "active": true
+  },
+  {
+    "id": "g-legal",
+    "sourceId": "22222222-0000-0000-0000-00000000b004",
+    "kind": "group",
+    "displayName": "Legal Team",
+    "membershipKind": "security",
+    "memberCount": 5,
+    "memberOf": [],
+    "active": true
+  },
+  {
+    "id": "g-sales",
+    "sourceId": "22222222-0000-0000-0000-00000000b005",
+    "kind": "group",
+    "displayName": "Sales Team",
+    "membershipKind": "m365",
+    "memberCount": 42,
+    "memberOf": [],
+    "active": true
+  },
+  {
+    "id": "g-engineering",
+    "sourceId": "22222222-0000-0000-0000-00000000b006",
+    "kind": "group",
+    "displayName": "Engineering Team",
+    "membershipKind": "m365",
+    "memberCount": 35,
+    "memberOf": [],
+    "active": true
+  },
+  {
+    "id": "g-contractors",
+    "sourceId": "22222222-0000-0000-0000-00000000b007",
+    "kind": "group",
+    "displayName": "Contractors",
+    "membershipKind": "security",
+    "memberCount": 6,
+    "memberOf": [],
+    "active": true
+  },
+  {
+    "id": "g-executive",
+    "sourceId": "22222222-0000-0000-0000-00000000b008",
+    "kind": "group",
+    "displayName": "Executive Team",
+    "membershipKind": "security",
+    "memberCount": 4,
+    "memberOf": [],
+    "active": true
+  }
+]

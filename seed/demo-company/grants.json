@@ -1,0 +1,85 @@
+[
+  {
+    "id": "pg-issue1-salary-orgwide",
+    "resourceId": "f-salary",
+    "principalId": "g-everyone",
+    "right": "read",
+    "via": "orgwide",
+    "linkScope": "org-wide",
+    "sourcePermissionId": "perm-salary-link-001"
+  },
+  {
+    "id": "pg-issue2-contracts-sales",
+    "resourceId": "s-contracts",
+    "principalId": "g-sales",
+    "right": "read",
+    "via": "direct",
+    "sourcePermissionId": "perm-contracts-sales-001"
+  },
+  {
+    "id": "pg-issue3-board-everyone",
+    "resourceId": "s-board",
+    "principalId": "g-everyone",
+    "right": "read",
+    "via": "direct",
+    "sourcePermissionId": "perm-board-everyone-001"
+  },
+  {
+    "id": "pg-issue4-phoenix-contractor",
+    "resourceId": "s-phoenix",
+    "principalId": "u-dev",
+    "right": "read",
+    "via": "guest",
+    "expirationAt": "2025-12-31T00:00:00.000Z",
+    "sourcePermissionId": "perm-phoenix-guest-001"
+  },
+  {
+    "id": "pg-hr-owner",
+    "resourceId": "s-hr",
+    "principalId": "u-alice",
+    "right": "owner",
+    "via": "direct"
+  },
+  {
+    "id": "pg-hr-leadership",
+    "resourceId": "s-hr",
+    "principalId": "g-hr-leadership",
+    "right": "read",
+    "via": "direct"
+  },
+  {
+    "id": "pg-contracts-legal",
+    "resourceId": "s-contracts",
+    "principalId": "g-legal",
+    "right": "read",
+    "via": "direct"
+  },
+  {
+    "id": "pg-board-exec",
+    "resourceId": "s-board",
+    "principalId": "g-executive",
+    "right": "read",
+    "via": "direct"
+  },
+  {
+    "id": "pg-security-owner",
+    "resourceId": "s-security",
+    "principalId": "u-nina",
+    "right": "owner",
+    "via": "direct"
+  },
+  {
+    "id": "pg-phoenix-engineering",
+    "resourceId": "s-phoenix",
+    "principalId": "g-engineering",
+    "right": "read",
+    "via": "direct"
+  },
+  {
+    "id": "pg-product-engineering",
+    "resourceId": "s-product",
+    "principalId": "g-engineering",
+    "right": "write",
+    "via": "direct"
+  }
+]

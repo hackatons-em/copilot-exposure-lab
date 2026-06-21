@@ -1,0 +1,15 @@
+{
+  "workspace": {
+    "id": "ws-acme",
+    "name": "Acme Health Finance Ltd",
+    "createdAt": "2026-06-01T09:00:00.000Z"
+  },
+  "connection": {
+    "id": "conn-acme-demo",
+    "workspaceId": "ws-acme",
+    "mode": "demo-seed",
+    "tenantName": "acmehealthfinance.onmicrosoft.com",
+    "connectedAt": "2026-06-01T09:05:00.000Z",
+    "scopes": ["User.Read.All", "Group.Read.All", "Sites.Read.All", "Files.Read.All"]
+  }
+}
