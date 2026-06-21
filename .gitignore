@@ -39,3 +39,9 @@ infra/**/*.local.json
 # Report artifacts (generated)
 /tmp/
 apps/worker/.artifacts/
+
+# Playwright (E2E)
+.auth/
+test-results/
+playwright-report/
+.last-run.json

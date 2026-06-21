@@ -17,6 +17,8 @@ interface WorkspaceContextValue {
   runAssessment: () => Promise<void>;
   /** Re-seed the demo company then re-scan. */
   reseedAndScan: () => Promise<void>;
+  /** Bump the data version so dependent pages reload (e.g. after a tenant connect). */
+  bumpDataVersion: () => void;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextValue | undefined>(undefined);
@@ -81,9 +83,11 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const bumpDataVersion = useCallback(() => setDataVersion((v) => v + 1), []);
+
   const value = useMemo<WorkspaceContextValue>(
-    () => ({ dataVersion, scanning, lastRun, runAssessment, reseedAndScan }),
-    [dataVersion, scanning, lastRun, runAssessment, reseedAndScan],
+    () => ({ dataVersion, scanning, lastRun, runAssessment, reseedAndScan, bumpDataVersion }),
+    [dataVersion, scanning, lastRun, runAssessment, reseedAndScan, bumpDataVersion],
   );
 
   return <WorkspaceContext.Provider value={value}>{children}</WorkspaceContext.Provider>;

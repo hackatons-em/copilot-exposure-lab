@@ -51,6 +51,23 @@ export interface SeedResult {
   counts: Record<string, number>;
 }
 
+/** Body for POST /connections/microsoft/start. The client secret is sent once, never stored. */
+export interface ConnectMicrosoftBody {
+  tenantId: string;
+  clientId: string;
+  clientSecret: string;
+  tenantName?: string;
+}
+
+/**
+ * Shape returned by POST /connections/microsoft/start.
+ * `counts` keys are `principals`, `resources`, `grants`, `scenarios`.
+ */
+export interface ConnectMicrosoftResult {
+  connection: TenantConnection;
+  counts: Record<string, number>;
+}
+
 export interface FindingFilter {
   severity?: string;
   status?: string;
@@ -113,6 +130,17 @@ export const api = {
 
   seedDemo(): Promise<SeedResult> {
     return request<SeedResult>(`/api/workspaces/${ws}/connections/demo/seed`, { method: "POST" });
+  },
+
+  /**
+   * Connect a live Microsoft 365 tenant. The client secret is sent once to
+   * acquire a token and is never stored or displayed back.
+   */
+  connectMicrosoft(body: ConnectMicrosoftBody): Promise<ConnectMicrosoftResult> {
+    return request<ConnectMicrosoftResult>(`/api/workspaces/${ws}/connections/microsoft/start`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
   },
 
   listConnections(): Promise<TenantConnection[]> {

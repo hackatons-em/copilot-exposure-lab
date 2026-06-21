@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useState, type FormEvent } from "react";
 import type { TenantConnection } from "@cel/types";
 import { api } from "@/lib/api";
 import { formatDateTime, titleCase } from "@/lib/format";
@@ -20,16 +21,92 @@ const SCOPE_EXPLANATIONS: Record<string, string> = {
   "InformationProtectionPolicy.Read.All": "Read sensitivity-label policy to detect missing-label gaps.",
 };
 
+interface ConnectFields {
+  tenantId: string;
+  clientId: string;
+  clientSecret: string;
+  tenantName: string;
+}
+
+const EMPTY_CONNECT_FIELDS: ConnectFields = {
+  tenantId: "",
+  clientId: "",
+  clientSecret: "",
+  tenantName: "",
+};
+
 export default function SettingsPage() {
-  const { dataVersion, reseedAndScan, scanning, lastRun } = useWorkspace();
+  const { dataVersion, reseedAndScan, scanning, lastRun, bumpDataVersion } = useWorkspace();
   const { data, loading, error, reload } = useAsync<TenantConnection[]>(
     () => api.listConnections(),
     [dataVersion],
   );
 
+  const [fields, setFields] = useState<ConnectFields>(EMPTY_CONNECT_FIELDS);
+  const [connecting, setConnecting] = useState(false);
+  const [connectError, setConnectError] = useState<string | undefined>(undefined);
+  const [connectSuccess, setConnectSuccess] = useState<string | undefined>(undefined);
+
+  const setField = useCallback(
+    (key: keyof ConnectFields, value: string) => setFields((prev) => ({ ...prev, [key]: value })),
+    [],
+  );
+
+  const handleConnect = useCallback(
+    async (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      if (connecting) return;
+      setConnecting(true);
+      setConnectError(undefined);
+      setConnectSuccess(undefined);
+
+      const tenantId = fields.tenantId.trim();
+      const clientId = fields.clientId.trim();
+      const tenantName = fields.tenantName.trim();
+      try {
+        const result = await api.connectMicrosoft({
+          tenantId,
+          clientId,
+          clientSecret: fields.clientSecret,
+          ...(tenantName.length > 0 ? { tenantName } : {}),
+        });
+        const counts = result.counts;
+        const principals = counts.principals ?? 0;
+        const resources = counts.resources ?? 0;
+        const label = result.connection.tenantName || tenantName || tenantId;
+        setConnectSuccess(
+          `Connected ${label} — ${principals} principal${principals === 1 ? "" : "s"}, ${resources} resource${
+            resources === 1 ? "" : "s"
+          }.`,
+        );
+        // Drop the secret (and the rest of the form) as soon as it has been used.
+        setFields(EMPTY_CONNECT_FIELDS);
+        // Refresh connection-aware pages with the freshly ingested tenant.
+        bumpDataVersion();
+      } catch (err) {
+        // Never echo the secret back; only surface the API error message.
+        setConnectError(err instanceof Error ? err.message : "Could not connect the tenant.");
+        // Clear only the secret on failure so it is not kept around longer than needed.
+        setFields((prev) => ({ ...prev, clientSecret: "" }));
+      } finally {
+        setConnecting(false);
+      }
+    },
+    [bumpDataVersion, connecting, fields],
+  );
+
   const connection = data && data.length > 0 ? data[0] : undefined;
   const scopes =
     connection?.scopes && connection.scopes.length > 0 ? connection.scopes : Object.keys(SCOPE_EXPLANATIONS);
+
+  const connectDisabled =
+    connecting ||
+    fields.tenantId.trim().length === 0 ||
+    fields.clientId.trim().length === 0 ||
+    fields.clientSecret.length === 0;
+
+  const fieldClass =
+    "mt-1 w-full rounded-md border border-surface-border bg-surface px-2.5 py-1.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-brand/30";
 
   return (
     <>
@@ -126,6 +203,88 @@ export default function SettingsPage() {
           <TrustCopy />
         </div>
       </div>
+
+      <section className="mt-6 rounded-lg border border-surface-border bg-surface p-5">
+        <h2 className="text-sm font-semibold text-ink">Connect a Microsoft 365 tenant</h2>
+        <p className="mt-1 text-sm text-ink-soft">
+          Read-only, metadata-only. Requires an Entra app registration — see{" "}
+          <a
+            href="https://github.com/hackatons-em/copilot-exposure-lab/blob/main/docs/SETUP-GRAPH.md"
+            className="text-brand no-underline hover:underline"
+            target="_blank"
+            rel="noreferrer"
+          >
+            docs/SETUP-GRAPH.md
+          </a>
+          .
+        </p>
+
+        <form onSubmit={handleConnect} className="mt-4 grid gap-4 sm:grid-cols-2">
+          <label className="block text-xs font-medium text-ink-soft">
+            Tenant ID
+            <input
+              type="text"
+              autoComplete="off"
+              value={fields.tenantId}
+              onChange={(e) => setField("tenantId", e.target.value)}
+              placeholder="contoso.onmicrosoft.com or a directory (tenant) ID"
+              className={fieldClass}
+            />
+          </label>
+          <label className="block text-xs font-medium text-ink-soft">
+            Client ID
+            <input
+              type="text"
+              autoComplete="off"
+              value={fields.clientId}
+              onChange={(e) => setField("clientId", e.target.value)}
+              placeholder="Application (client) ID"
+              className={fieldClass}
+            />
+          </label>
+          <label className="block text-xs font-medium text-ink-soft">
+            Client secret
+            <input
+              type="password"
+              autoComplete="new-password"
+              value={fields.clientSecret}
+              onChange={(e) => setField("clientSecret", e.target.value)}
+              placeholder="Sent once, never stored"
+              className={fieldClass}
+            />
+          </label>
+          <label className="block text-xs font-medium text-ink-soft">
+            Tenant name <span className="text-ink-faint">(optional)</span>
+            <input
+              type="text"
+              autoComplete="off"
+              value={fields.tenantName}
+              onChange={(e) => setField("tenantName", e.target.value)}
+              placeholder="Friendly display name"
+              className={fieldClass}
+            />
+          </label>
+
+          <div className="sm:col-span-2">
+            <Button type="submit" busy={connecting} disabled={connectDisabled}>
+              {connecting ? "Connecting…" : "Connect tenant"}
+            </Button>
+          </div>
+        </form>
+
+        {connectError ? (
+          <p className="mt-3 text-xs text-severity-critical">{connectError}</p>
+        ) : null}
+        {connectSuccess ? <p className="mt-3 text-xs text-ink-soft">{connectSuccess}</p> : null}
+
+        <div className="mt-4">
+          <TrustCopy
+            lines={[
+              "The client secret is sent once to acquire a token and is never stored or displayed.",
+            ]}
+          />
+        </div>
+      </section>
     </>
   );
 }
