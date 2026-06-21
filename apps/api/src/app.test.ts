@@ -39,6 +39,14 @@ describe("workspace lifecycle + scan", () => {
     expect(body.bands.critical).toBeGreaterThanOrEqual(1);
   });
 
+  it("returns a tenant exposure score", async () => {
+    const res = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/exposure` });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().score).toBeGreaterThanOrEqual(90);
+    expect(res.json().band).toBe("critical");
+    expect(res.json().findingCount).toBe(9);
+  });
+
   it("lists findings and filters by severity", async () => {
     const all = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/findings` });
     expect(all.json()).toHaveLength(9);

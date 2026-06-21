@@ -9,7 +9,7 @@ import {
   createGraphRequester,
 } from "@cel/graph-client";
 import { EXPORT_FORMATS, isExportFormat, runExport } from "@cel/integrations";
-import { simulateRetrieval } from "@cel/rule-engine";
+import { simulateRetrieval, tenantExposureScore } from "@cel/rule-engine";
 import Fastify, { type FastifyInstance } from "fastify";
 import { z } from "zod";
 import type { FindingStatus } from "@cel/types";
@@ -307,6 +307,17 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
     const resolvedActor = actorId ?? fallbackActor;
     if (!resolvedActor) throw Object.assign(new Error("no actor available to simulate"), { statusCode: 404 });
     return simulateRetrieval(graph, { actorId: resolvedActor });
+  });
+
+  // ── Tenant exposure score (headline metric) ────────────────
+  app.get("/api/workspaces/:id/exposure", perm("view"), async (req) => {
+    const { id } = req.params as { id: string };
+    await requireWorkspace(id);
+    const result = await store.getScanResult(id);
+    if (!result) {
+      return { score: 0, band: "info", findingCount: 0, bands: { critical: 0, high: 0, medium: 0, low: 0, info: 0 }, drivers: [] };
+    }
+    return tenantExposureScore(result);
   });
 
   // ── Scans ──────────────────────────────────────────────────

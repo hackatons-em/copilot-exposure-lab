@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import type { Finding, Resource } from "@cel/types";
-import { api } from "@/lib/api";
+import { api, type TenantExposure } from "@/lib/api";
 import { bandRank } from "@/lib/format";
 import { useAsync } from "@/lib/useAsync";
 import { useWorkspace } from "@/components/WorkspaceProvider";
@@ -11,6 +11,7 @@ import { Button } from "@/components/Button";
 import { DataTable, type Column } from "@/components/DataTable";
 import { EmptyState } from "@/components/EmptyState";
 import { ErrorState, LoadingState } from "@/components/States";
+import { ExposureGauge } from "@/components/ExposureGauge";
 import { MetricCard } from "@/components/MetricCard";
 import { PageHeader } from "@/components/PageHeader";
 import { SeverityBadge } from "@/components/SeverityBadge";
@@ -19,6 +20,7 @@ import { TrustCopy } from "@/components/TrustCopy";
 interface OverviewData {
   findings: Finding[];
   resources: Resource[];
+  exposure: TenantExposure;
 }
 
 function resourceName(resources: Resource[], id: string): string {
@@ -29,8 +31,12 @@ export default function OverviewPage() {
   const { dataVersion, runAssessment, scanning } = useWorkspace();
 
   const { data, loading, error, reload } = useAsync<OverviewData>(async () => {
-    const [findings, resources] = await Promise.all([api.listFindings(), api.listResources()]);
-    return { findings, resources };
+    const [findings, resources, exposure] = await Promise.all([
+      api.listFindings(),
+      api.listResources(),
+      api.getExposure(),
+    ]);
+    return { findings, resources, exposure };
   }, [dataVersion]);
 
   const sorted = useMemo(() => {
@@ -147,20 +153,23 @@ export default function OverviewPage() {
         }
       />
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        <MetricCard
-          label="Critical"
-          value={metrics.critical}
-          accentClassName={metrics.critical > 0 ? "text-severity-critical" : "text-ink"}
-        />
-        <MetricCard
-          label="High"
-          value={metrics.high}
-          accentClassName={metrics.high > 0 ? "text-severity-high" : "text-ink"}
-        />
-        <MetricCard label="Sensitive resources" value={metrics.sensitive} />
-        <MetricCard label="Broad-access paths" value={metrics.broad} />
-        <MetricCard label="Risky agents" value={metrics.riskyAgents} />
+      <div className="grid gap-4 lg:grid-cols-[16rem_1fr]">
+        {data?.exposure && <ExposureGauge exposure={data.exposure} />}
+        <div className="grid content-start gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <MetricCard
+            label="Critical"
+            value={metrics.critical}
+            accentClassName={metrics.critical > 0 ? "text-severity-critical" : "text-ink"}
+          />
+          <MetricCard
+            label="High"
+            value={metrics.high}
+            accentClassName={metrics.high > 0 ? "text-severity-high" : "text-ink"}
+          />
+          <MetricCard label="Sensitive resources" value={metrics.sensitive} />
+          <MetricCard label="Broad-access paths" value={metrics.broad} />
+          <MetricCard label="Risky agents" value={metrics.riskyAgents} />
+        </div>
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">

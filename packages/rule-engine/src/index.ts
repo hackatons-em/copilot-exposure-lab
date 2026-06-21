@@ -19,6 +19,8 @@ export type { ExposureRule, RuleContext, RuleHit, ScoringInputs, EvidenceInput }
 export { BROAD_GROUP_THRESHOLD, SENSITIVE_THRESHOLD } from "./rules/shared.js";
 
 export { score } from "./scoring/scorer.js";
+export { tenantExposureScore } from "./scoring/tenant-score.js";
+export type { TenantExposure } from "./scoring/tenant-score.js";
 export { bandFor, bandLabel } from "./scoring/bands.js";
 export { WEIGHTS, MAX_SCORE } from "./scoring/weights.js";
 export { remediationFor } from "./remediation/catalog.js";

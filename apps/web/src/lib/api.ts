@@ -102,6 +102,15 @@ export interface RetrievalResult {
   items: RetrievalItem[];
 }
 
+/** Headline tenant exposure (GET /exposure). */
+export interface TenantExposure {
+  score: number;
+  band: string;
+  findingCount: number;
+  bands: Record<string, number>;
+  drivers: string[];
+}
+
 /** What a schedule enqueues when it fires. */
 export type ScheduleAction = "scan" | "report";
 
@@ -231,6 +240,11 @@ export const api = {
   /** Simulate what M365 Copilot could surface to an actor (defaults to the normal-employee persona). */
   getRetrieval(actorId?: string): Promise<RetrievalResult> {
     return request<RetrievalResult>(`/api/workspaces/${ws}/retrieval${qs({ actorId })}`);
+  },
+
+  /** Headline tenant exposure score (deterministic aggregate of the latest scan). */
+  getExposure(): Promise<TenantExposure> {
+    return request<TenantExposure>(`/api/workspaces/${ws}/exposure`);
   },
 
   runScan(actorId?: string): Promise<ScanRunSummary> {
