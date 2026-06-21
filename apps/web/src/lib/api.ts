@@ -165,6 +165,31 @@ export interface UpdateScheduleBody {
   enabled?: boolean;
 }
 
+/** A node in the exposure graph (GET /graph) — a principal, resource, link, or agent. */
+export interface ExposureGraphNode {
+  id: string;
+  type: "user" | "group" | "link" | "file" | "site" | "folder" | "drive" | "agent" | "connector" | "permission" | "action";
+  label: string;
+  risk: "critical" | "high" | "medium" | "low" | "info";
+  findingIds: string[];
+}
+
+/** A directed edge in the exposure graph — one hop in an exposure path. */
+export interface ExposureGraphEdge {
+  id: string;
+  source: string;
+  target: string;
+  relation: string;
+  risk: "critical" | "high" | "medium" | "low" | "info";
+  findingIds: string[];
+}
+
+/** Union of every finding's exposure path: who can reach what, and how (GET /graph). */
+export interface ExposureGraphModel {
+  nodes: ExposureGraphNode[];
+  edges: ExposureGraphEdge[];
+}
+
 const ws = WORKSPACE_ID;
 
 /**
@@ -269,6 +294,14 @@ export const api = {
   /** Headline tenant exposure score (deterministic aggregate of the latest scan). */
   getExposure(): Promise<TenantExposure> {
     return request<TenantExposure>(`/api/workspaces/${ws}/exposure`);
+  },
+
+  /**
+   * The exposure graph — the union of every finding's exposure path as one
+   * picture (who can reach what, and how). Empty when there is no scan yet.
+   */
+  getGraph(): Promise<ExposureGraphModel> {
+    return request<ExposureGraphModel>(`/api/workspaces/${ws}/graph`);
   },
 
   /** Exposure snapshots over time + drift since the last scan. */

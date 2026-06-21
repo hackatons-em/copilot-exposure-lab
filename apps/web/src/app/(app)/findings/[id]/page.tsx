@@ -4,12 +4,13 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useState } from "react";
 import type { Resource } from "@cel/types";
-import { api, type FindingDetail } from "@/lib/api";
+import { api, type ExposureGraphModel, type FindingDetail } from "@/lib/api";
 import { formatDateTime } from "@/lib/format";
 import { useAsync } from "@/lib/useAsync";
 import { Button } from "@/components/Button";
 import { ErrorState, LoadingState } from "@/components/States";
 import { EvidenceTimeline } from "@/components/EvidenceTimeline";
+import { ExposureGraphView } from "@/components/ExposureGraphView";
 import { ExposurePath } from "@/components/ExposurePath";
 import { FindingStatusPill } from "@/components/StatusPill";
 import { RemediationCard } from "@/components/RemediationCard";
@@ -18,6 +19,7 @@ import { ScoreBreakdown } from "@/components/ScoreBreakdown";
 interface DetailBundle {
   detail: FindingDetail;
   resource?: Resource;
+  graph: ExposureGraphModel;
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -44,7 +46,13 @@ export default function FindingDetailPage() {
     } catch {
       resource = undefined;
     }
-    return { detail, resource };
+    let graph: ExposureGraphModel = { nodes: [], edges: [] };
+    try {
+      graph = await api.getGraph();
+    } catch {
+      graph = { nodes: [], edges: [] };
+    }
+    return { detail, resource, graph };
   }, [findingId]);
 
   const markRemediating = useCallback(async () => {
@@ -80,7 +88,7 @@ export default function FindingDetailPage() {
     return <ErrorState message={error ?? "Finding not found."} onRetry={reload} />;
   }
 
-  const { detail, resource } = data;
+  const { detail, resource, graph } = data;
   const { finding, evidence, remediation } = detail;
   const resolved = finding.status === "resolved";
 
@@ -123,6 +131,10 @@ export default function FindingDetailPage() {
 
           <Section title="Exposure path">
             <ExposurePath path={finding.exposurePath} />
+          </Section>
+
+          <Section title="Exposure path (graph)">
+            <ExposureGraphView model={graph} focusFindingId={finding.id} height={320} />
           </Section>
 
           <Section title="Evidence chain">

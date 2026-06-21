@@ -9,6 +9,7 @@ import { useWorkspace } from "./WorkspaceProvider";
 const NAV: { href: string; label: string }[] = [
   { href: "/overview", label: "Overview" },
   { href: "/findings", label: "Findings" },
+  { href: "/graph", label: "Exposure graph" },
   { href: "/scenarios", label: "Scenarios" },
   { href: "/copilot-sim", label: "Copilot sim" },
   { href: "/resources", label: "Resources" },
