@@ -81,6 +81,36 @@ export interface ExportFormatInfo {
   description: string;
 }
 
+/** What a schedule enqueues when it fires. */
+export type ScheduleAction = "scan" | "report";
+
+/** A recurring trigger that enqueues a scan/report job for the workspace. */
+export interface Schedule {
+  id: string;
+  workspaceId: string;
+  name: string;
+  action: ScheduleAction;
+  cadenceMinutes: number;
+  enabled: boolean;
+  lastRunAt?: string;
+  nextRunAt: string;
+  createdAt: string;
+}
+
+/** Body for POST /schedules. */
+export interface CreateScheduleBody {
+  name: string;
+  action?: ScheduleAction;
+  cadenceMinutes: number;
+}
+
+/** Body for PATCH /schedules/:id. */
+export interface UpdateScheduleBody {
+  name?: string;
+  cadenceMinutes?: number;
+  enabled?: boolean;
+}
+
 const ws = WORKSPACE_ID;
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -210,5 +240,29 @@ export const api = {
 
   listAudit(): Promise<AuditEvent[]> {
     return request<AuditEvent[]>(`/api/workspaces/${ws}/audit-events`);
+  },
+
+  listSchedules(): Promise<Schedule[]> {
+    return request<Schedule[]>(`/api/workspaces/${ws}/schedules`);
+  },
+
+  createSchedule(body: CreateScheduleBody): Promise<Schedule> {
+    return request<Schedule>(`/api/workspaces/${ws}/schedules`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+  },
+
+  updateSchedule(scheduleId: string, patch: UpdateScheduleBody): Promise<Schedule> {
+    return request<Schedule>(`/api/workspaces/${ws}/schedules/${encodeURIComponent(scheduleId)}`, {
+      method: "PATCH",
+      body: JSON.stringify(patch),
+    });
+  },
+
+  deleteSchedule(scheduleId: string): Promise<void> {
+    return request<void>(`/api/workspaces/${ws}/schedules/${encodeURIComponent(scheduleId)}`, {
+      method: "DELETE",
+    });
   },
 };

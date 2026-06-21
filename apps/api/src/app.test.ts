@@ -107,6 +107,59 @@ describe("workspace lifecycle + scan", () => {
   });
 });
 
+describe("schedules", () => {
+  let scheduleId: string;
+
+  it("creates a schedule", async () => {
+    const res = await app.inject({
+      method: "POST",
+      url: `/api/workspaces/${wsId}/schedules`,
+      payload: { name: "Nightly scan", action: "scan", cadenceMinutes: 1440 },
+    });
+    expect(res.statusCode).toBe(201);
+    const body = res.json();
+    scheduleId = body.id as string;
+    expect(scheduleId).toMatch(/^sch-/);
+    expect(body.enabled).toBe(true);
+    expect(body.nextRunAt).toBeTruthy();
+  });
+
+  it("lists schedules for the workspace", async () => {
+    const res = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/schedules` });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toHaveLength(1);
+  });
+
+  it("patches a schedule to disabled", async () => {
+    const res = await app.inject({
+      method: "PATCH",
+      url: `/api/workspaces/${wsId}/schedules/${scheduleId}`,
+      payload: { enabled: false },
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().enabled).toBe(false);
+  });
+
+  it("deletes a schedule", async () => {
+    const res = await app.inject({
+      method: "DELETE",
+      url: `/api/workspaces/${wsId}/schedules/${scheduleId}`,
+    });
+    expect(res.statusCode).toBe(204);
+    const list = await app.inject({ method: "GET", url: `/api/workspaces/${wsId}/schedules` });
+    expect(list.json()).toHaveLength(0);
+  });
+
+  it("404s when patching a missing schedule", async () => {
+    const res = await app.inject({
+      method: "PATCH",
+      url: `/api/workspaces/${wsId}/schedules/sch-nope`,
+      payload: { enabled: true },
+    });
+    expect(res.statusCode).toBe(404);
+  });
+});
+
 // A network-free live-Graph provider returning a tiny org-wide-exposed graph.
 const liveGraph: TenantGraph = {
   workspace: { id: "x", name: "x" },

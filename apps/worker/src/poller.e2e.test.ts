@@ -9,6 +9,7 @@ import { drizzle } from "drizzle-orm/pglite";
 import { beforeAll, describe, expect, it } from "vitest";
 import { cleanup } from "./cleanup.js";
 import { drain, pollOnce } from "./poller.js";
+import { tickSchedules } from "./scheduler.js";
 
 /** Verifies the queue SQL (enqueue -> claim -> complete) over real Postgres (pglite). */
 let db: Database;
@@ -19,8 +20,11 @@ beforeAll(async () => {
   const d = drizzle(client, { schema });
   const here = dirname(fileURLToPath(import.meta.url));
   const migDir = resolve(here, "../../../packages/db/drizzle");
-  const sqlFile = readdirSync(migDir).find((f) => f.endsWith(".sql"))!;
-  await client.exec(readFileSync(resolve(migDir, sqlFile), "utf8"));
+  for (const f of readdirSync(migDir)
+    .filter((f) => f.endsWith(".sql"))
+    .sort()) {
+    await client.exec(readFileSync(resolve(migDir, f), "utf8"));
+  }
   db = d as unknown as Database;
   store = new DrizzleStore(db);
   await store.createWorkspace({ id: "ws-job", name: "Acme" });
@@ -48,6 +52,37 @@ describe("worker queue (pglite)", () => {
     const [job] = await db.select().from(jobs).where(eq(jobs.id, id));
     expect(job!.status).toBe("failed");
     expect(job!.error).toContain("unknown job type");
+  });
+});
+
+describe("scheduler tick (pglite)", () => {
+  it("enqueues a scan job for a due schedule and advances its nextRunAt", async () => {
+    const schedule = await store.createSchedule("ws-job", {
+      name: "Due scan",
+      action: "scan",
+      cadenceMinutes: 1440,
+      nextRunAt: "2020-01-01T00:00:00.000Z", // in the past => due
+    });
+
+    const now = "2026-06-21T00:00:00.000Z";
+    const enqueued = await tickSchedules(db, store, { now });
+    expect(enqueued).toBeGreaterThanOrEqual(1);
+
+    // A queued scan job now exists for the workspace.
+    const queued = await db
+      .select()
+      .from(jobs)
+      .where(eq(jobs.status, "queued"));
+    expect(queued.some((j) => j.workspaceId === "ws-job" && j.type === "scan")).toBe(true);
+
+    // The schedule's nextRunAt advanced past now (now + cadence).
+    // (PGlite renders `timestamptz` in its own format, so compare by instant.)
+    const [after] = await store.listSchedules("ws-job").then((all) => all.filter((s) => s.id === schedule.id));
+    expect(new Date(after!.lastRunAt!).getTime()).toBe(new Date(now).getTime());
+    expect(new Date(after!.nextRunAt).getTime()).toBeGreaterThan(new Date(now).getTime());
+
+    // A second tick at the same `now` finds nothing due.
+    expect(await tickSchedules(db, store, { now })).toBe(0);
   });
 });
 

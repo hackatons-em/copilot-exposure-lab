@@ -12,6 +12,7 @@ import {
   resources as resourcesTable,
   scenarioRuns,
   scenarios as scenariosTable,
+  schedules as schedulesTable,
   tenantConnections,
   workspaces,
 } from "@cel/db";
@@ -31,10 +32,24 @@ import type {
   TenantGraph,
   Workspace,
 } from "@cel/types";
-import { and, eq } from "drizzle-orm";
-import type { FindingDetail, FindingFilter, ReportContent, ScanRunSummary, Store } from "./types.js";
+import { and, asc, eq, lte } from "drizzle-orm";
+import type {
+  CreateScheduleInput,
+  FindingDetail,
+  FindingFilter,
+  ReportContent,
+  ScanRunSummary,
+  Schedule,
+  ScheduleAction,
+  Store,
+  UpdateScheduleInput,
+} from "./types.js";
 
 const nowIso = (): string => new Date().toISOString();
+
+/** now + minutes, as an ISO string. */
+const addMinutes = (iso: string, minutes: number): string =>
+  new Date(new Date(iso).getTime() + minutes * 60_000).toISOString();
 function notFound(msg: string): never {
   throw Object.assign(new Error(msg), { statusCode: 404 });
 }
@@ -464,6 +479,95 @@ export class DrizzleStore implements Store {
     const content = report.format === "html" ? renderHtml(model) : renderMarkdown(model);
     const ext = report.format === "html" ? "html" : "md";
     return { format: report.format, content, filename: `copilot-exposure-report-${reportId}.${ext}` };
+  }
+
+  // ── Schedules ──────────────────────────────────────────────
+  private toSchedule(r: typeof schedulesTable.$inferSelect): Schedule {
+    return {
+      id: r.id,
+      workspaceId: r.workspaceId,
+      name: r.name,
+      action: r.action as ScheduleAction,
+      cadenceMinutes: r.cadenceMinutes,
+      enabled: r.enabled,
+      lastRunAt: r.lastRunAt ?? undefined,
+      nextRunAt: r.nextRunAt,
+      createdAt: r.createdAt,
+    };
+  }
+
+  async createSchedule(workspaceId: string, input: CreateScheduleInput): Promise<Schedule> {
+    await this.assertWorkspace(workspaceId);
+    const now = nowIso();
+    const row = {
+      id: `sch-${randomUUID()}`,
+      workspaceId,
+      name: input.name,
+      action: input.action ?? "scan",
+      cadenceMinutes: input.cadenceMinutes,
+      enabled: true,
+      nextRunAt: input.nextRunAt ?? addMinutes(now, input.cadenceMinutes),
+      createdAt: now,
+    };
+    await this.db.insert(schedulesTable).values(row);
+    const [created] = await this.db.select().from(schedulesTable).where(eq(schedulesTable.id, row.id));
+    return this.toSchedule(created!);
+  }
+
+  async listSchedules(workspaceId: string): Promise<Schedule[]> {
+    const rows = await this.db
+      .select()
+      .from(schedulesTable)
+      .where(eq(schedulesTable.workspaceId, workspaceId))
+      .orderBy(asc(schedulesTable.createdAt));
+    return rows.map((r) => this.toSchedule(r));
+  }
+
+  async updateSchedule(
+    workspaceId: string,
+    scheduleId: string,
+    patch: UpdateScheduleInput,
+  ): Promise<Schedule | undefined> {
+    const set: Partial<typeof schedulesTable.$inferInsert> = {};
+    if (patch.name !== undefined) set.name = patch.name;
+    if (patch.cadenceMinutes !== undefined) set.cadenceMinutes = patch.cadenceMinutes;
+    if (patch.enabled !== undefined) set.enabled = patch.enabled;
+    if (patch.nextRunAt !== undefined) set.nextRunAt = patch.nextRunAt;
+    if (Object.keys(set).length > 0) {
+      await this.db
+        .update(schedulesTable)
+        .set(set)
+        .where(and(eq(schedulesTable.workspaceId, workspaceId), eq(schedulesTable.id, scheduleId)));
+    }
+    const [row] = await this.db
+      .select()
+      .from(schedulesTable)
+      .where(and(eq(schedulesTable.workspaceId, workspaceId), eq(schedulesTable.id, scheduleId)));
+    return row ? this.toSchedule(row) : undefined;
+  }
+
+  async deleteSchedule(workspaceId: string, scheduleId: string): Promise<boolean> {
+    const res = await this.db
+      .delete(schedulesTable)
+      .where(and(eq(schedulesTable.workspaceId, workspaceId), eq(schedulesTable.id, scheduleId)))
+      .returning({ id: schedulesTable.id });
+    return res.length > 0;
+  }
+
+  async dueSchedules(now: string): Promise<Schedule[]> {
+    const rows = await this.db
+      .select()
+      .from(schedulesTable)
+      .where(and(eq(schedulesTable.enabled, true), lte(schedulesTable.nextRunAt, now)))
+      .orderBy(asc(schedulesTable.nextRunAt), asc(schedulesTable.id));
+    return rows.map((r) => this.toSchedule(r));
+  }
+
+  async markScheduleRan(scheduleId: string, ranAt: string, nextRunAt: string): Promise<void> {
+    await this.db
+      .update(schedulesTable)
+      .set({ lastRunAt: ranAt, nextRunAt })
+      .where(eq(schedulesTable.id, scheduleId));
   }
 
   async listAudit(workspaceId: string): Promise<AuditEvent[]> {

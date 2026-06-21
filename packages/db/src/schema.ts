@@ -202,6 +202,20 @@ export const jobs = pgTable("jobs", {
   finishedAt: timestamp("finished_at", { withTimezone: true, mode: "string" }),
 });
 
+export const schedules = pgTable("schedules", {
+  id: text("id").primaryKey(),
+  workspaceId: text("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  action: text("action").notNull().default("scan"), // scan | report
+  cadenceMinutes: integer("cadence_minutes").notNull(), // e.g. 60 | 1440 | 10080
+  enabled: boolean("enabled").default(true).notNull(),
+  lastRunAt: timestamp("last_run_at", { withTimezone: true, mode: "string" }),
+  nextRunAt: timestamp("next_run_at", { withTimezone: true, mode: "string" }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
+});
+
 export const schema = {
   workspaces,
   tenantConnections,
@@ -216,4 +230,5 @@ export const schema = {
   reports,
   auditEvents,
   jobs,
+  schedules,
 };

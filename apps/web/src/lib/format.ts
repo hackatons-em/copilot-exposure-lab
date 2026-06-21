@@ -67,6 +67,23 @@ export function formatDateTime(iso?: string): string {
   });
 }
 
+/** Human-friendly cadence, e.g. 60 -> "every 1h", 1440 -> "every 24h", 10080 -> "every 7d". */
+export function formatCadence(minutes: number): string {
+  if (minutes % 10080 === 0) {
+    const weeks = minutes / 10080;
+    return `every ${weeks}w`;
+  }
+  if (minutes % 1440 === 0) {
+    const days = minutes / 1440;
+    return `every ${days}d`;
+  }
+  if (minutes % 60 === 0) {
+    const hours = minutes / 60;
+    return `every ${hours}h`;
+  }
+  return `every ${minutes}m`;
+}
+
 export function formatDate(iso?: string): string {
   if (!iso) return "—";
   const date = new Date(iso);

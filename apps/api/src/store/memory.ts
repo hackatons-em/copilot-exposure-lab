@@ -15,7 +15,16 @@ import type {
   TenantGraph,
   Workspace,
 } from "@cel/types";
-import type { FindingDetail, FindingFilter, ReportContent, ScanRunSummary, Store } from "./types.js";
+import type {
+  CreateScheduleInput,
+  FindingDetail,
+  FindingFilter,
+  ReportContent,
+  ScanRunSummary,
+  Schedule,
+  Store,
+  UpdateScheduleInput,
+} from "./types.js";
 
 interface WorkspaceState {
   workspace: Workspace;
@@ -25,9 +34,14 @@ interface WorkspaceState {
   appliedFixes: Set<string>;
   audit: AuditEvent[];
   reports: Map<string, { report: Report; content: string }>;
+  schedules: Map<string, Schedule>;
 }
 
 const nowIso = (): string => new Date().toISOString();
+
+/** now + minutes, as an ISO string. */
+const addMinutes = (iso: string, minutes: number): string =>
+  new Date(new Date(iso).getTime() + minutes * 60_000).toISOString();
 
 /** In-memory Store — backs tests and a database-free demo. */
 export class MemoryStore implements Store {
@@ -47,6 +61,7 @@ export class MemoryStore implements Store {
       appliedFixes: new Set(),
       audit: [],
       reports: new Map(),
+      schedules: new Map(),
     });
     return workspace;
   }
@@ -221,6 +236,68 @@ export class MemoryStore implements Store {
       content: entry.content,
       filename: `copilot-exposure-report-${reportId}.${ext}`,
     };
+  }
+
+  async createSchedule(workspaceId: string, input: CreateScheduleInput): Promise<Schedule> {
+    const state = this.require(workspaceId);
+    const now = nowIso();
+    const schedule: Schedule = {
+      id: `sch-${randomUUID()}`,
+      workspaceId,
+      name: input.name,
+      action: input.action ?? "scan",
+      cadenceMinutes: input.cadenceMinutes,
+      enabled: true,
+      nextRunAt: input.nextRunAt ?? addMinutes(now, input.cadenceMinutes),
+      createdAt: now,
+    };
+    state.schedules.set(schedule.id, schedule);
+    return { ...schedule };
+  }
+
+  async listSchedules(workspaceId: string): Promise<Schedule[]> {
+    return [...this.require(workspaceId).schedules.values()]
+      .map((s) => ({ ...s }))
+      .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  }
+
+  async updateSchedule(
+    workspaceId: string,
+    scheduleId: string,
+    patch: UpdateScheduleInput,
+  ): Promise<Schedule | undefined> {
+    const schedule = this.require(workspaceId).schedules.get(scheduleId);
+    if (!schedule) return undefined;
+    if (patch.name !== undefined) schedule.name = patch.name;
+    if (patch.cadenceMinutes !== undefined) schedule.cadenceMinutes = patch.cadenceMinutes;
+    if (patch.enabled !== undefined) schedule.enabled = patch.enabled;
+    if (patch.nextRunAt !== undefined) schedule.nextRunAt = patch.nextRunAt;
+    return { ...schedule };
+  }
+
+  async deleteSchedule(workspaceId: string, scheduleId: string): Promise<boolean> {
+    return this.require(workspaceId).schedules.delete(scheduleId);
+  }
+
+  async dueSchedules(now: string): Promise<Schedule[]> {
+    const due: Schedule[] = [];
+    for (const state of this.ws.values()) {
+      for (const s of state.schedules.values()) {
+        if (s.enabled && s.nextRunAt <= now) due.push({ ...s });
+      }
+    }
+    return due.sort((a, b) => a.nextRunAt.localeCompare(b.nextRunAt) || a.id.localeCompare(b.id));
+  }
+
+  async markScheduleRan(scheduleId: string, ranAt: string, nextRunAt: string): Promise<void> {
+    for (const state of this.ws.values()) {
+      const s = state.schedules.get(scheduleId);
+      if (s) {
+        s.lastRunAt = ranAt;
+        s.nextRunAt = nextRunAt;
+        return;
+      }
+    }
   }
 
   async listAudit(workspaceId: string): Promise<AuditEvent[]> {

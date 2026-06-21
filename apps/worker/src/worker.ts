@@ -2,6 +2,7 @@ import { DrizzleStore } from "@cel/api";
 import { createDb } from "@cel/db";
 import { createBlobUploader } from "./blob.js";
 import { drain } from "./poller.js";
+import { tickSchedules } from "./scheduler.js";
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -18,6 +19,12 @@ async function main(): Promise<void> {
   console.log(`cel-worker started — polling jobs every ${intervalMs}ms`);
 
   for (;;) {
+    try {
+      const enqueued = await tickSchedules(db, store);
+      if (enqueued > 0) console.log(`scheduler enqueued ${enqueued} job(s)`);
+    } catch (err) {
+      console.error("scheduler error:", err);
+    }
     try {
       const n = await drain(db, store, blob);
       if (n > 0) console.log(`processed ${n} job(s)`);

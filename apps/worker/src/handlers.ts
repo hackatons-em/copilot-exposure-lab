@@ -39,6 +39,8 @@ export async function dispatch(ctx: JobContext, job: Job): Promise<JobResult> {
         const summary = await store.runScan(job.workspaceId, { actorId: job.payload.actorId as string | undefined });
         return { ok: true, detail: summary };
       }
+      // "report" is the schedule action alias for the report-gen job type.
+      case "report":
       case "report-gen": {
         const format = (job.payload.format as ReportFormat) ?? "markdown";
         const report = await store.createReport(job.workspaceId, format);

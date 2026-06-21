@@ -19,9 +19,13 @@ beforeAll(async () => {
   const db = drizzle(client, { schema });
   const here = dirname(fileURLToPath(import.meta.url));
   const migDir = resolve(here, "../../../packages/db/drizzle");
-  const sqlFile = readdirSync(migDir).find((f) => f.endsWith(".sql"));
-  if (!sqlFile) throw new Error("no migration SQL found");
-  await client.exec(readFileSync(resolve(migDir, sqlFile), "utf8"));
+  const sqlFiles = readdirSync(migDir)
+    .filter((f) => f.endsWith(".sql"))
+    .sort();
+  if (sqlFiles.length === 0) throw new Error("no migration SQL found");
+  for (const f of sqlFiles) {
+    await client.exec(readFileSync(resolve(migDir, f), "utf8"));
+  }
   store = new DrizzleStore(db as unknown as Database);
 });
 

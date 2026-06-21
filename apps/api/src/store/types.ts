@@ -40,6 +40,40 @@ export interface ScanRunSummary {
   generatedAt: string;
 }
 
+/** What a schedule enqueues when it fires. */
+export type ScheduleAction = "scan" | "report";
+
+/**
+ * A recurring trigger that enqueues a scan (and optional report) job for a
+ * workspace every `cadenceMinutes`. Stored, not engine-derived — hence it lives
+ * with the Store contract rather than in the frozen @cel/types domain.
+ */
+export interface Schedule {
+  id: string;
+  workspaceId: string;
+  name: string;
+  action: ScheduleAction;
+  cadenceMinutes: number;
+  enabled: boolean;
+  lastRunAt?: string;
+  nextRunAt: string;
+  createdAt: string;
+}
+
+export interface CreateScheduleInput {
+  name: string;
+  action?: ScheduleAction;
+  cadenceMinutes: number;
+  nextRunAt?: string;
+}
+
+export interface UpdateScheduleInput {
+  name?: string;
+  cadenceMinutes?: number;
+  enabled?: boolean;
+  nextRunAt?: string;
+}
+
 /**
  * Persistence + workflow boundary for the API. Two implementations:
  * MemoryStore (tests + demo) and DrizzleStore (Postgres). Routes only see this.
@@ -84,4 +118,19 @@ export interface Store {
 
   listAudit(workspaceId: string): Promise<AuditEvent[]>;
   logAudit(event: Omit<AuditEvent, "id" | "at"> & { at?: string }): Promise<AuditEvent>;
+
+  // ── Schedules ──────────────────────────────────────────────
+  /** Create a schedule. nextRunAt defaults to now + cadenceMinutes. */
+  createSchedule(workspaceId: string, input: CreateScheduleInput): Promise<Schedule>;
+  listSchedules(workspaceId: string): Promise<Schedule[]>;
+  updateSchedule(
+    workspaceId: string,
+    scheduleId: string,
+    patch: UpdateScheduleInput,
+  ): Promise<Schedule | undefined>;
+  deleteSchedule(workspaceId: string, scheduleId: string): Promise<boolean>;
+  /** Enabled schedules across ALL workspaces whose nextRunAt is at or before `now`. */
+  dueSchedules(now: string): Promise<Schedule[]>;
+  /** Record that a schedule fired at `ranAt` and advance its nextRunAt. */
+  markScheduleRan(scheduleId: string, ranAt: string, nextRunAt: string): Promise<void>;
 }

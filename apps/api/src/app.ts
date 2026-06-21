@@ -42,6 +42,17 @@ const findingPatch = z.object({
   applyFix: z.boolean().optional(),
 });
 
+const createScheduleBody = z.object({
+  name: z.string().min(1),
+  action: z.enum(["scan", "report"]).optional(),
+  cadenceMinutes: z.number().int().positive(),
+});
+const schedulePatch = z.object({
+  name: z.string().min(1).optional(),
+  cadenceMinutes: z.number().int().positive().optional(),
+  enabled: z.boolean().optional(),
+});
+
 /** Build the Fastify app over a Store. Pure of any transport/db specifics. */
 export function buildApp(opts: BuildAppOptions): FastifyInstance {
   const app = Fastify({ logger: opts.logger ?? false });
@@ -235,6 +246,54 @@ export function buildApp(opts: BuildAppOptions): FastifyInstance {
       .header("content-type", contentType)
       .header("content-disposition", `attachment; filename="${content.filename}"`)
       .send(content.content);
+  });
+
+  // ── Schedules ──────────────────────────────────────────────
+  // A schedule periodically enqueues a scan (or report) job for a workspace.
+  app.post("/api/workspaces/:id/schedules", async (req, reply) => {
+    const { id } = req.params as { id: string };
+    await requireWorkspace(id);
+    const body = createScheduleBody.parse(req.body ?? {});
+    const schedule = await store.createSchedule(id, body);
+    await store.logAudit({
+      workspaceId: id,
+      actor: "api",
+      action: "schedule.create",
+      targetId: schedule.id,
+      detail: { name: schedule.name, action: schedule.action, cadenceMinutes: schedule.cadenceMinutes },
+    });
+    return reply.status(201).send(schedule);
+  });
+
+  app.get("/api/workspaces/:id/schedules", async (req) => {
+    const { id } = req.params as { id: string };
+    await requireWorkspace(id);
+    return store.listSchedules(id);
+  });
+
+  app.patch("/api/workspaces/:id/schedules/:sid", async (req) => {
+    const { id, sid } = req.params as { id: string; sid: string };
+    await requireWorkspace(id);
+    const patch = schedulePatch.parse(req.body ?? {});
+    const schedule = await store.updateSchedule(id, sid, patch);
+    if (!schedule) throw Object.assign(new Error("schedule not found"), { statusCode: 404 });
+    await store.logAudit({
+      workspaceId: id,
+      actor: "api",
+      action: "schedule.update",
+      targetId: sid,
+      detail: { ...patch },
+    });
+    return schedule;
+  });
+
+  app.delete("/api/workspaces/:id/schedules/:sid", async (req, reply) => {
+    const { id, sid } = req.params as { id: string; sid: string };
+    await requireWorkspace(id);
+    const deleted = await store.deleteSchedule(id, sid);
+    if (!deleted) throw Object.assign(new Error("schedule not found"), { statusCode: 404 });
+    await store.logAudit({ workspaceId: id, actor: "api", action: "schedule.delete", targetId: sid });
+    return reply.status(204).send();
   });
 
   // ── Exports ────────────────────────────────────────────────
