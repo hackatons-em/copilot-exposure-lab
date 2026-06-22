@@ -139,10 +139,10 @@ test("/product page tours every surface", async ({ page }) => {
   await expect(page.getByRole("heading", { name: /The exact path to the data/i })).toBeVisible(VISIBLE);
 });
 
-test("/pricing shows the three tiers and comparison", async ({ page }) => {
+test("/pricing shows the four tiers and comparison", async ({ page }) => {
   await page.goto("/pricing");
   await expect(page.getByRole("heading", { name: /Start free\. Scale to always-on\./i })).toBeVisible(VISIBLE);
-  for (const tier of ["Free", "Team", "Enterprise"]) {
+  for (const tier of ["Free", "Starter", "Growth", "Enterprise"]) {
     await expect(page.getByRole("heading", { name: new RegExp(`^${tier}$`) }).first()).toBeVisible(VISIBLE);
   }
   await expect(page.getByRole("heading", { name: /Compare plans/i })).toBeVisible(VISIBLE);

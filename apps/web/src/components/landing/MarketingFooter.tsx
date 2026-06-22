@@ -2,8 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { API_URL } from "@/lib/config";
 
-const SAMPLE_REPORT_URL =
-  "https://github.com/hackatons-em/copilot-exposure-lab/blob/main/docs/sample-report/acme-exposure-report.md";
+const SAMPLE_REPORT_URL = "/sample-report.html";
 
 interface FooterLink {
   href: string;

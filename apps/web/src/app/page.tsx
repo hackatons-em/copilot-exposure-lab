@@ -19,8 +19,7 @@ import { TIERS } from "@/lib/pricing";
  * text are load-bearing (asserted by Playwright) and must not change wording.
  */
 
-const SAMPLE_REPORT_URL =
-  "https://github.com/hackatons-em/copilot-exposure-lab/blob/main/docs/sample-report/acme-exposure-report.md";
+const SAMPLE_REPORT_URL = "/sample-report.html";
 
 const STEPS = [
   {
@@ -293,7 +292,7 @@ export default function LandingPage() {
               </p>
             </Reveal>
 
-            <div className="mt-12 grid gap-4 md:grid-cols-3">
+            <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {TIERS.map((tier, i) => (
                 <Reveal key={tier.id} delay={i * 70}>
                   <div

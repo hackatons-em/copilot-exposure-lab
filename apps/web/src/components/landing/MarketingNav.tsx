@@ -4,8 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Logo } from "@/components/Logo";
 
-const SAMPLE_REPORT_URL =
-  "https://github.com/hackatons-em/copilot-exposure-lab/blob/main/docs/sample-report/acme-exposure-report.md";
+const SAMPLE_REPORT_URL = "/sample-report.html";
 
 interface NavLink {
   href: string;

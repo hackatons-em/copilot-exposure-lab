@@ -10,7 +10,7 @@ import { COMPARISON, PRICING_FAQ, PRICING_NOTE, TIERS, type PricingTier } from "
 export const metadata: Metadata = {
   title: "Pricing — Copilot Exposure Lab",
   description:
-    "A free one-time exposure test, Team for always-on monitoring, and Enterprise for large organizations and security service providers. Read-only, never reads file contents, same result every time.",
+    "Start free with a one-time exposure assessment, then Starter or Growth for always-on monitoring priced by tenant size, and Enterprise for large organizations and security service providers. Read-only, never reads file contents, same result every time.",
 };
 
 function Check() {
@@ -93,7 +93,7 @@ export default function PricingPage() {
               <p className="mt-3 font-mono text-[11px] uppercase tracking-wider text-ink-faint">{PRICING_NOTE}</p>
             </Reveal>
 
-            <div className="mt-14 grid gap-5 text-left md:grid-cols-3">
+            <div className="mt-14 grid gap-5 text-left sm:grid-cols-2 lg:grid-cols-4">
               {TIERS.map((tier, i) => (
                 <Reveal key={tier.id} delay={i * 80}>
                   <TierCard tier={tier} />
@@ -132,16 +132,18 @@ export default function PricingPage() {
                   {COMPARISON.map((group) => (
                     <Fragment key={group.group}>
                       <tr className="bg-surface-subtle/60">
-                        <td colSpan={4} className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-ink-faint">
+                        <td colSpan={TIERS.length + 1} className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-ink-faint">
                           {group.group}
                         </td>
                       </tr>
                       {group.rows.map((row) => (
                         <tr key={row.label} className="border-b border-hairline last:border-0">
                           <td className="px-4 py-3 text-ink-soft">{row.label}</td>
-                          <td className="px-4 py-3 text-center"><Cell value={row.free} /></td>
-                          <td className="px-4 py-3 text-center"><Cell value={row.team} /></td>
-                          <td className="px-4 py-3 text-center"><Cell value={row.enterprise} /></td>
+                          {TIERS.map((t) => (
+                            <td key={t.id} className="px-4 py-3 text-center">
+                              <Cell value={row.values[t.id]} />
+                            </td>
+                          ))}
                         </tr>
                       ))}
                     </Fragment>

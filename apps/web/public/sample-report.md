@@ -1,0 +1,263 @@
+# Copilot Exposure Assessment Report
+
+**Prepared for:** Acme Health Finance Ltd  
+**Generated:** 2026-06-21T00:00:00.000Z  
+**Scope:** Microsoft 365 SharePoint / OneDrive permissions, sharing links, and Copilot Studio agents (metadata only).
+
+## 1. Executive Summary
+
+**Tenant exposure score: 98/100 (Critical).** Derived deterministically from the findings below — applying a fix and re-scanning lowers it.
+
+Top drivers of the score:
+- Sensitive file shared through an organization-wide link
+- Sensitive file inherits broad read from its parent site
+- Agent can take a risky external action
+
+This assessment surfaced **9 exposure findings** — 1 critical, 4 high, 4 medium, 0 low. The highest-risk paths are listed below; each has an evidence chain and a Microsoft-native remediation. Risk scores are deterministic and evidence-backed.
+
+## 2. Top Risks by Business Impact
+
+1. **Sensitive file shared through an organization-wide link** — Critical (91/100). _(MITRE T1213.002, T1530)_ Any of 7 users — and anyone a link is forwarded to — can open 2026_salary_plan.xlsx. Copilot can surface it to all of them.
+2. **Sensitive file inherits broad read from its parent site** — High (75/100). _(MITRE T1213.002, T1530)_ 2026_acquisition_strategy.pptx is readable by the whole organization through inherited site permissions — likely unintended for board-level content.
+3. **Agent can take a risky external action** — High (71/100). _(MITRE T1567)_ Helpdesk Assistant could send sensitive summaries to external recipients on a user's behalf. Combined with broad data access, that is an exfiltration path.
+4. **External guest retains access to a confidential resource** — High (70/100). _(MITRE T1078.004, T1530)_ A contractor/guest outside the company can reach Project Phoenix. If their account or domain is compromised, so is this content.
+5. **Sensitive file exposed to a broad department group** — High (70/100). _(MITRE T1213.002)_ 42 people in Sales Team can open master_services_agreement.pdf, far beyond its intended audience.
+
+## 3. Threat Framework Coverage
+
+Each finding maps deterministically (by rule) to the adversary techniques it enables and the controls that address it. These framework references route findings into existing security programs; they never influence the score.
+
+**MITRE ATT&CK** — 5 technique(s) across 3 tactic(s): Collection, Exfiltration, Persistence.
+
+| Technique | Name | Tactic |
+|---|---|---|
+| `T1078` | Valid Accounts | Persistence |
+| `T1078.004` | Valid Accounts: Cloud Accounts | Persistence |
+| `T1213.002` | Data from Information Repositories: SharePoint | Collection |
+| `T1530` | Data from Cloud Storage | Collection |
+| `T1567` | Exfiltration Over Web Service | Exfiltration |
+
+**Mapped controls:** CISA SCuBA M365 guest (Review and expire external guest access) · CISA SCuBA M365 sharing (Restrict external & org-wide sharing of sensitive content) · CISA SCuBA Purview (Apply and enforce sensitivity labels) · NIST 800-53 AC-2 (Account Management) · NIST 800-53 AC-3 (Access Enforcement) · NIST 800-53 AC-6 (Least Privilege) · NIST 800-53 CM-7 (Least Functionality) · NIST 800-53 RA-2 (Security Categorization) · NIST 800-53 SC-7 (Boundary Protection)
+
+## 4. Exposure by Rule
+
+Heat map of findings grouped by rule (rows) across severity bands (columns).
+
+| Rule | Critical | High | Medium | Low | Info | Total |
+|---|---:|---:|---:|---:|---:|---:|
+| `org-wide-link` | 1 | · | · | · | · | 1 |
+| `broad-dept-access` | · | 1 | 1 | · | · | 2 |
+| `agent-send-action` | · | 1 | · | · | · | 1 |
+| `inherited-broad-read` | · | 1 | · | · | · | 1 |
+| `stale-external-access` | · | 1 | · | · | · | 1 |
+| `missing-label` | · | · | 1 | · | · | 1 |
+| `orphaned-agent-owner` | · | · | 1 | · | · | 1 |
+| `risky-connector` | · | · | 1 | · | · | 1 |
+
+## 5. Findings by Severity
+
+| Severity | Score | Finding | Resource |
+|---|---:|---|---|
+| Critical | 91 | Sensitive file shared through an organization-wide link | `f-salary` |
+| High | 75 | Sensitive file inherits broad read from its parent site | `f-acq` |
+| High | 71 | Agent can take a risky external action | `a-helpdesk` |
+| High | 70 | External guest retains access to a confidential resource | `s-phoenix` |
+| High | 70 | Sensitive file exposed to a broad department group | `f-msa` |
+| Medium | 66 | Sensitive file exposed to a broad department group | `f-launch` |
+| Medium | 59 | Agent owned by a departed or inactive maker | `a-helpdesk` |
+| Medium | 55 | Agent or flow uses a risky data-egress connector | `a-salesflow` |
+| Medium | 55 | Sensitive file is missing a sensitivity label | `f-token` |
+
+## 6. Scope and Methodology
+
+- Metadata ingestion of users, groups, sites, drives, files, permissions, sharing links, and agents.
+- Permission-graph construction (group expansion, inheritance, links, guests, org-wide access).
+- Deterministic exposure scenarios executed against the graph.
+- Deterministic 0-100 risk scoring — severity is computed, never generated by an LLM.
+
+Scenarios run:
+- **Normal employee** — Normal employee: 3 finding(s) — 1 critical, 1 high, 1 medium.
+- **Contractor / guest** — Contractor / guest: 1 finding(s) — 1 high.
+- **Broad sharing** — Broad sharing: 4 finding(s) — 1 critical, 2 high, 1 medium.
+- **Sensitive file** — Sensitive file: 5 finding(s) — 1 critical, 2 high, 2 medium.
+- **Agent action** — Agent action: 2 finding(s) — 1 high, 1 medium.
+- **Departing employee** — Departing employee: 2 finding(s) — 1 high, 1 medium.
+- **Ransomware blast radius** — Ransomware blast radius: 5 finding(s) — 1 critical, 3 high, 1 medium.
+
+## 7. Critical & High Finding Detail
+
+### fnd-c1be79bf — Sensitive file shared through an organization-wide link
+
+- **Severity:** Critical (91/100)
+- **Status:** open
+- **Resource:** `f-salary`
+- **Summary:** 2026_salary_plan.xlsx is reachable through an organization-wide sharing link.
+
+> **Why this matters:** Any of 7 users — and anyone a link is forwarded to — can open 2026_salary_plan.xlsx. Copilot can surface it to all of them.
+
+**Exposure path:** Bob Novak →(member of)→ Everyone Except External Users →(via)→ organization-wide link →(to)→ 2026_salary_plan.xlsx
+
+**Evidence chain:**
+- _(link)_ Sharing link scope = organization-wide (read) `[link:pg-issue1-salary-orgwide]`
+- _(permission)_ Grants read access to Everyone Except External Users `[permission:pg-issue1-salary-orgwide]`
+- _(membership)_ Reachable by 7 internal user(s) `[group:g-everyone]`
+- _(sensitivity)_ Sensitive content: salary, payroll, compensation, hr `[file:f-salary]`
+
+**Score breakdown:** sensitivity 25 · exposureBreadth 20 · externalReach 12 · agentActionRisk 14 · governanceGap 5 · businessCriticality 10 · confidence 5
+
+**Remediation (SharePoint sharing policy + Purview sensitivity label):** Remove the organization-wide link and restrict to the intended audience
+  1. Delete the organization-wide / 'people in your org' sharing link on the file.
+  1. Grant access only to the specific team that needs it (e.g. HR Leadership).
+  1. Apply a sensitivity label (e.g. Confidential) to enforce handling downstream.
+  1. Set the SharePoint site/library default sharing to 'Specific people'.
+
+### fnd-1cb3d835 — Sensitive file inherits broad read from its parent site
+
+- **Severity:** High (75/100)
+- **Status:** open
+- **Resource:** `f-acq`
+- **Summary:** 2026_acquisition_strategy.pptx inherits broad read from Board Room.
+
+> **Why this matters:** 2026_acquisition_strategy.pptx is readable by the whole organization through inherited site permissions — likely unintended for board-level content.
+
+**Exposure path:** Bob Novak →(member of)→ Everyone Except External Users →(to)→ Board Room →(inherited by)→ 2026_acquisition_strategy.pptx
+
+**Evidence chain:**
+- _(permission)_ Site Board Room grants read to Everyone Except External Users `[site:s-board]`
+- _(permission)_ 2026_acquisition_strategy.pptx inherits this read grant (inheritance not broken) `[permission:pg-issue3-board-everyone]`
+- _(membership)_ Everyone Except External Users effectively covers the whole organization `[group:g-everyone]`
+- _(sensitivity)_ Sensitive content: acquisition, board, confidential, executive `[file:f-acq]`
+
+**Score breakdown:** sensitivity 25 · exposureBreadth 17 · externalReach 2 · agentActionRisk 13 · governanceGap 4 · businessCriticality 10 · confidence 4
+
+**Remediation (SharePoint unique permissions):** Break inheritance and remove whole-org read on sensitive content
+  1. Stop inheriting permissions on the sensitive library/file.
+  1. Remove the 'Everyone except external users' read grant inherited from the site.
+  1. Grant access explicitly to the board/executive audience only.
+
+### fnd-cfde412c — Agent can take a risky external action
+
+- **Severity:** High (71/100)
+- **Status:** open
+- **Resource:** `a-helpdesk`
+- **Summary:** Helpdesk Assistant can mail.send and external.connector — a risky action for an agent over company data.
+
+> **Why this matters:** Helpdesk Assistant could send sensitive summaries to external recipients on a user's behalf. Combined with broad data access, that is an exfiltration path.
+
+**Exposure path:** _n/a_
+
+**Evidence chain:**
+- _(agent-config)_ Agent actions enabled: mail.send, external.connector `[agent:a-helpdesk]`
+- _(action)_ Connectors: Office365Outlook, HTTPWithAzureAD `[action:a-helpdesk]`
+- _(ownership)_ Authentication mode: maker; owner: Tomas Berg `[user:u-tomas]`
+
+**Score breakdown:** sensitivity 15 · exposureBreadth 10 · externalReach 11 · agentActionRisk 15 · governanceGap 7 · businessCriticality 8 · confidence 5
+
+**Remediation (Copilot Studio governance + Power Platform DLP policy):** Restrict the agent's risky actions and connectors
+  1. Remove or gate the agent's send-mail / external connector actions.
+  1. Require approval / DLP policy for outbound actions from agents.
+  1. Scope the agent's data access to only what it needs.
+
+### fnd-41eb6688 — External guest retains access to a confidential resource
+
+- **Severity:** High (70/100)
+- **Status:** open
+- **Resource:** `s-phoenix`
+- **Summary:** External user Dev Patel still has access to Project Phoenix (expired).
+
+> **Why this matters:** A contractor/guest outside the company can reach Project Phoenix. If their account or domain is compromised, so is this content.
+
+**Exposure path:** Dev Patel →(to)→ Project Phoenix
+
+**Evidence chain:**
+- _(permission)_ Guest grant: Dev Patel has read on Project Phoenix `[permission:pg-issue4-phoenix-contractor]`
+- _(permission)_ Access expired 2025-12-31T00:00:00.000Z but was never removed `[permission:pg-issue4-phoenix-contractor]`
+- _(ownership)_ Dev Patel is an external user (dev.patel@contoso-contractors.com) `[user:u-dev]`
+- _(sensitivity)_ Sensitive content: confidential, project `[site:s-phoenix]`
+
+**Score breakdown:** sensitivity 20 · exposureBreadth 8 · externalReach 12 · agentActionRisk 8 · governanceGap 9 · businessCriticality 8 · confidence 5
+
+**Remediation (Entra ID access reviews + SharePoint guest expiration):** Revoke the external guest's access and enforce expiration
+  1. Remove the guest's access to the site/file.
+  1. Review and disable the guest account in Entra ID if the engagement ended.
+  1. Enable guest access reviews and link expiration so this can't recur.
+
+### fnd-8463e035 — Sensitive file exposed to a broad department group
+
+- **Severity:** High (70/100)
+- **Status:** open
+- **Resource:** `f-msa`
+- **Summary:** master_services_agreement.pdf is readable by the entire Sales Team (42 members).
+
+> **Why this matters:** 42 people in Sales Team can open master_services_agreement.pdf, far beyond its intended audience.
+
+**Exposure path:** Sales Team →(to)→ Customer Contracts →(inherited by)→ master_services_agreement.pdf
+
+**Evidence chain:**
+- _(permission)_ Grants read to Sales Team (42 members) `[permission:pg-issue2-contracts-sales]`
+- _(permission)_ Permission inherited from Customer Contracts `[site:s-contracts]`
+- _(membership)_ Sales Team has 42 members `[group:g-sales]`
+- _(sensitivity)_ Sensitive content: contract, customer, legal `[file:f-msa]`
+
+**Score breakdown:** sensitivity 21 · exposureBreadth 17 · externalReach 2 · agentActionRisk 13 · governanceGap 4 · businessCriticality 8 · confidence 5
+
+**Remediation (SharePoint permissions + Entra group membership):** Narrow the broad group grant to the intended audience
+  1. Replace the broad department group on the site/library with a scoped security group.
+  1. Review and break role inheritance where the broad grant flows down.
+  1. Confirm the new audience with the content owner.
+
+## 8. Remediation Roadmap
+
+**Prioritized plan — fix these 8 first to drop the tenant exposure score 98 → 55 (−43).** Ordered by score reduction per unit of effort.
+
+| # | Finding | Severity | Effort | Score −Δ | Cumulative |
+|---:|---|---|---|---:|---:|
+| 1 | Sensitive file shared through an organization-wide link | Critical | low | −18 | −18 |
+| 2 | Sensitive file inherits broad read from its parent site | High | medium | −5 | −23 |
+| 3 | External guest retains access to a confidential resource | High | low | −1 | −24 |
+| 4 | Agent can take a risky external action | High | medium | −2 | −26 |
+| 5 | Sensitive file exposed to a broad department group | High | medium | −5 | −31 |
+| 6 | Sensitive file exposed to a broad department group | Medium | medium | −7 | −38 |
+| 7 | Agent owned by a departed or inactive maker | Medium | low | −4 | −42 |
+| 8 | Sensitive file is missing a sensitivity label | Medium | low | −1 | −43 |
+
+Remediation sequenced by effort — quick wins first, most severe within each lane.
+
+**Quick wins (low effort)**
+
+| Finding | Microsoft control | Severity | Status |
+|---|---|---|---|
+| Sensitive file shared through an organization-wide link | SharePoint sharing policy + Purview sensitivity label | Critical (91) | todo |
+| External guest retains access to a confidential resource | Entra ID access reviews + SharePoint guest expiration | High (70) | todo |
+| Agent owned by a departed or inactive maker | Power Platform managed environments + ownership review | Medium (59) | todo |
+| Sensitive file is missing a sensitivity label | Microsoft Purview sensitivity labels + auto-labeling | Medium (55) | todo |
+
+**Planned (medium effort)**
+
+| Finding | Microsoft control | Severity | Status |
+|---|---|---|---|
+| Sensitive file inherits broad read from its parent site | SharePoint unique permissions | High (75) | todo |
+| Agent can take a risky external action | Copilot Studio governance + Power Platform DLP policy | High (71) | todo |
+| Sensitive file exposed to a broad department group | SharePoint permissions + Entra group membership | High (70) | todo |
+| Sensitive file exposed to a broad department group | SharePoint permissions + Entra group membership | Medium (66) | todo |
+| Agent or flow uses a risky data-egress connector | Microsoft 365 admin controls | Medium (55) | todo |
+
+**Project (high effort)**
+
+_None._
+
+## 9. Proof-of-Fix
+
+_No findings have been remediated and re-verified yet._
+
+## 10. Limitations
+
+- Metadata-only mode may miss content-sensitive issues inside documents.
+- Findings depend on the approved scan scope.
+- This product does not guarantee Copilot safety; it surfaces and prioritizes exposure paths.
+
+## 11. Data Handling
+
+- Document contents, email bodies, and credentials are not stored.
+- Only metadata, permission grants, findings, evidence references, and reports are retained.
+- Workspace deletion removes all associated data.
