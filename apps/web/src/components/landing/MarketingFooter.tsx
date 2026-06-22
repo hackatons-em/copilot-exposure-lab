@@ -63,7 +63,8 @@ export function MarketingFooter() {
         <div className="max-w-xs">
           <Logo />
           <p className="mt-3 text-xs leading-relaxed text-ink-faint">
-            Know what Copilot would expose — before you turn it on. Read-only, metadata-only, Microsoft-native.
+            Know what Microsoft 365 Copilot would expose before you turn it on. Read-only, built for Microsoft, and it
+            never reads your file contents.
           </p>
         </div>
         {COLUMNS.map((col) => (

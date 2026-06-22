@@ -4,7 +4,7 @@ import { MarketingChrome } from "@/components/landing/MarketingChrome";
 export const metadata: Metadata = {
   title: "The State of Copilot Exposure — Copilot Exposure Lab",
   description:
-    "A point-of-view on why Microsoft 365 Copilot turns a decade of quiet oversharing into an instant data-exposure problem, and the archetypes a deterministic engine finds before rollout.",
+    "Why Microsoft 365 Copilot turns a decade of quiet over-sharing into an instant data-exposure problem, and the eight patterns our engine finds before you turn it on.",
 };
 
 const DOC_URL =
@@ -22,10 +22,10 @@ const ARCHETYPES = [
 ];
 
 const FIGURES = [
-  { value: "~5,060", label: "resources in the reference tenant" },
-  { value: "~6,380", label: "permission grants" },
-  { value: "~1,330", label: "exposure findings per scan" },
-  { value: "~14 / ~850", label: "critical / high paths" },
+  { value: "~5,060", label: "files, sites, and other items" },
+  { value: "~6,380", label: "grants of who-can-open-what" },
+  { value: "~1,330", label: "exposure findings per test" },
+  { value: "~14 / ~850", label: "critical / high-risk paths" },
 ];
 
 export default function ResearchPage() {
@@ -36,10 +36,12 @@ export default function ResearchPage() {
         The State of Copilot Exposure
       </h1>
       <p className="mt-5 text-lg leading-relaxed text-ink-soft">
-        Permissions accreted over a decade — &ldquo;share with everyone&rdquo;, broad groups, guests never offboarded,
-        un-audited inheritance. It was never urgent, because reaching a file still meant knowing it existed.{" "}
-        <span className="text-ink">Copilot removes that friction.</span> One prompt retrieves anything the asker is
-        permitted to see. The latent permission surface becomes an active retrieval surface overnight.
+        Over a decade, access piles up: files shared with everyone, broad groups, outside guests who were never removed,
+        and permissions quietly passed down through folders that no one reviewed. It never felt urgent, because finding
+        a file still meant knowing it existed in the first place.{" "}
+        <span className="text-ink">Copilot removes that last bit of friction.</span> One question pulls up anything the
+        person asking is allowed to see. Years of forgotten over-sharing turn into something anyone can stumble into,
+        overnight.
       </p>
 
       <div className="mt-6 rounded-2xl border border-severity-medium/30 bg-severity-medium-soft/40 px-5 py-4">
@@ -52,9 +54,10 @@ export default function ResearchPage() {
       </div>
 
       <section className="mt-16">
-        <h2 className="font-display text-2xl font-semibold tracking-tightest text-ink">The eight exposure archetypes</h2>
+        <h2 className="font-display text-2xl font-semibold tracking-tightest text-ink">The eight ways files get exposed</h2>
         <p className="mt-2 text-base text-ink-soft">
-          Each is evidence-backed, scored 0–100, and mapped to MITRE ATT&amp;CK + control frameworks.
+          These are the eight patterns we look for. Each one comes with evidence, a 0–100 risk score, and a mapping to
+          MITRE ATT&amp;CK and the other standard security frameworks teams already report against.
         </p>
         <div className="mt-6 overflow-hidden rounded-2xl border border-hairline bg-surface shadow-elevation">
           <table className="w-full border-collapse text-sm">
@@ -73,7 +76,7 @@ export default function ResearchPage() {
       <section className="mt-16">
         <h2 className="font-display text-2xl font-semibold tracking-tightest text-ink">Illustrative figures</h2>
         <p className="mt-2 text-base text-ink-soft">
-          Synthetic reference tenant (~1,100 principals), scanned in well under a second.
+          From a made-up example company of about 1,100 people, tested in well under a second.
         </p>
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
           {FIGURES.map((f) => (
@@ -84,9 +87,10 @@ export default function ResearchPage() {
           ))}
         </div>
         <p className="mt-5 text-base leading-relaxed text-ink-soft">
-          The headline isn&rsquo;t any single percentage — it&rsquo;s <strong className="text-ink">volume × reachability</strong>.
-          At this scale manual review is hopeless; deterministic scoring and ranked, evidence-backed findings are what
-          make the surface governable.
+          The real story isn&rsquo;t any single number. It&rsquo;s{" "}
+          <strong className="text-ink">how much there is, multiplied by how easily Copilot can reach it</strong>. At
+          this scale, checking by hand is hopeless. A risk score that&rsquo;s the same every time, plus findings ranked
+          by risk and backed by evidence, are what make the problem manageable.
         </p>
       </section>
 

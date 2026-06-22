@@ -51,7 +51,8 @@ export function IntegrationBand() {
           </div>
         </div>
         <p className="mt-6 text-center text-xs text-ink-faint">
-          Read-only, metadata-only. We don&rsquo;t replace these — we make their exposure visible and fixable.
+          Read-only, and we never read file contents. We don&rsquo;t replace these tools. We show where they leave data
+          exposed, and how to fix it.
         </p>
       </div>
     </section>

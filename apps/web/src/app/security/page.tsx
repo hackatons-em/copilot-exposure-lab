@@ -4,40 +4,40 @@ import { MarketingChrome } from "@/components/landing/MarketingChrome";
 export const metadata: Metadata = {
   title: "Security & Trust — Copilot Exposure Lab",
   description:
-    "How Copilot Exposure Lab handles your data: read-only metadata-only Microsoft Graph access, deterministic scoring, audited writes, and an honest compliance roadmap.",
+    "How Copilot Exposure Lab handles your data: read-only access through Microsoft Graph, we never read file contents, a risk score that's the same every time, a full audit trail, and an honest compliance status.",
 };
 
 const SCOPES = [
-  { scope: "User.Read.All", why: "Resolve who principals are and whether accounts are active (offboarding gaps)." },
-  { scope: "Group.Read.All", why: "Expand group membership to compute who can actually reach a resource." },
-  { scope: "Sites.Read.All", why: "Read site/library structure, sensitivity labels, and inheritance." },
-  { scope: "Files.Read.All", why: "Read file metadata, sharing links, and permissions — never contents." },
+  { scope: "User.Read.All", why: "See who each account belongs to and whether it's still active, so we can catch people who left but were never removed." },
+  { scope: "Group.Read.All", why: "See who is in which group, so we can work out who can actually reach a given file." },
+  { scope: "Sites.Read.All", why: "See how SharePoint sites and libraries are structured, their sensitivity labels, and which permissions are passed down." },
+  { scope: "Files.Read.All", why: "See file details, sharing links, and who can open each file — never the contents of the files." },
 ];
 
 const INVARIANTS = [
   {
-    title: "Metadata-only",
-    body: "We ingest labels, permissions, group membership, sharing links, and agent configuration. We never store document contents, email bodies, Teams messages, or credentials.",
+    title: "We never read file contents",
+    body: "We read only descriptive details: sensitivity labels, who can open what, who is in which group, sharing links, and AI assistant settings. We never store the contents of documents, emails, or Teams messages, or any passwords.",
   },
   {
-    title: "Least privilege, read-only",
-    body: "Every Graph scope is read-only and scope-limited. There are no write scopes — the product cannot modify your tenant, by construction.",
+    title: "Read-only, minimum access",
+    body: "We ask only for read-only access, and only to what we need. We have no permission to change anything, so the product cannot modify your tenant. That isn't a promise; it's built that way.",
   },
   {
-    title: "No auto-remediation",
-    body: "Generated fix scripts are advisory. They are never executed by the product; a human reviews and runs them.",
+    title: "We never apply fixes for you",
+    body: "The fixes we write are advice. The product never runs them. A person on your team reviews each one and decides whether to run it.",
   },
   {
-    title: "Deterministic scoring",
-    body: "Severity comes from a transparent 0–100 model — same input, same score. LLMs may summarize, but never decide risk or invent facts. The rule engine imports no AI SDK (enforced in CI).",
+    title: "A risk score you can check",
+    body: "Risk comes from a clear 0–100 model with deterministic scoring (the same inputs always produce the same score — no guessing, fully auditable). AI may help write summaries, but never decides risk or makes up facts. Our risk engine contains no AI code at all, and we test for that on every change.",
   },
   {
-    title: "Evidence-backed",
-    body: "Every finding carries an evidence chain; every evidence item points at a concrete source object id. No evidence → no finding.",
+    title: "Nothing flagged without proof",
+    body: "Every finding shows its evidence, and every piece of evidence points at a specific file, group, link, or assistant. If there's no evidence, there's no finding.",
   },
   {
-    title: "Audited & isolated",
-    body: "Every state-changing call emits an audit event. Secrets are never logged or returned. Data is scoped per workspace; deleting a workspace removes its data.",
+    title: "Audited and kept separate",
+    body: "Every action that changes anything is recorded in an audit log. Passwords and keys are never logged or shown. Each customer's data is kept separate, and deleting a workspace deletes its data.",
   },
 ];
 
@@ -50,16 +50,19 @@ export default function SecurityPage() {
     <MarketingChrome>
       <Eyebrow>Security &amp; Trust</Eyebrow>
       <h1 className="mt-4 font-display text-4xl font-semibold tracking-tightest text-ink">
-        We hold ourselves to the posture we help you reach.
+        We hold ourselves to the standard we help you reach.
       </h1>
       <p className="mt-5 text-lg leading-relaxed text-ink-soft">
-        Copilot Exposure Lab is a security product. These are architectural invariants enforced in code — not
-        marketing claims.
+        Copilot Exposure Lab is a security product, so trust comes first. The rules below aren't promises in a
+        brochure. They are built into how the product works, and we test for them on every change.
       </p>
 
       <section className="mt-16">
-        <h2 className="font-display text-2xl font-semibold tracking-tightest text-ink">Microsoft Graph scopes</h2>
-        <p className="mt-2 text-base text-ink-soft">Read-only and scope-limited. Each one is explained, not just requested.</p>
+        <h2 className="font-display text-2xl font-semibold tracking-tightest text-ink">What access we ask for</h2>
+        <p className="mt-2 text-base text-ink-soft">
+          These are the exact read-only permissions we request through Microsoft Graph (Microsoft&rsquo;s official API
+          for your 365 data). Each one is explained, not just requested.
+        </p>
         <div className="mt-6 overflow-hidden rounded-2xl border border-hairline bg-surface shadow-elevation">
           <table className="w-full border-collapse text-sm">
             <tbody>
@@ -75,7 +78,7 @@ export default function SecurityPage() {
       </section>
 
       <section className="mt-16">
-        <h2 className="font-display text-2xl font-semibold tracking-tightest text-ink">Data-handling invariants</h2>
+        <h2 className="font-display text-2xl font-semibold tracking-tightest text-ink">How we handle your data</h2>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           {INVARIANTS.map((item) => (
             <div key={item.title} className="h-full rounded-2xl border border-hairline bg-surface p-6 shadow-elevation">
@@ -87,12 +90,13 @@ export default function SecurityPage() {
       </section>
 
       <section className="mt-16 rounded-2xl border border-hairline bg-surface-subtle/60 p-7">
-        <h2 className="font-display text-xl font-semibold tracking-tightest text-ink">Compliance roadmap — honest status</h2>
+        <h2 className="font-display text-xl font-semibold tracking-tightest text-ink">Compliance: where we honestly stand</h2>
         <p className="mt-2 text-base leading-relaxed text-ink-soft">
-          We are early-stage and <strong className="text-ink">not SOC 2 certified yet</strong>. We designed the data
-          handling — metadata-only, least privilege, audit, deletion — to make that path straightforward, and will
-          pursue SOC 2 Type II as we take on production customers. We&rsquo;d rather say this plainly than imply a
-          certification we don&rsquo;t hold.
+          We are early-stage and <strong className="text-ink">not SOC 2 certified yet</strong>. SOC 2 is an independent
+          audit of how a company protects customer data. We built our data handling — read-only, minimum access, full
+          audit trail, easy deletion — to make that audit straightforward, and we&rsquo;ll pursue SOC 2 Type II as we
+          take on production customers. We&rsquo;d rather say this plainly than imply a certification we don&rsquo;t
+          hold.
         </p>
       </section>
 

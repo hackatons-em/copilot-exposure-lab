@@ -18,7 +18,7 @@ import {
 export const metadata: Metadata = {
   title: "Product — Copilot Exposure Lab",
   description:
-    "A surface-by-surface tour: exposure score, attack graph, Copilot simulation, the exact fix, threat model, continuous monitoring, and the board report. Deterministic and evidence-backed.",
+    "A tour, one piece at a time: your risk score, a map of who can reach what, a safe Copilot test, the exact fix, security-framework mapping, ongoing monitoring, and the board report. Backed by evidence, with the same result every time.",
 };
 
 interface Surface {
@@ -32,58 +32,58 @@ interface Surface {
 const SURFACES: Surface[] = [
   {
     eyebrow: "Exposure score",
-    title: "One deterministic number, benchmarked",
-    body: "A transparent 0–100 tenant score aggregates every finding and is benchmarked against comparable tenants. It moves only when the underlying exposure does — so a fix is provable, not assumed.",
-    bullets: ["Auditable 0–100 model", "Peer percentile context", "Trends down as you remediate"],
+    title: "One number, and how you compare",
+    body: "A single 0–100 score sums up your whole organization's exposure and shows how you compare to similar organizations. It uses deterministic scoring (the same inputs always produce the same score — no guessing, fully auditable) and only moves when the real exposure does, so a fix is provable, not assumed.",
+    bullets: ["Auditable 0–100 score", "How you compare to peers", "Goes down as you fix things"],
     Specimen: GaugeSpecimen,
   },
   {
     eyebrow: "Attack graph",
     title: "The exact path to the data",
-    body: "Every finding is a traced chain — who reaches what, through which group, inherited permission, sharing link, or agent. Group expansion, inheritance, guests, and org-wide access are all resolved.",
-    bullets: ["Resolved nested + inherited access", "Worst-severity path highlighted", "Aggregates gracefully at scale"],
+    body: "Every finding is a clear path: who can reach what, and through which group, inherited permission, sharing link, or AI assistant. Access passed down through folders, nested groups, outside guests, and company-wide sharing is all traced for you.",
+    bullets: ["Traces nested and inherited access", "Highlights the riskiest path", "Stays readable at large scale"],
     Specimen: GraphSpecimen,
   },
   {
     eyebrow: "Copilot exposure",
     title: "What Copilot would actually surface",
-    body: "Simulate a prompt as a real persona and see the sensitive documents Copilot would ground on — grounded strictly in what that identity can already access. Deterministic and metadata-only; no LLM decides risk.",
-    bullets: ["Persona-scoped retrieval", "Cited, reachable documents", "No document contents read"],
+    body: "Ask a question as a specific person and see the sensitive documents Copilot would pull up for them — limited strictly to what that person is already allowed to open. It reads only descriptive details, never file contents, and the same question always returns the same result.",
+    bullets: ["Limited to one person's access", "Shows the real files they'd reach", "Never reads file contents"],
     Specimen: CopilotSimSpecimen,
   },
   {
     eyebrow: "Find + Fix",
     title: "The exact Microsoft fix, written for you",
-    body: "Each finding ships a copy-pasteable Microsoft Graph PowerShell / PnP / Power Platform script wired to its real source-object ids. Advisory by design — you review and run it; the product never writes to your tenant.",
-    bullets: ["Wired to real ids", "Per-rule, deterministic", "Never auto-executed"],
+    body: "Each finding comes with the precise Microsoft commands to close it, ready to copy and paste and already pointing at the right files and groups. They are advisory only: your team reviews and runs them, and we never change anything in your tenant.",
+    bullets: ["Pre-filled with the right targets", "Tailored to each finding", "Never run automatically"],
     Specimen: FixScriptSpecimen,
   },
   {
     eyebrow: "Remediation planner",
-    title: "Turn the pile into a roadmap",
-    body: "A deterministic plan ranks fixes by exposure-score reduction per unit of effort — 'fix these 5 to drop 92 → 52'. An interactive what-if projects the score for any set you choose, before you touch the tenant.",
-    bullets: ["Greedy impact/effort ranking", "Live what-if simulation", "Sequenced, board-ready"],
+    title: "Turn the list into a plan",
+    body: "We rank the fixes by how much risk each one removes for the effort involved — for example, fix these five to drop your score from 92 to 52. A live what-if lets you pick any set of fixes and see the projected score before you touch anything.",
+    bullets: ["Ranked by impact for the effort", "Live what-if projection", "Sequenced and board-ready"],
     Specimen: PlannerSpecimen,
   },
   {
     eyebrow: "Threat model",
     title: "Mapped to the frameworks you report on",
-    body: "Every rule maps to MITRE ATT&CK techniques and NIST 800-53 / CISA controls, surfaced on each finding, in the report, and as a coverage matrix — so findings route straight into your existing program.",
-    bullets: ["MITRE ATT&CK techniques", "NIST 800-53 / CISA controls", "Coverage matrix"],
+    body: "Every check maps to MITRE ATT&CK and NIST 800-53 / CISA (the standard security frameworks teams already report against). The mapping shows on each finding, in the report, and as a coverage grid, so findings drop straight into the program you already run.",
+    bullets: ["MITRE ATT&CK techniques", "NIST 800-53 / CISA controls", "Coverage grid"],
     Specimen: ThreatMatrixSpecimen,
   },
   {
     eyebrow: "Continuous monitoring",
-    title: "Prove the fix over time",
-    body: "Schedule re-scans or trigger them on Graph change notifications. The exposure trend and drift show new, resolved, and net change since the last scan — closing the loop from finding to verified fix.",
-    bullets: ["Scheduled + change-driven re-scans", "Trend + drift", "Proof-of-fix re-verification"],
+    title: "Prove the fix keeps holding",
+    body: "Re-test on a schedule, or automatically whenever something changes in your tenant. You see what's new, what's resolved, and the net change since the last test — closing the loop from finding to verified fix.",
+    bullets: ["Scheduled and change-triggered re-tests", "What changed since last time", "Confirms each fix held"],
     Specimen: TrendSpecimen,
   },
   {
     eyebrow: "Board report",
-    title: "A CISO-grade report in one click",
-    body: "Exposure score, an exposure-by-rule heat map, top risks by business impact, threat-framework coverage, and a sequenced remediation roadmap — generated deterministically as Markdown or print-ready HTML.",
-    bullets: ["Deterministic bytes", "Markdown + HTML", "Sentinel / Purview / Jira exports"],
+    title: "A board-ready report in one click",
+    body: "Your exposure score, a heat map of where the risk sits, the top risks by business impact, your security-framework coverage, and a step-by-step fix plan. It generates the same way every time, as a document or a print-ready page.",
+    bullets: ["Identical output every time", "Document or print-ready page", "Exports to Sentinel, Purview, and Jira"],
     Specimen: ReportSpecimen,
   },
 ];
@@ -103,8 +103,8 @@ export default function ProductPage() {
                 Every surface of the drill
               </h1>
               <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-soft">
-                From a single deterministic score down to the exact PowerShell that closes the path — here&rsquo;s the
-                whole product, surface by surface.
+                From a single risk score down to the exact Microsoft command that closes the gap, here is the whole
+                product, one piece at a time.
               </p>
               <div className="mt-9 flex flex-wrap items-center gap-3">
                 <Link
@@ -167,10 +167,10 @@ export default function ProductPage() {
           <div className="mx-auto max-w-6xl px-6 py-28 text-center md:py-36">
             <Reveal className="mx-auto max-w-2xl">
               <h2 className="font-display text-3xl font-semibold leading-tight tracking-tightest text-ink md:text-[2.4rem]">
-                Walk the evidence chain yourself.
+                Follow the evidence yourself.
               </h2>
               <p className="mx-auto mt-5 max-w-lg text-lg text-ink-soft">
-                Run the drill against the live demo tenant — no setup, no write access.
+                Try it on our live demo company. No setup, and we never change anything.
               </p>
               <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
                 <Link

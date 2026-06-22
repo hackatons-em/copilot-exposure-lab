@@ -30,8 +30,8 @@ export function Quotes() {
             Built for the people who answer for the risk
           </h2>
           <p className="mt-4 text-base text-ink-soft">
-            We&rsquo;re early — so these are illustrative of the buyers we build for, not customer endorsements.
-            We&rsquo;d rather say that plainly.
+            We&rsquo;re early, so these aren&rsquo;t customer endorsements. They&rsquo;re examples of the people we build
+            for and the problems they tell us they have. We&rsquo;d rather say that plainly.
           </p>
         </Reveal>
 

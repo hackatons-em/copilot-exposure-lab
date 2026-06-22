@@ -10,7 +10,7 @@ import { COMPARISON, PRICING_FAQ, PRICING_NOTE, TIERS, type PricingTier } from "
 export const metadata: Metadata = {
   title: "Pricing — Copilot Exposure Lab",
   description:
-    "Free one-time exposure scan, Team continuous monitoring, and Enterprise for large estates and MSSPs. Read-only, metadata-only, deterministic.",
+    "A free one-time exposure test, Team for always-on monitoring, and Enterprise for large organizations and security service providers. Read-only, never reads file contents, same result every time.",
 };
 
 function Check() {
@@ -87,7 +87,8 @@ export default function PricingPage() {
                 Start free. Scale to always-on.
               </h1>
               <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-soft">
-                Run a complete exposure scan for free. Upgrade when you want continuous monitoring that proves the fix.
+                Run a complete exposure test for free. Upgrade when you want always-on monitoring that keeps proving the
+                fix held.
               </p>
               <p className="mt-3 font-mono text-[11px] uppercase tracking-wider text-ink-faint">{PRICING_NOTE}</p>
             </Reveal>
@@ -194,7 +195,7 @@ export default function PricingPage() {
           <div className="mx-auto max-w-6xl px-6 py-28 text-center md:py-36">
             <Reveal className="mx-auto max-w-2xl">
               <h2 className="font-display text-3xl font-semibold leading-tight tracking-tightest text-ink md:text-[2.4rem]">
-                Run your first exposure scan free.
+                Run your first exposure test free.
               </h2>
               <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
                 <Link

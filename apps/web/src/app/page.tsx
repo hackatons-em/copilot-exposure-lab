@@ -24,76 +24,76 @@ const SAMPLE_REPORT_URL =
 
 const STEPS = [
   {
-    title: "Connect, metadata-only",
-    body: "Read-only Microsoft Graph scopes. We ingest labels, permissions, groups, links, and agents — never document contents.",
+    title: "Connect safely, read-only",
+    body: "You grant read-only access through Microsoft Graph (Microsoft's official API for your 365 data). We read who can open which files, plus labels, groups, sharing links, and AI assistants — never the contents of any document.",
   },
   {
-    title: "Build the permission graph",
-    body: "Every user, group, site, file, sharing link, and Copilot agent becomes a node. Inherited and nested access is resolved.",
+    title: "Map who can reach what",
+    body: "We turn your tenant into a map: every person, team, site, file, sharing link, and Copilot assistant, connected by who is allowed to open what. Access passed down through folders or nested groups is fully traced.",
   },
   {
-    title: "Run exposure scenarios",
-    body: "Safe drills as real personas — an employee, a guest, a Copilot Studio agent — trace what sensitive data each could actually reach.",
+    title: "Safely test real scenarios",
+    body: "We safely test what different people could reach — an employee, an outside guest, a custom AI assistant — without touching a single file. The test shows exactly which sensitive documents each one could open today.",
   },
   {
-    title: "Get evidence + score + fix",
-    body: "Each finding carries an evidence chain to its source object, a deterministic 0–100 score, and a Microsoft-native remediation.",
+    title: "See the proof, score, and fix",
+    body: "Each finding points to the exact file, group, or link that caused it, gets a 0–100 risk score (higher means more exposed), and comes with the precise Microsoft fix to close it.",
   },
   {
-    title: "Re-scan to prove the fix",
-    body: "Close the path, re-run the same drill, and watch the exposure score trend down. The fix is provable, not assumed.",
+    title: "Re-test to prove it's fixed",
+    body: "Apply the fix, run the same test again, and watch the risk score fall. You get proof the problem is gone, not just an assumption.",
   },
 ];
 
 const FEATURES = [
   {
-    eyebrow: "Defensible",
-    title: "Evidence, not vibes",
-    body: "Every finding traces to a concrete source object — the file, group, link, or agent that created the exposure. Nothing is asserted without proof.",
+    eyebrow: "Provable",
+    title: "Proof, not guesswork",
+    body: "Every finding points to the exact thing that caused it — the file, the group, the sharing link, the AI assistant. Nothing is flagged without showing you the evidence.",
   },
   {
-    eyebrow: "Deterministic",
-    title: "Scoring you can audit",
-    body: "A transparent 0–100 model sets severity — same input, same score, every time. LLMs may summarize; they never decide risk or invent facts.",
+    eyebrow: "Auditable",
+    title: "A score you can check",
+    body: "Risk is set by a clear 0–100 model with deterministic scoring (the same inputs always produce the same score — no guessing, fully auditable). AI may help write summaries; it never decides risk or makes up facts.",
   },
   {
     eyebrow: "Actionable",
-    title: "The exact fix, written",
-    body: "Each finding ships a copy-pasteable Microsoft Graph PowerShell / PnP script wired to its real ids. Advisory — reviewed and run by you, never auto-executed.",
+    title: "The exact fix, written out",
+    body: "Each finding comes with the precise Microsoft commands to close it, ready to copy and paste. They are advisory only: your team reviews and runs them, and we never change anything in your tenant.",
   },
   {
     eyebrow: "Mapped",
-    title: "Threat-framework rigor",
-    body: "Every rule maps to MITRE ATT&CK techniques and NIST 800-53 / CISA controls, so findings route straight into your existing program.",
+    title: "Speaks your security language",
+    body: "Every check maps to MITRE ATT&CK and NIST 800-53 / CISA (the standard security frameworks teams already report against), so findings drop straight into the program you already run.",
   },
   {
     eyebrow: "Operational",
-    title: "Report + exports built in",
-    body: "A print-ready CISO report plus Microsoft Sentinel, Purview, and Jira exports, so findings land in the tools your team already runs.",
+    title: "Report and exports built in",
+    body: "A board-ready report plus one-click exports to the tools your team already uses — Microsoft Sentinel and Purview (Microsoft's security and data-governance tools) and Jira (the issue tracker).",
   },
   {
-    eyebrow: "Trusted",
-    title: "Your cloud, least privilege",
-    body: "Runs on read-only, scope-limited access in your own Microsoft tenant. Metadata only — no document contents leave your environment.",
+    eyebrow: "Private",
+    title: "Stays in your environment",
+    body: "Everything runs on read-only, tightly limited access inside your own Microsoft tenant. We read only descriptive details about files, never their contents, and nothing leaves your environment.",
   },
 ];
 
 const FAQ: FaqItem[] = [
   {
-    q: "Is this a Purview or Defender replacement?",
-    a: "No. It's complementary. We focus narrowly on whether Copilot, agents, and existing SharePoint/OneDrive permissions could expose sensitive data — and we surface it as evidence-backed, scored, fixable findings.",
+    q: "Does this replace Microsoft Purview or Defender?",
+    a: "No. It works alongside them. We answer one focused question: could Microsoft 365 Copilot, the custom AI assistants teams build, or your existing file permissions (who is allowed to open which files) expose sensitive data? We show the answer as findings with proof, a risk score, and a fix.",
   },
   {
-    q: "Does Copilot need to be rolled out first?",
-    a: "No — that's the point. Run the drill before rollout to see what Copilot would surface, so you fix the permission surface first instead of doing a postmortem after.",
+    q: "Do we need to turn Copilot on first?",
+    a: "No, and that's the whole idea. Run the test before you turn Copilot on, so you can fix who can reach what first — instead of investigating a leak after the fact.",
   },
   {
-    q: "How do you avoid false positives?",
-    a: "Findings are deterministic and evidence-backed: each one points at the exact permission, link, group, or agent that creates the path, with a confidence band. No evidence, no finding.",
+    q: "How do you avoid false alarms?",
+    a: "Every finding shows the exact permission, sharing link, group, or AI assistant that creates the risk, with a confidence level. If there's no evidence, there's no finding.",
   },
   {
     q: "What does it cost?",
-    a: "A complete exposure scan is free. Continuous monitoring (Team) and Enterprise plans are on the pricing page.",
+    a: "A full exposure test is free. Always-on monitoring (the Team plan) and large-organization options (Enterprise) are on the pricing page.",
   },
 ];
 
@@ -115,8 +115,9 @@ export default function LandingPage() {
                 Run a Copilot Exposure Drill Before Rollout
               </h1>
               <p className="mt-6 max-w-lg text-lg leading-relaxed text-ink-soft">
-                Copilot is only as safe as the permissions beneath it. Simulate the exposure paths, see the
-                evidence, and fix what matters — before you flip the switch.
+                Microsoft 365 Copilot (the AI assistant inside Office, Outlook and Teams) can instantly find any file a
+                person is allowed to open — including ones quietly over-shared years ago. We safely test what it could
+                expose, show you the proof, and hand you the exact fix, before you turn it on.
               </p>
               <div className="mt-9 flex flex-wrap items-center gap-3">
                 <Link
@@ -152,10 +153,12 @@ export default function LandingPage() {
             <Reveal className="max-w-3xl">
               <span className="eyebrow">Why now</span>
               <p className="mt-5 font-display text-2xl font-medium leading-snug tracking-tightest text-ink md:text-[1.75rem]">
-                A decade of M365 oversharing has been mostly invisible. Copilot makes it instant — one prompt can
-                surface a file that &ldquo;Everyone&rdquo; could technically always read.{" "}
+                For years, files have been quietly over-shared inside Microsoft 365, and almost no one noticed. Copilot
+                changes that overnight: one question can surface a file that &ldquo;everyone in the company&rdquo; was
+                technically always allowed to read.{" "}
                 <span className="text-ink-soft">
-                  Security teams need proof of what Copilot would expose, before rollout — not a postmortem after.
+                  Security teams need proof of what Copilot would expose before they turn it on, not an investigation
+                  after something leaks.
                 </span>
               </p>
             </Reveal>
@@ -171,8 +174,8 @@ export default function LandingPage() {
                 The whole drill, on one screen
               </h2>
               <p className="mt-4 text-base text-ink-soft">
-                Score, attack graph, Copilot simulation, the exact fix, threat mapping, and the board report — every
-                surface is deterministic and evidence-backed.
+                The risk score, the map of who can reach what, a safe Copilot test, the exact fix, the security-framework
+                mapping, and the board report. Every part shows its evidence and produces the same result every time.
               </p>
             </Reveal>
             <div className="mt-12">
@@ -192,10 +195,11 @@ export default function LandingPage() {
             <Reveal className="max-w-2xl">
               <span className="eyebrow">How it works</span>
               <h2 className="mt-4 font-display text-3xl font-semibold tracking-tightest text-ink md:text-4xl">
-                From connection to provable fix
+                From connect to a fix you can prove
               </h2>
               <p className="mt-4 text-base text-ink-soft">
-                Five steps. No write access, no agents installed in your tenant, no document contents stored.
+                Five steps. We never change anything in your tenant, never install software in it, and never store the
+                contents of your files.
               </p>
             </Reveal>
 
@@ -221,12 +225,13 @@ export default function LandingPage() {
         <section className="border-b border-hairline bg-surface-subtle/60">
           <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
             <Reveal className="max-w-2xl">
-              <span className="eyebrow">Why it&rsquo;s credible</span>
+              <span className="eyebrow">Why you can trust it</span>
               <h2 className="mt-4 font-display text-3xl font-semibold tracking-tightest text-ink md:text-4xl">
                 Built for the security buyer
               </h2>
               <p className="mt-4 text-base text-ink-soft">
-                For CISOs, security architects, and M365 admins who need defensible evidence — not another AI black box.
+                For the security and IT leaders who answer for the risk and need evidence they can defend, not another
+                AI tool that asks to be trusted.
               </p>
             </Reveal>
 
@@ -249,8 +254,8 @@ export default function LandingPage() {
           <div className="mx-auto max-w-6xl px-6 py-24 md:py-28">
             <Reveal className="flex flex-col items-start gap-8 md:flex-row md:items-center md:justify-between">
               <p className="max-w-xl font-display text-2xl font-medium leading-snug tracking-tightest text-ink md:text-[1.75rem]">
-                One number your board can track:{" "}
-                <span className="text-ink-soft">an exposure score that trends down as you close paths.</span>
+                One number your board can follow:{" "}
+                <span className="text-ink-soft">a risk score that goes down as you close off who can reach what.</span>
               </p>
               <div className="flex shrink-0 items-end gap-4">
                 <CountStat
@@ -284,7 +289,7 @@ export default function LandingPage() {
                 Start free. Scale to always-on.
               </h2>
               <p className="mt-4 text-base text-ink-soft">
-                Run a full exposure scan for free; upgrade for continuous monitoring that proves the fix.
+                Run a full exposure test for free. Upgrade for always-on monitoring that keeps proving the fix held.
               </p>
             </Reveal>
 
@@ -345,10 +350,10 @@ export default function LandingPage() {
           <div className="mx-auto max-w-6xl px-6 py-28 text-center md:py-36">
             <Reveal className="mx-auto max-w-2xl">
               <h2 className="font-display text-3xl font-semibold leading-tight tracking-tightest text-ink md:text-[2.6rem]">
-                Know what Copilot would expose — <span className="text-brand">before you turn it on.</span>
+                Know what Copilot would expose <span className="text-brand">before you turn it on.</span>
               </h2>
               <p className="mx-auto mt-5 max-w-lg text-lg text-ink-soft">
-                Run the drill against the live demo tenant and walk the evidence chain yourself.
+                Try it on our live demo company and follow the evidence yourself, finding by finding.
               </p>
               <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
                 <Link
